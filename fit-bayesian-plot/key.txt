@@ -1,0 +1,5 @@
+Line - median
+Shaded - 95% CI
+Points (inf) - hanam data infected proportions
+Numbers (inf) - total group size of the corresponding points in hanam data
+Dashed lines - bounds (95%) of the prior distribution (upper is above 90 in inf hence not seen)
