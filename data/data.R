@@ -22,7 +22,13 @@ hanam_extra <- hanam %>%
   mutate(
     status_bin = if_else(status == "Not infected", 0, 1),
     logHIlb = if_else(near(preHI, 5) | is.na(preHI), -1e6, log(preHI)),
-    logHIub = if_else(near(preHI, 1280) | is.na(preHI), 1e6, log(2 * preHI))
+    logHIub = if_else(near(preHI, 1280) | is.na(preHI), 1e6, log(2 * preHI)),
+    logHImid = case_when(
+      is.na(preHI) ~ NA_real_,
+      near(preHI, 5) ~ log(5),
+      near(preHI, 1280) ~ log(1280),
+      TRUE ~ log(preHI) + log(2) / 2
+    )
   )
 
 hanam_hi_info <- filter(hanam_extra, !is.na(preHI) | !is.na(status))
@@ -39,5 +45,13 @@ save_hanam(hanam_hi_exposed, "HI-exp")
 hanam_hi_summ <- bind_rows(hanam_hi_general, hanam_hi_exposed) %>%
   filter(!is.na(preHI), !is.na(status)) %>%
   group_by(population, virus, preHI) %>%
-  summarise(ntot = n(), inf_prop = sum(status != "Not infected") / ntot)
+  summarise(ntot = n(), inf_prop = sum(status != "Not infected") / ntot) %>%
+  mutate(
+    logHImid = case_when(
+      is.na(preHI) ~ NA_real_,
+      near(preHI, 5) ~ log(5),
+      near(preHI, 1280) ~ log(1280),
+      TRUE ~ log(preHI) + log(2) / 2
+    )
+  )
 save_hanam(hanam_hi_summ, "HI-summ")
