@@ -16,6 +16,8 @@ Comparison of models for antibody data
 
 * `data` - contains all real data used.
 
+* `data-raw` - contains data that needed modifying before moving to `data`.
+
 * `data-plot` - plot of hanam data.
 
 * `edu-article` - example of an educational article.
