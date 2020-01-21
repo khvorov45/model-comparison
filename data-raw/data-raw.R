@@ -1,7 +1,7 @@
 # Raw data manipulation
 # Arseniy Khvorov
 # Created 2020-01-17
-# Last edit 2020-01-17
+# Last edit 2020-01-21
 
 library(tidyverse)
 
@@ -33,7 +33,7 @@ read_swab <- function(filepath) {
     )
 }
 
-fix_a_subtypes_swab <- function(swab) {
+fix_subtypes_swab <- function(swab) {
   swab %>%
     mutate(
       bvic = case_when(
@@ -93,16 +93,41 @@ test_swab <- function(filepath) {
 read_serology <- function(filepath) {
   filepath %>%
     read_csv(
-      col_types = cols(
-        
+      col_types = cols_only(
+        hhID = col_integer(),
+        member = col_integer(),
+        postvax.pH1 = col_integer(),
+        postvax.sH1 = col_integer(),
+        postvax.sH3 = col_integer(),
+        postvax.B.Brisbane = col_integer(),
+        postvax.B.Floride = col_integer()
       )
+    ) %>%
+    rename(hhold = hhID)
+}
+
+lengthen_serology <- function(serology) {
+  serology %>%
+    pivot_longer(
+      starts_with("postvax"), names_to = "virus", values_to = "titre"
+    )
+}
+
+fix_subtypes_serology <- function(serology) {
+  serology %>%
+    mutate(
+      virus = str_replace(virus, "postvax.", "") %>% 
+        recode(
+          "pH1" = "h1pdm", "sH1" = "h1seas", "sH3" = "h3",
+          "B.Brisbane" = "bvic", "B.Floride" = "byam"
+        )
     )
 }
 
 # Script ======================================================================
 
 swab <- read_swab(file.path(data_raw_dir, "swab.csv")) %>%
-  fix_a_subtypes_swab() %>%
+  fix_subtypes_swab() %>%
   lengthen_swab()
 
 # Say they were infected if any of the swabs are positive
@@ -112,4 +137,11 @@ swab_summ <- swab %>%
   summarise(status = as.integer(sum(swab_result) > 0)) %>%
   ungroup()
 
-serology <- read_serology(file.path(data_raw_dir, "serology.csv"))
+serology <- read_serology(file.path(data_raw_dir, "serology.csv")) %>%
+  lengthen_serology() %>%
+  fix_subtypes_serology()
+
+full_data <- full_join(swab_summ, serology, by = c("hhold", "member", "virus"))
+
+full_data %>%
+  filter(is.na(status))
