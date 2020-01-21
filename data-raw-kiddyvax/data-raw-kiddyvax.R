@@ -1,13 +1,13 @@
 # Raw data manipulation
 # Arseniy Khvorov
 # Created 2020-01-17
-# Last edit 2020-01-21
+# Last edit 2020-01-22
 
 library(tidyverse)
 
 # Directories to be used later
-data_raw_dir <- "data-raw"
-data_dir <- "data"
+data_raw_k_dir <- "data-raw-kiddyvax"
+data_k_dir <- "data-kiddyvax"
 
 # Functions ===================================================================
 
