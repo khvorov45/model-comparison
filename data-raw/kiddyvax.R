@@ -1,4 +1,4 @@
-# Raw data manipulation
+# Kiddyvax data manipulation
 # Arseniy Khvorov
 # Created 2020-01-17
 # Last edit 2020-01-22
@@ -6,8 +6,8 @@
 library(tidyverse)
 
 # Directories to be used later
-data_raw_k_dir <- "data-raw-kiddyvax"
-data_k_dir <- "data-kiddyvax"
+data_raw_dir <- "data-raw"
+data_dir <- "data"
 
 # Functions ===================================================================
 
@@ -126,7 +126,7 @@ fix_subtypes_serology <- function(serology) {
 
 # Script ======================================================================
 
-swab <- read_swab(file.path(data_raw_dir, "swab.csv")) %>%
+swab <- read_swab(file.path(data_raw_dir, "kiddyvax-swab.csv")) %>%
   fix_subtypes_swab() %>%
   lengthen_swab()
 
@@ -137,7 +137,7 @@ swab_summ <- swab %>%
   summarise(status = as.integer(sum(swab_result) > 0)) %>%
   ungroup()
 
-serology <- read_serology(file.path(data_raw_dir, "serology.csv")) %>%
+serology <- read_serology(file.path(data_raw_dir, "kiddyvax-serology.csv")) %>%
   lengthen_serology() %>%
   fix_subtypes_serology()
 
