@@ -90,6 +90,15 @@ test_swab <- function(filepath) {
   testthat::expect_equal(byam_og, byam)
 }
 
+# Say they were infected if any of the swabs are positive
+# i.e. status is infection at any time during the study
+summarise_swab <- function(swab) {
+  swab %>%
+    group_by(hhold, member, virus) %>%
+    summarise(status = as.integer(sum(swab_result) > 0)) %>%
+    ungroup()
+}
+
 read_serology <- function(filepath) {
   filepath %>%
     read_csv(
@@ -109,7 +118,8 @@ read_serology <- function(filepath) {
 lengthen_serology <- function(serology) {
   serology %>%
     pivot_longer(
-      starts_with("postvax"), names_to = "virus", values_to = "titre"
+      starts_with("postvax."), 
+      names_to = "virus", values_to = "hi"
     )
 }
 
@@ -124,24 +134,23 @@ fix_subtypes_serology <- function(serology) {
     )
 }
 
+save_data <- function(dat, name) {
+  write_csv(dat, file.path(data_dir, paste0(name, ".csv")))
+}
+
 # Script ======================================================================
 
-swab <- read_swab(file.path(data_raw_dir, "kiddyvax-swab.csv")) %>%
+swab <- read_swab(file.path(data_raw_dir, "kiddyvax-swab.csv")) %>% 
   fix_subtypes_swab() %>%
-  lengthen_swab()
+  lengthen_swab() %>%
+  summarise_swab()
 
-# Say they were infected if any of the swabs are positive
-# i.e. status is infection at any time during the study
-swab_summ <- swab %>%
-  group_by(hhold, member, virus) %>%
-  summarise(status = as.integer(sum(swab_result) > 0)) %>%
-  ungroup()
-
-serology <- read_serology(file.path(data_raw_dir, "kiddyvax-serology.csv")) %>%
+serology <- read_serology(file.path(data_raw_dir, "kiddyvax-serology.csv")) %>% 
   lengthen_serology() %>%
   fix_subtypes_serology()
 
-full_data <- full_join(swab_summ, serology, by = c("hhold", "member", "virus"))
+full_data <- full_join(swab, serology, by = c("hhold", "member", "virus")) %>%
+  # There is only one memeber per household
+  select(id = hhold, everything(), -member)
 
-full_data %>%
-  filter(is.na(status))
+save_data(full_data, "kiddyvax-main")
