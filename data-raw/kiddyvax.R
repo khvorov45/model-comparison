@@ -142,6 +142,16 @@ fix_subtypes_serology <- function(serology) {
     )
 }
 
+add_loghis <- function(dat) {
+  dat %>%
+    mutate(
+      loghi = log(hi),
+      loghimid = if_else(hi == 5, log(5), loghi + log(2) / 2),
+      loghilb = if_else(hi == 5 | is.na(hi), -1e6, loghi),
+      loghiub = if_else(is.na(hi), 1e6, loghi + log(2))
+    )
+}
+
 save_data <- function(dat, name) {
   write_csv(dat, file.path(data_dir, paste0(name, ".csv")))
 }
@@ -154,7 +164,8 @@ swab <- read_swab(file.path(data_raw_dir, "kiddyvax-swab.csv")) %>%
 
 serology <- read_serology(file.path(data_raw_dir, "kiddyvax-serology.csv")) %>% 
   lengthen_serology() %>%
-  fix_subtypes_serology()
+  fix_subtypes_serology() %>%
+  add_loghis()
 
 startend_dates <- select(serology, id, start_date, end_date) %>% unique()
 

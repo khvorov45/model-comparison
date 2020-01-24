@@ -78,12 +78,7 @@ han_model <- function(dat) {
 }
 kv_model <- function(dat) {
   dat <- dat %>%
-    mutate(
-      hi = as.integer(hi),
-      logHIlb = if_else(hi == 5 | is.na(hi), 1e-6, log(hi)),
-      logHIub = if_else(is.na(hi), 1e6, log(hi) + log(2) / 2)
-    ) %>%
-    select(status, logHIlb, logHIub)
+    select(status, logHIlb = loghilb, logHIub = loghiub)
   list(
     filepath = file.path(fit_bayesian_dir, "hanam.jags"),
     data = dat,
