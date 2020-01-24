@@ -1,7 +1,7 @@
 # Kiddyvax data manipulation
 # Arseniy Khvorov
 # Created 2020-01-17
-# Last edit 2020-01-22
+# Last edit 2020-01-24
 
 library(tidyverse)
 
@@ -15,8 +15,7 @@ read_swab <- function(filepath) {
   filepath %>%
     read_csv(
       col_types = cols_only(
-        hhID = col_integer(),
-        member = col_integer(),
+        hhID = col_integer(), # one observation per household
         date = col_date("%Y%m%d"),
         FluA = col_character(),
         `Swine H1` = col_character(),
@@ -27,7 +26,7 @@ read_swab <- function(filepath) {
       )
     ) %>%
     select(
-      hhold = hhID, member, swab_date = date, a = FluA,
+      id = hhID, swab_date = date, a = FluA,
       h1pdm = `Swine H1`, h1seas = H1, h3 = H3, b = FluB,
       b_type = `FluB subtype`
     )
@@ -66,7 +65,7 @@ lengthen_swab <- function(swab) {
 
 # Tests that the reshaped data contains the same information
 test_swab <- function(filepath) {
-  swab_og <- read_swab(filepath) %>% mutate(id = paste0(hhold, member))
+  swab_og <- read_swab(filepath)
   swab <- swab_og %>% fix_a_subtypes_swab() %>% lengthen_swab()
   
   h1pdm_og <- swab_og %>% filter(h1pdm == "P") %>% pull(id)
@@ -93,9 +92,18 @@ test_swab <- function(filepath) {
 # Say they were infected if any of the swabs are positive
 # i.e. status is infection at any time during the study
 summarise_swab <- function(swab) {
+  find_inf_date <- function(swab_result, swab_date) {
+    if (all(is.na(swab_result))) return(as.Date(NA))
+    if (all(swab_result == 0, na.rm = TRUE)) return(as.Date(NA))
+    first(swab_date[swab_result == 1 & !is.na(swab_result)])
+  }
   swab %>%
-    group_by(hhold, member, virus) %>%
-    summarise(status = as.integer(sum(swab_result) > 0)) %>%
+    filter(swab_date <= end_date) %>%
+    group_by(id, virus) %>%
+    summarise(
+      status = as.integer(any(swab_result == 1, na.rm = TRUE)),
+      infection_date = find_inf_date(swab_result, swab_date)
+    ) %>%
     ungroup()
 }
 
@@ -104,7 +112,8 @@ read_serology <- function(filepath) {
     read_csv(
       col_types = cols_only(
         hhID = col_integer(),
-        member = col_integer(),
+        start.date = col_date("%d/%m/%Y"),
+        end.date = col_date("%d/%m/%Y"),
         postvax.pH1 = col_integer(),
         postvax.sH1 = col_integer(),
         postvax.sH3 = col_integer(),
@@ -112,7 +121,7 @@ read_serology <- function(filepath) {
         postvax.B.Floride = col_integer()
       )
     ) %>%
-    rename(hhold = hhID)
+    rename(id = hhID, start_date = start.date, end_date = end.date)
 }
 
 lengthen_serology <- function(serology) {
@@ -142,15 +151,18 @@ save_data <- function(dat, name) {
 
 swab <- read_swab(file.path(data_raw_dir, "kiddyvax-swab.csv")) %>% 
   fix_subtypes_swab() %>%
-  lengthen_swab() %>%
-  summarise_swab()
+  lengthen_swab()
 
 serology <- read_serology(file.path(data_raw_dir, "kiddyvax-serology.csv")) %>% 
   lengthen_serology() %>%
   fix_subtypes_serology()
 
-full_data <- full_join(swab, serology, by = c("hhold", "member", "virus")) %>%
-  # There is only one memeber per household
-  select(id = hhold, everything(), -member)
+startend_dates <- select(serology, id, start_date, end_date) %>% unique()
 
+swab_full <- left_join(swab, startend_dates, by = "id")
+save_data(swab_full, "kiddyvax-swab")
+
+swab_summ <- summarise_swab(swab_full)
+
+full_data <- full_join(swab_summ, serology, by = c("id", "virus"))
 save_data(full_data, "kiddyvax-main")
