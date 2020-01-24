@@ -92,6 +92,42 @@ inf_plot <- function(kiddyvax) {
     )
 }
 
+swab_plot <- function(swab) {
+  swab %>%
+    lbl_virus() %>%
+    group_by(start_date, id) %>%
+    mutate(
+      id2 = group_indices(),
+      swab_result_lbl = factor(
+        swab_result, levels = c(1, 0, NA), 
+        labels = c("Positive", "Negative", "Missing"), 
+        exclude = NULL
+      )
+    ) %>%
+    ungroup() %>%
+    ggplot(aes(start_date, id2)) +
+    dark_theme_bw(verbose = FALSE) +
+    cmn_thm_els() +
+    theme(
+      legend.position = "bottom",
+      axis.text.y = element_blank(),
+      axis.ticks.y = element_blank(),
+      axis.title.y = element_blank(),
+      panel.grid.minor.y = element_blank()
+    ) +
+    scale_color_discrete("Swab result") +
+    scale_x_date(expand = c(0.01, 0.01), minor_breaks = "month") +
+    scale_y_continuous(
+      expand = c(0.01, 0.01), breaks = 1:length(unique(swab$id))
+    ) +
+    facet_wrap(~virus_lbl, nrow = 1) +
+    geom_segment(
+      aes(x = start_date, xend = end_date, y = id2, yend = id2),
+      lwd = 0.1, col = "gray50"
+    ) +
+    geom_point(aes(swab_date, id2, color = swab_result_lbl), shape = 17)
+}
+
 save_plot <- function(plot, name, width, height) {
   ggsave_dark(
     plot,
@@ -109,40 +145,5 @@ swab <- read_swab("kiddyvax-swab")
 kiddyvax_inf <- inf_plot(kiddyvax)
 save_plot(kiddyvax_inf, "kiddyvax-main-titre", 15, 7.5)
 
-swab %>%
-  lbl_virus() %>%
-  group_by(start_date, id) %>%
-  mutate(
-    id2 = group_indices(),
-    swab_result_lbl = factor(
-      swab_result, levels = c(1, 0, NA), 
-      labels = c("Positive", "Negative", "Missing"), 
-      exclude = NULL
-    )
-  ) %>%
-  ungroup() %>%
-  ggplot(aes(start_date, id2)) +
-  dark_theme_bw(verbose = FALSE) +
-  cmn_thm_els() +
-  theme(
-    legend.position = "bottom",
-    axis.text.y = element_blank(),
-    axis.ticks.y = element_blank(),
-    axis.title.y = element_blank(),
-    panel.grid.minor.y = element_blank()
-  ) +
-  scale_color_discrete("Swab result") +
-  scale_x_date(expand = c(0.01, 0.01), minor_breaks = "month") +
-  scale_y_continuous(
-    expand = c(0.01, 0.01), breaks = 1:length(unique(swab$id))
-  ) +
-  facet_wrap(~virus_lbl, nrow = 1) +
-  geom_segment(
-    aes(x = start_date, xend = end_date, y = id2, yend = id2),
-    lwd = 0.1, col = "gray50"
-  ) +
-  geom_point(aes(swab_date, id2, color = swab_result_lbl), shape = 17)
+kiddyvax_swab <- swab_plot(swab)
 save_plot(last_plot(), "kiddyvax-swab", 50, 65)
-
-
-
