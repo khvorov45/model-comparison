@@ -93,15 +93,14 @@ test_swab <- function(filepath) {
 # i.e. status is infection at any time during the study
 summarise_swab <- function(swab) {
   find_inf_date <- function(swab_result, swab_date) {
-    if (all(is.na(swab_result))) return(as.Date(NA))
-    if (all(swab_result == 0, na.rm = TRUE)) return(as.Date(NA))
-    first(swab_date[swab_result == 1 & !is.na(swab_result)])
+    if (all(swab_result == 0)) return(as.Date(NA))
+    first(swab_date[swab_result == 1])
   }
   swab %>%
-    filter(swab_date <= end_date) %>%
+    filter(swab_date <= end_date, !is.na(swab_result)) %>%
     group_by(id, virus) %>%
     summarise(
-      status = as.integer(any(swab_result == 1, na.rm = TRUE)),
+      status = as.integer(any(swab_result == 1)),
       infection_date = find_inf_date(swab_result, swab_date)
     ) %>%
     ungroup()
