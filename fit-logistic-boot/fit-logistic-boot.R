@@ -80,5 +80,5 @@ save_lr_boot(fit_bootstraps_han, "samples")
 fit_lr_boot_kv <- kv %>%
   mutate(logHImid = if_else(hi == 5, log(5), log(hi) + log(2) / 2)) %>%
   group_by(virus) %>%
-  group_modify(~ boot_fit(.x, status ~ logHImid, 1e3))
+  group_modify(~ boot_fit(.x, status ~ logHImid, 1e4))
 save_lr_boot(fit_lr_boot_kv, "kiddyvax-samples")
