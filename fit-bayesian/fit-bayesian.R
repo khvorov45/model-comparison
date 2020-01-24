@@ -76,6 +76,25 @@ han_model <- function(dat) {
     )
   )
 }
+kv_model <- function(dat) {
+  dat <- dat %>%
+    mutate(
+      hi = as.integer(hi),
+      logHIlb = if_else(hi == 5 | is.na(hi), 1e-6, log(hi)),
+      logHIub = if_else(is.na(hi), 1e6, log(hi) + log(2) / 2)
+    ) %>%
+    select(status, logHIlb, logHIub)
+  list(
+    filepath = file.path(fit_bayesian_dir, "hanam.jags"),
+    data = dat,
+    pars = c("lambda", "beta_0", "beta_HI", "logHImean", "logHIsd"),
+    inits = list(
+      list(lambda = 0.1, beta_0 = 0, beta_HI = 0, logHImean = 0, logHIsd = 1),
+      list(lambda = 0.5, beta_0 = 5, beta_HI = 2.5, logHImean = 2, logHIsd = 2),
+      list(lambda = 0.9, beta_0 = -5, beta_HI = 5, logHImean = 4, logHIsd = 4)
+    )
+  )
+}
 
 # Script ======================================================================
 
@@ -85,12 +104,17 @@ han_hi_gen <- read_one("hanam-HI-gen")
 # Exposed HI
 han_hi_exp <- read_one("hanam-HI-exp")
 
+# Kiddyvax main study
+kiddyvax <- read_one("kiddyvax-main")
+
 # Model definition
 models_hanam <- list(
-  H1N1pdm = han_model(filter(han_hi_gen, virus == "H1N1pdm")),
-  H3N2 = han_model(filter(han_hi_gen, virus == "H3N2")),
-  H1N1pdmExp = han_model(filter(han_hi_exp, virus == "H1N1pdm")),
-  H3N2Exp = han_model(filter(han_hi_exp, virus == "H3N2"))
+  #H1N1pdm = han_model(filter(han_hi_gen, virus == "H1N1pdm")),
+  #H3N2 = han_model(filter(han_hi_gen, virus == "H3N2")),
+  #H1N1pdmExp = han_model(filter(han_hi_exp, virus == "H1N1pdm")),
+  #H3N2Exp = han_model(filter(han_hi_exp, virus == "H3N2")),
+  `kiddyvax-H1N1pdm` = kv_model(filter(kiddyvax, virus == "h1pdm")),
+  `kiddyvax-BVic` = kv_model(filter(kiddyvax, virus == "bvic"))
 )
 
 # Fit models
