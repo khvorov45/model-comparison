@@ -1,7 +1,7 @@
 # Manipulates hanam data
 # Arseniy Khvorov
 # Created 2019/12/11
-# Last edit 2019/12/11
+# Last edit 2020/01/28
 
 library(tidyverse)
 
