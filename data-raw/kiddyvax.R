@@ -1,7 +1,7 @@
 # Kiddyvax data manipulation
 # Arseniy Khvorov
 # Created 2020-01-17
-# Last edit 2020-01-24
+# Last edit 2020-01-28
 
 library(tidyverse)
 
@@ -176,3 +176,10 @@ swab_summ <- summarise_swab(swab_full)
 
 full_data <- full_join(swab_summ, serology, by = c("id", "virus"))
 save_data(full_data, "kiddyvax-main")
+
+full_data_summ <- full_data %>%
+  group_by(virus, hi, loghimid) %>%
+  filter(!is.na(status), !is.na(hi)) %>%
+  summarise(ntot = n(), inf_prop = sum(status) / ntot) %>%
+  ungroup()
+save_data(full_data_summ, "kiddyvax-main-summ")
