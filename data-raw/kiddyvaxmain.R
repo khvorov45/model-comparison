@@ -158,11 +158,13 @@ save_data <- function(dat, name) {
 
 # Script ======================================================================
 
-swab <- read_swab(file.path(data_raw_dir, "kiddyvax-swab.csv")) %>% 
+swab <- read_swab(file.path(data_raw_dir, "kiddyvaxmain-swab.csv")) %>% 
   fix_subtypes_swab() %>%
   lengthen_swab()
 
-serology <- read_serology(file.path(data_raw_dir, "kiddyvax-serology.csv")) %>% 
+serology <- read_serology(
+  file.path(data_raw_dir, "kiddyvaxmain-serology.csv")
+) %>% 
   lengthen_serology() %>%
   fix_subtypes_serology() %>%
   add_loghis()
@@ -170,16 +172,16 @@ serology <- read_serology(file.path(data_raw_dir, "kiddyvax-serology.csv")) %>%
 startend_dates <- select(serology, id, start_date, end_date) %>% unique()
 
 swab_full <- left_join(swab, startend_dates, by = "id")
-save_data(swab_full, "kiddyvax-swab")
+save_data(swab_full, "kiddyvaxmain-swab")
 
 swab_summ <- summarise_swab(swab_full)
 
 full_data <- full_join(swab_summ, serology, by = c("id", "virus"))
-save_data(full_data, "kiddyvax-main")
+save_data(full_data, "kiddyvaxmain")
 
 full_data_summ <- full_data %>%
   group_by(virus, hi, loghimid) %>%
   filter(!is.na(status), !is.na(hi)) %>%
   summarise(ntot = n(), inf_prop = sum(status) / ntot) %>%
   ungroup()
-save_data(full_data_summ, "kiddyvax-main-summ")
+save_data(full_data_summ, "kiddyvaxmain-summ")
