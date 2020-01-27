@@ -1,7 +1,7 @@
 # Fitting Hanam data in a Baysian way
 # Arseniy Khvorov
 # Created 2019/09/18
-# Last edit 2019/12/11
+# Last edit 2019/01/28
 
 library(tidyverse)
 library(dclone)
