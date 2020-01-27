@@ -1,7 +1,7 @@
 # Graphing MCMC output
 # Arseniy Khvorov
 # Created 2019/09/24
-# Last edit 2019/12/12
+# Last edit 2019/01/28
 
 library(tidyverse)
 library(ggdark) # devtools::install_github("khvorov45/ggdark")
