@@ -49,13 +49,13 @@ hanam_extra <- hanam %>%
 
 hanam_hi_info <- filter(hanam_extra, !is.na(preHI) | !is.na(status))
 
-hanam_hi_general <- mutate(hanam_hi_info, population = "general")
+hanam_hi_general <- mutate(hanam_hi_info, population = "General")
 save_hanam(hanam_hi_general, "hi-gen")
 
 hanam_hi_exposed <- hanam_hi_info %>%
   group_by(virus, hhold, season) %>%
   filter(sum(status != "Not infected", na.rm = TRUE) > 0) %>%
-  mutate(population = "exposed")
+  mutate(population = "Exposed")
 save_hanam(hanam_hi_exposed, "hi-exp")
 
 hanam_hi_summ <- bind_rows(hanam_hi_general, hanam_hi_exposed) %>%
