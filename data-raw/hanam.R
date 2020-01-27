@@ -7,8 +7,23 @@ library(tidyverse)
 
 # Directories to be used later
 data_dir <- "data"
+data_raw_dir <- "data-raw"
 
 # Functions ===================================================================
+
+read_hanam_raw <- function(name) {
+  read_csv(
+    file.path(data_raw_dir, paste0(name, ".csv")),
+    col_types = cols_only(
+      hhold = col_character(),
+      ind = col_character(),
+      season = col_integer(),
+      virus = col_character(),
+      status = col_character(),
+      preHI = col_integer()
+    )
+  )
+}
 
 save_hanam <- function(dat, name) {
   write_csv(dat, file.path(data_dir, paste0("hanam-", name, ".csv")))
@@ -16,18 +31,19 @@ save_hanam <- function(dat, name) {
 
 # Script ======================================================================
 
-hanam <- read_csv(file.path(data_dir, "hanam.csv"))
+hanam <- read_hanam_raw("hanam")
 
 hanam_extra <- hanam %>%
   mutate(
     status_bin = if_else(status == "Not infected", 0, 1),
-    logHIlb = if_else(near(preHI, 5) | is.na(preHI), -1e6, log(preHI)),
-    logHIub = if_else(near(preHI, 1280) | is.na(preHI), 1e6, log(2 * preHI)),
+    logHI = log(preHI),
+    logHIlb = if_else(preHI == 5L | is.na(preHI), -1e6, logHI),
+    logHIub = if_else(preHI == 1280L | is.na(preHI), 1e6, logHI + log(2)),
     logHImid = case_when(
       is.na(preHI) ~ NA_real_,
-      near(preHI, 5) ~ log(5),
-      near(preHI, 1280) ~ log(1280),
-      TRUE ~ log(preHI) + log(2) / 2
+      preHI == 5L ~ log(5),
+      preHI == 1280L ~ log(1280),
+      TRUE ~ logHI + log(2) / 2
     )
   )
 
@@ -44,14 +60,7 @@ save_hanam(hanam_hi_exposed, "HI-exp")
 
 hanam_hi_summ <- bind_rows(hanam_hi_general, hanam_hi_exposed) %>%
   filter(!is.na(preHI), !is.na(status)) %>%
-  group_by(population, virus, preHI) %>%
+  group_by(population, virus, preHI, logHImid) %>%
   summarise(ntot = n(), inf_prop = sum(status != "Not infected") / ntot) %>%
-  mutate(
-    logHImid = case_when(
-      is.na(preHI) ~ NA_real_,
-      near(preHI, 5) ~ log(5),
-      near(preHI, 1280) ~ log(1280),
-      TRUE ~ log(preHI) + log(2) / 2
-    )
-  )
+  ungroup()
 save_hanam(hanam_hi_summ, "HI-summ")
