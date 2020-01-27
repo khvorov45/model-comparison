@@ -15,6 +15,30 @@ data_dir <- "data"
 
 # Functions ===================================================================
 
+recode_hanam_pop <- function(dat) {
+  dat %>%
+    mutate(
+      population = factor(
+        population, levels = c("general", "exposed"), 
+        labels = c("General", "Exposed")
+      )
+    )
+}
+
+read_hanam_summ <- function(name) {
+  read_csv(
+    file.path(data_dir, paste0(name, ".csv")),
+    col_types = cols(
+      population = col_character(),
+      virus = col_character(),
+      preHI = col_integer(),
+      logHImid = col_double(),
+      ntot = col_integer(),
+      inf_prop = col_double()
+    )
+  )
+}
+
 # Summarise (a subset of) hanam data
 sum_han <- function(han) {
   han %>%
@@ -38,7 +62,7 @@ read_one_summ <- function(filepath) {
   read_csv(filepath, col_types = cols()) %>% 
     mutate(
       name = str_replace(basename(filepath), ".csv", ""),
-      virus = str_replace(name, "Exp", ""),
+      virus = str_replace(name, "Exp|kiddyvax-", ""),
       population = if_else(str_detect(name, "Exp"), "Exposed", "General")
     )
 }
@@ -118,23 +142,13 @@ save_plot <- function(pl, name, dark) {
 # Script ======================================================================
 
 # Hanam data
-han <- read_csv(file.path(data_dir, "hanam-HI-summ.csv")) %>%
+han <- read_hanam_summ("hanam-HI-summ") %>%
   filter(virus != "H1N1seas") %>%
-  mutate(
-    logHImid = case_when(
-      near(preHI, 5) ~ log(5),
-      near(preHI, 1280) ~ log(1280),
-      TRUE ~ log(preHI) + log(2) / 2
-    ),
-    population = factor(
-      population, levels = c("general", "exposed"), 
-      labels = c("General", "Exposed")
-    )
-  )
+  recode_hanam_pop()
 
 # Model output summary
 out_files <- tools::list_files_with_exts(fit_summ_dir, "csv")
-out_summ <- map_dfr(out_files, read_one_summ) %>%
+out_summ <- map_dfr(out_files, read_one_summ)
   mutate(population = factor(population, levels = c("General", "Exposed")))
 
 # Curves
