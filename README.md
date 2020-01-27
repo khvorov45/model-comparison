@@ -17,7 +17,7 @@ Comparison of models for antibody data
 * `data` - contains all real data used.
 
 * `data-raw` - contains data that needed modifying before moving to `data`. Conventions:
-  * File names have the format `[study]-[dataset]` where `study` is the name of the study (e.g. `kiddyvax`) and `dataset` is the name of the dataset that comes from the study (e.g. `serology`). If `dataset` part is not present, all study data is in `[study].csv` file.
+  * File names have the format `[study]-[dataset]` where `study` is the name of the study (e.g. `kiddyvaxmain`) and `dataset` is the name of the dataset that comes from the study (e.g. `serology`). If `dataset` part is not present, all study data is in `[study].csv` file.
 
 * `data-plot` - plot of hanam data.
 
