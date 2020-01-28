@@ -1,21 +1,42 @@
 # Fitting Hanam data in a Baysian way
 # Arseniy Khvorov
-# Created 2019/09/18
-# Last edit 2019/01/28
+# Created 2019-09-18
+# Last edit 2019-01-28
 
 library(tidyverse)
 library(dclone)
 library(rjags)
 
 # Directories to be used later
-fit_bayesian_dir <- "fit-bayesian"
+fit_sclr_ba_dir <- "fit-sclr-bayesian"
 data_dir <- "data"
 
 # Functions ===================================================================
 
-# Reads one csv file
-read_one <- function(nme) {
-  read_csv(file.path(data_dir, paste0(nme, ".csv")), col_types = cols())
+read_hanam <- function(nme) {
+  read_csv(
+    file.path(data_dir, paste0(nme, ".csv")), 
+    col_types = cols_only(
+      status_bin = col_integer(),
+      loghilb = col_double(),
+      loghiub = col_double(),
+      virus = col_character(),
+      population = col_character()
+    )
+  ) %>%
+    rename(status = status_bin)
+}
+
+read_kiddyvax <- function(nme) {
+  read_csv(
+    file.path(data_dir, paste0(nme, ".csv")), 
+    col_types = cols_only(
+      status = col_integer(),
+      loghilb = col_double(),
+      loghiub = col_double(),
+      virus = col_character()
+    )
+  )
 }
 
 # Convert one chain's output to table (JAGS only)
@@ -58,29 +79,14 @@ fit_bayesian_many <- function(models, n_adapt, n_iter) {
 
 # Saves table output
 save_model_output <- function(tidyout, model_name) {
-  write_csv(tidyout, file.path(fit_bayesian_dir, paste0(model_name, ".csv")))
+  write_csv(tidyout, file.path(fit_sclr_ba_dir, paste0(model_name, ".csv")))
 }
 
 # Create a list with model data
-han_model <- function(dat) {
-  dat <- dat %>%
-    select(status = status_bin, logHIlb, logHIub)
+create_jags_model <- function(dat, ...) {
+  dat <- filter(dat, ...)
   list(
-    filepath = file.path(fit_bayesian_dir, "hanam.jags"),
-    data = dat,
-    pars = c("lambda", "beta_0", "beta_HI", "logHImean", "logHIsd"),
-    inits = list(
-      list(lambda = 0.1, beta_0 = 0, beta_HI = 0, logHImean = 0, logHIsd = 1),
-      list(lambda = 0.5, beta_0 = 5, beta_HI = 2.5, logHImean = 2, logHIsd = 2),
-      list(lambda = 0.9, beta_0 = -5, beta_HI = 5, logHImean = 4, logHIsd = 4)
-    )
-  )
-}
-kv_model <- function(dat) {
-  dat <- dat %>%
-    select(status, logHIlb = loghilb, logHIub = loghiub)
-  list(
-    filepath = file.path(fit_bayesian_dir, "hanam.jags"),
+    filepath = file.path(fit_sclr_ba_dir, "sclr.jags"),
     data = dat,
     pars = c("lambda", "beta_0", "beta_HI", "logHImean", "logHIsd"),
     inits = list(
@@ -93,23 +99,28 @@ kv_model <- function(dat) {
 
 # Script ======================================================================
 
-# HI subset
-han_hi_gen <- read_one("hanam-HI-gen")
-
-# Exposed HI
-han_hi_exp <- read_one("hanam-HI-exp")
+# HI subset of Hanam data
+han_hi <- map_dfr(c("hanam-HI-gen", "hanam-HI-exp"), read_hanam)
 
 # Kiddyvax main study
-kiddyvax <- read_one("kiddyvax-main")
+kiddyvax_main <- read_kiddyvax("kiddyvaxmain")
 
 # Model definition
 models_hanam <- list(
-  #H1N1pdm = han_model(filter(han_hi_gen, virus == "H1N1pdm")),
-  #H3N2 = han_model(filter(han_hi_gen, virus == "H3N2")),
-  #H1N1pdmExp = han_model(filter(han_hi_exp, virus == "H1N1pdm")),
-  #H3N2Exp = han_model(filter(han_hi_exp, virus == "H3N2")),
-  `kiddyvax-H1N1pdm` = kv_model(filter(kiddyvax, virus == "h1pdm")),
-  `kiddyvax-BVic` = kv_model(filter(kiddyvax, virus == "bvic"))
+  `hanam-hi-gen-h1pdm` = create_jags_model(
+    han_hi, virus == "H1N1pdm", population == "General"
+  ),
+  `hanam-hi-gen-h3` = create_jags_model(
+    han_hi, virus == "H3N2", population == "General"
+  ),
+  `hanam-hi-exp-h1pdm` = create_jags_model(
+    han_hi, virus == "H1N1pdm", population == "Exposed"
+  ),
+  `hanam-hi-exp-h3` = create_jags_model(
+    han_hi, virus == "H3N2", population == "Exposed"
+  ),
+  `kiddyvaxmain-h1pdm` = create_jags_model(kiddyvax_main, virus == "h1pdm"),
+  `kiddyvaxmain-bvic` = create_jags_model(kiddyvax_main, virus == "bvic")
 )
 
 # Fit models
