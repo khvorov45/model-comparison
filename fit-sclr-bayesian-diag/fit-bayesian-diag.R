@@ -1,15 +1,15 @@
 # Graphing MCMC output
 # Arseniy Khvorov
-# Created 2019/09/24
-# Last edit 2019/12/12
+# Created 2019-09-24
+# Last edit 2020-01-28
 
 library(tidyverse)
 library(ggpubr)
 library(ggdark) # devtools::install_github("khvorov45/ggdark")
 
 # Directories to be used later
-fit_bayesian_dir <- "fit-bayesian"
-fit_diag_dir <- "fit-bayesian-diag"
+fit_sclr_ba_dir <- "fit-sclr-bayesian"
+fit_sclr_ba_diag_dir <- "fit-sclr-bayesian-diag"
 
 # Functions ===================================================================
 
@@ -92,7 +92,7 @@ arrange_itdens_one <- function(dens, iter) {
 save_trace_dens <- function(pl, model_name) {
   ggsave_dark(
     pl, 
-    filename = file.path(fit_diag_dir, paste0(model_name, ".pdf")),
+    filename = file.path(fit_sclr_ba_diag_dir, paste0(model_name, ".pdf")),
     dark = FALSE,
     width = 20, height = 8, units = "cm",
     device = "pdf"
@@ -111,7 +111,7 @@ han_priors <- list(
 )
 
 # Model output
-out_files <- tools::list_files_with_exts(fit_bayesian_dir, "csv")
+out_files <- tools::list_files_with_exts(fit_sclr_ba_dir, "csv")
 out <- map(out_files, read_one)
 names(out) <- str_replace(basename(out_files), ".csv", "")
 
