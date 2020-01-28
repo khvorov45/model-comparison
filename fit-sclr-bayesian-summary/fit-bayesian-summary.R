@@ -6,8 +6,8 @@
 library(tidyverse)
 
 # Directories to be used later
-fit_bayesian_dir <- "fit-bayesian"
-fit_summ_dir <- "fit-bayesian-summary"
+fit_sclr_ba_dir <- "fit-sclr-bayesian"
+fit_sclr_ba_summ_dir <- "fit-sclr-bayesian-summary"
 
 # Functions ===================================================================
 
@@ -45,14 +45,14 @@ sum_outprob <- function(outprob) {
 save_summ <- function(summ, name) {
   write_csv(
     summ, 
-    file.path(fit_summ_dir, paste0(name, ".csv"))
+    file.path(fit_sclr_ba_summ_dir, paste0(name, ".csv"))
   )
 }
 
 # Script ======================================================================
 
 # Model output
-out_files <- tools::list_files_with_exts(fit_bayesian_dir, "csv")
+out_files <- tools::list_files_with_exts(fit_sclr_ba_dir, "csv")
 out <- map(out_files, read_one) %>% 
   map(filter, niter > 6e4) %>% 
   map(sample_n, 5e4)
