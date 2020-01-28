@@ -1,7 +1,7 @@
 # Graphing MCMC output
 # Arseniy Khvorov
-# Created 2019/09/24
-# Last edit 2019/01/28
+# Created 2019-09-24
+# Last edit 2020-01-28
 
 library(tidyverse)
 library(ggdark) # devtools::install_github("khvorov45/ggdark")
@@ -9,52 +9,37 @@ library(facetscales) # devtools::install_github("khvorov45/facetscales")
 library(ggrepel)
 
 # Directories to be used later
-fit_summ_dir <- "fit-bayesian-summary"
-fit_plot_dir <- "fit-bayesian-plot"
+fit_sclr_ba_summ_dir <- "fit-sclr-bayesian-summary"
+fit_sclr_ba_plot_dir <- "fit-sclr-bayesian-plot"
 data_dir <- "data"
 
 # Functions ===================================================================
-
-recode_hanam_pop <- function(dat) {
-  dat %>%
-    mutate(
-      population = factor(
-        population, levels = c("general", "exposed"), 
-        labels = c("General", "Exposed")
-      )
-    )
-}
 
 read_hanam_summ <- function(name) {
   read_csv(
     file.path(data_dir, paste0(name, ".csv")),
     col_types = cols(
-      population = col_character(),
+      population = col_factor(levels = c("General", "Exposed")),
       virus = col_character(),
-      preHI = col_integer(),
-      logHImid = col_double(),
+      prehi = col_integer(),
+      loghimid = col_double(),
       ntot = col_integer(),
       inf_prop = col_double()
     )
   )
 }
 
-# Summarise (a subset of) hanam data
-sum_han <- function(han) {
-  han %>%
-    group_by(preHI, virus) %>%
-    summarise(
-      prop_inf = sum(status != "Not infected", na.rm = TRUE) / n(), n_tot = n()
-    ) %>%
-    ungroup() %>%
-    mutate(
-      name = virus, 
-      logHImid = case_when(
-        near(preHI, 5) ~ log(5),
-        near(preHI, 1280) ~ log(1280),
-        TRUE ~ log(preHI) + log(2) / 2
-      )
+read_kv_summ <- function(name) {
+  read_csv(
+    file.path(data_dir, paste0(name, ".csv")),
+    col_types = cols(
+      virus = col_character(),
+      hi = col_integer(),
+      loghimid = col_double(),
+      ntot = col_integer(),
+      inf_prop = col_double()
     )
+  )
 }
 
 # Read one set of results
@@ -62,21 +47,33 @@ read_one_summ <- function(filepath) {
   read_csv(filepath, col_types = cols()) %>% 
     mutate(
       name = str_replace(basename(filepath), ".csv", ""),
-      virus = str_replace(name, "Exp|kiddyvax-", ""),
-      population = if_else(str_detect(name, "Exp"), "Exposed", "General")
+      virus = str_match(name, "-([[:alnum:]]*)$")[, 2],
+      study = str_match(name, "^([[:alnum:]]*)-")[, 2],
+      population = if_else(
+        str_detect(name, "-exp-"), "Exposed", "General"
+      ) %>% factor(levels = c("General", "Exposed"))
+    )
+}
+
+recode_viruses <- function(dat) {
+  dat %>%
+    mutate(
+      virus = recode(
+        virus, "h1pdm" = "H1N1pdm", "h3" = "H3N2", "bvic" = "B VIC"
+      )
     )
 }
 
 # Elements common to both plots
 common_plot_els <- function() {
-  xbreaks <- c(5 * 2^(0:8))
+  xbreaks <- c(5 * 2^(0:10))
   ybreaks <- seq(0, 1, 0.1)
   list(
     dark_theme_bw(verbose = FALSE),
     theme(
-      strip.background = element_rect(fill = NA),
+      strip.background = element_blank(),
       panel.spacing = unit(0, "null"),
-      axis.text.x = element_text(angle = 90, vjust = 0.5),
+      axis.text.x = element_text(angle = 45, hjust = 1),
       panel.grid.minor.y = element_blank()
     ),
     xlab("HI titre"),
@@ -91,22 +88,27 @@ common_plot_els <- function() {
   )
 }
 
-prot_curve_fun <- function(outsum) {
+prot_curve_fun <- function(outsum, facets = "virpop") {
+  facets <- rlang::arg_match(facets, c("vir", "virpop"))
+  if (facets == "virpop") {
+    faceting <- facet_grid(population ~ virus)
+  } else {
+    faceting <- facet_wrap(~virus, nrow = 1)
+  }
   outsum %>%
-    ggplot(aes(logHI, prob_med, ymin = prob_lb, ymax = prob_ub)) +
+    ggplot(aes(loghi, prob_med, ymin = prob_lb, ymax = prob_ub)) +
     ylab("Protection") +
     coord_cartesian(xlim = c(log(5), log(1280))) +
-    facet_grid(population ~ virus) +
+    faceting +
     geom_line(aes(y = prob_ub_prior), lty = "3333", col = "gray50") +
     common_plot_els()
 }
 
-inf_curve_fun <- function(outsum, data) {
-  outsum %>%
-    ggplot(aes(logHI, prob_med, ymin = prob_lb, ymax = prob_ub)) +
-    ylab("Infection probability") +
-    coord_cartesian(xlim = c(log(5), log(1280))) +
-    facet_grid_sc(
+inf_curve_fun <- function(outsum, data, facets = "virpop", 
+                          xmin = 5, xmax = 1280) {
+  facets <- rlang::arg_match(facets, c("vir", "virpop"))
+  if (facets == "virpop") {
+    faceting <- facet_grid_sc(
       population ~ virus, 
       scales = list(
         y = list(
@@ -117,51 +119,66 @@ inf_curve_fun <- function(outsum, data) {
             limits = c(0, 0.5), labels = scales::percent_format(1)
           )
         )
-      ),
-    ) +
+      )
+    )
+  } else {
+    faceting <- facet_wrap(~virus, nrow = 1)
+  }
+  data <- filter(data, virus %in% unique(outsum$virus))
+  outsum %>%
+    ggplot(aes(loghi, prob_med, ymin = prob_lb, ymax = prob_ub)) +
+    ylab("Infection probability") +
+    coord_cartesian(xlim = c(log(xmin), log(xmax))) +
+    faceting +
     common_plot_els() +
     geom_point(
-      data = data, mapping = aes(logHImid, inf_prop), inherit.aes = FALSE,
+      data = data, mapping = aes(loghimid, inf_prop), inherit.aes = FALSE,
       shape = 18
     ) +
     geom_text_repel(
-      data = data, mapping = aes(logHImid, inf_prop, label = ntot), 
+      data = data, mapping = aes(loghimid, inf_prop, label = ntot), 
       inherit.aes = FALSE
     )
 }
 
-save_plot <- function(pl, name, dark) {
-  suff <- if_else(dark, "_dark", "_light")
-  plpath <- file.path(fit_plot_dir, paste0(name, suff, ".pdf"))
+save_plot <- function(pl, name, width = 10, height = 10) {
+  plpath <- file.path(fit_sclr_ba_plot_dir, paste0(name, ".pdf"))
   ggsave_dark(
-    plot = pl, filename = plpath, dark = dark,
-    width = 10, height = 10, units = "cm", device = "pdf"
+    plot = pl, filename = plpath, dark = FALSE,
+    width = width, height = height, units = "cm", device = "pdf"
   )
 }
 
 # Script ======================================================================
 
-# Hanam data
-han <- read_hanam_summ("hanam-HI-summ") %>%
-  filter(virus != "H1N1seas") %>%
-  recode_hanam_pop()
+# Summary data
+han_hi_summ <- read_hanam_summ("hanam-hi-summ") %>% filter(virus != "H1N1seas")
+kv_main_summ <- read_kv_summ("kiddyvaxmain-summ") %>% recode_viruses()
 
 # Model output summary
-out_files <- tools::list_files_with_exts(fit_summ_dir, "csv")
-out_summ <- map_dfr(out_files, read_one_summ)
-  mutate(population = factor(population, levels = c("General", "Exposed")))
-
-# Curves
+out_files <- tools::list_files_with_exts(fit_sclr_ba_summ_dir, "csv")
+out_summ <- map_dfr(out_files, read_one_summ) %>%
+  recode_viruses()
 
 prot_data <- out_summ %>% filter(prob_type == "prot")
 inf_data <- out_summ %>% filter(prob_type == "inf")
 
-prot_curve <- prot_curve_fun(prot_data)
-inf_curve <- inf_curve_fun(inf_data, han)
+# Protection curves
+prot_curve_han <- prot_curve_fun(filter(prot_data, study == "hanam"), "virpop")
+save_plot(prot_curve_han, "hanam-hi-prot")
 
-walk(
-  c(TRUE, FALSE), 
-  ~ walk2(
-    list(prot_curve, inf_curve), c("protection", "infection"), save_plot, .x
-  )
+prot_curve_kv <- prot_curve_fun(
+  filter(prot_data, study == "kiddyvaxmain"), "vir"
 )
+save_plot(prot_curve_kv, "kiddyvaxmain-prot", 10, 7.5)
+
+# Infection curves
+inf_curve_han <- inf_curve_fun(
+  filter(inf_data, study == "hanam"), han_hi_summ, "virpop"
+)
+save_plot(inf_curve_han, "hanam-hi-inf")
+
+inf_curve_kv <- inf_curve_fun(
+  filter(inf_data, study == "kiddyvaxmain"), kv_main_summ, "vir", xmax = 5120
+)
+save_plot(inf_curve_kv, "kiddyvaxmain-inf", 10, 7.5)
