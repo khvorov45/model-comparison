@@ -184,6 +184,9 @@ kvm_lr_b_inf <- filter(kvm_lr_b, prob_type == "inf")
 han_hi_lr_b_prot <- filter(han_hi_lr_b, prob_type == "prot")
 kvm_lr_b_prot <- filter(kvm_lr_b, prob_type == "prot")
 
+han_hi_lr_b_prot_rel <- filter(han_hi_lr_b, prob_type == "prot_rel")
+kvm_lr_b_prot_rel <- filter(kvm_lr_b, prob_type == "prot_rel")
+
 # Hanam plots
 han_hi_lr_b_inf_plot <- inf_curve_fun(
   han_hi_lr_b_inf, han_hi_summ, "virpop", 5, 1280
@@ -192,6 +195,11 @@ save_plot(han_hi_lr_b_inf_plot, "hanam-hi-inf")
 
 han_hi_lr_b_prot_plot <- prot_curve_fun(han_hi_lr_b_prot, "virpop", 5, 1280)
 save_plot(han_hi_lr_b_prot_plot, "hanam-hi-prot")
+
+han_hi_lr_b_prot_rel_plot <- prot_curve_fun(
+  han_hi_lr_b_prot_rel, "virpop", 5, 1280
+)
+save_plot(han_hi_lr_b_prot_rel_plot, "hanam-hi-prot-rel")
 
 # Kiddyvax plots
 kvm_lr_b_inf_plot <- inf_curve_fun(
