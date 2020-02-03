@@ -211,7 +211,7 @@ A potentially large problem with the application of this model to antibody data 
 
 \begin{figure}[htp]
 	\centering
-	\includegraphics[width=0.9\textwidth]{../data-plot/hanam_counts_light.pdf}
+	\includegraphics[width=0.9\textwidth]{../data-plot/hanam-hi-summ-light.pdf}
 	\caption{
 	Hanam cohort data. Subjects were grouped by virus and measured HI titre. Numbers next to points are the total number of observations in the corresponding group. The top row is all observations. The bottom row are the observations from households with at least one infection in a given season. The left column is observations for the H1N1pdm virus, the right row --- for H3N2 virus.
 	}
@@ -304,7 +304,7 @@ The fitted infection curve is shown in Figure \ref{SclrBayesInf}. The fitted pro
 
 \begin{figure}[htp]
 	\centering
-	\includegraphics[width=0.8\textwidth]{../fit-bayesian-plot/infection_light.pdf}
+	\includegraphics[width=0.8\textwidth]{../fit-sclr-bayesian-plot/hanam-hi-inf.pdf}
 	\caption{
 	Fitted infection curve and credible interval from the scaled logit model Bayesian fit to Hanam data (also shown in Figure \ref{HanamCounts}). The solid line is the median of the posterior distribution. The shaded region is the 95\% credible interval. The dashed line is the prior distribution, i.e. the bounds of the shaded region that would have been obtained if the data contained no information to estimate model parameters. The upper bound is above 90\% and therefore not visible. The points are the infected proportions at the corresponding titre measurements. The numbers next to the points are the total sample size of the corresponding groups. Note that the titre measurements were shifted to midpoints of the corresponding intervals to better represent average underlying titres, e.g. the measurement of 20 was shifted to the log-scale midpoint between 20 and 40 (except the measurement of 5 which represents undetectable titres and the measurement of 1280 which represents titres above the highest detectable level).
 	}
@@ -315,7 +315,7 @@ The fitted infection curve is shown in Figure \ref{SclrBayesInf}. The fitted pro
 
 \begin{figure}[htp]
 	\centering
-	\includegraphics[width=0.8\textwidth]{../fit-bayesian-plot/protection_light.pdf}
+	\includegraphics[width=0.8\textwidth]{../fit-sclr-bayesian-plot/hanam-hi-prot.pdf}
 	\caption{
 	Fitted protection curve and credible interval from the scaled logit model Bayesian fit to Hanam data (also shown in Figure \ref{HanamCounts}). The solid line is the median of the posterior distribution. The shaded region is the 95\% credible interval. The dashed line is the prior distribution, i.e. the bounds of the shaded region that would have been obtained if the data contained no information to estimate model parameters.
 	}
@@ -329,10 +329,10 @@ Limiting the sample to just those exposed to the virus (at least one household i
 \subsection{Comparison to standard logistic fit}
 
 As mentioned before, the standard logistic model is inappropriate due to unsatisfied assumption of baseline of 1. It was fit to the same Hanam data using maximum likelihood with no accounting for censored titres (observations of 5 (below detectable) and 1280 (above detectable) were unchanged, all other observations were moved to the midpoint of the corresponding censored interval on a log scale). The fitted infection curve is in Figure \ref{lr-inf}.
-
+-ba
 \begin{figure}[htp]
 	\centering
-	\includegraphics[width=0.8\textwidth]{../fit-logistic/inf.pdf}
+	\includegraphics[width=0.8\textwidth]{../fit-logistic-plot/hanam-hi-inf.pdf}
 	\caption{
 	Fitted infection curves and confidence intervals from the standard logistic model fit to Hanam data (also shown in Figure \ref{HanamCounts}) using maximum likelihood with no accounting of censored titres (observations of 5 (below detectable) and 1280 (above detectable) were unchanged, all other observations were moved to the midpoints of the corresponding censored intervals on a log scale). The points are the infected proportions at the corresponding modified titre measurements (i.e. interval midpoints). The solid line is the point estimates. The shaded region is the 95\% confidence interval. The numbers next to the points are the total sample size of the corresponding groups.
 	}
@@ -345,7 +345,7 @@ While the infection curves appear to fit the data well, it is problematic to gen
 
 \begin{figure}[htp]
 	\centering
-	\includegraphics[width=0.8\textwidth]{../fit-logistic/prot-abs.pdf}
+	\includegraphics[width=0.8\textwidth]{../fit-logistic-plot/hanam-hi-prot.pdf}
 	\caption{
 	Fitted protection curves and confidence intervals from the standard logistic model fit to Hanam data (also shown in Figure \ref{HanamCounts}) using maximum likelihood with no accounting of censored titres (observations of 5 (below detectable) and 1280 (above detectable) were unchanged, all other observations were moved to the midpoints of the corresponding censored intervals on a log scale). The solid line is the point estimates. The shaded region is the 95\% confidence interval.
 	}
@@ -358,7 +358,7 @@ The other option for generating a protection curve is to calculate the fitted pr
 
 \begin{figure}[htp]
 	\centering
-	\includegraphics[width=0.8\textwidth]{../fit-logistic/prot-rel.pdf}
+	\includegraphics[width=0.8\textwidth]{../fit-logistic-boot-plot/hanam-hi-prot-rel.pdf}
 	\caption{
 	Fitted relative-to-5 protection curves and confidence intervals from the standard logistic model fit to Hanam data (also shown in Figure \ref{HanamCounts}) using maximum likelihood with no accounting of censored titres (observations of 5 (below detectable) and 1280 (above detectable) were unchanged, all other observations were moved to the midpoints of the corresponding censored intervals on a log scale). The solid line is the point estimates. The shaded region is the 95\% confidence interval.
 	}
