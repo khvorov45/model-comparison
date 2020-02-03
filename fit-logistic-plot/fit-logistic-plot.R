@@ -182,5 +182,5 @@ han_hi_lr_plot <- inf_curve_fun(han_hi_lr, han_hi_summ, "virpop", 5, 1280)
 save_plot(han_hi_lr_plot, "hanam-hi")
 
 # Kiddyvax plots
-kvm_lr_plot <- inf_curve_fun(kvm_lr, kv_main_summ, "vir", 5, 5120, 0, 0.3)
-save_plot(kvm_lr_plot, "kiddyvaxmain", 12.5, 8.5)
+kvm_lr_plot <- inf_curve_fun(kvm_lr, kv_main_summ, "vir", 5, 5120, 0, 0.27)
+save_plot(kvm_lr_plot, "kiddyvaxmain", 10, 7.5)
