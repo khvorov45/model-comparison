@@ -41,6 +41,38 @@ sum_outprob <- function(outprob) {
     ungroup()
 }
 
+find_prot_titre_levels <- function(out, prob_name, level = 0.5) {
+  low <- -100
+  high <- 100
+  
+  get_prot_prob <- function(var_name, titre, out) {
+    calc_probs(titre, out) %>% 
+      sum_outprob() %>% 
+      filter(prob_type == "prot") %>%
+      pull(var_name)
+  }
+  
+  while (TRUE) {
+    med <- median(c(low, high))
+    pred_med <- get_prot_prob(prob_name, med, out)
+    if (near(pred_med, level)) return(med)
+    if (pred_med < level) low <- med
+    else high <- med
+  }
+}
+
+find_prot_titre_levels_all <- function(out, level = 0.5) {
+  tibble(
+    level = level,
+    loghi_lb = find_prot_titre_levels(out, "prob_ub", level),
+    loghi_med = find_prot_titre_levels(out, "prob_med", level),
+    loghi_ub = find_prot_titre_levels(out, "prob_lb", level),
+    hi_lb = exp(loghi_lb),
+    hi_med = exp(loghi_med),
+    hi_ub = exp(loghi_ub)
+  )
+}
+
 # Save the summary file
 save_summ <- function(summ, name) {
   write_csv(
@@ -62,6 +94,12 @@ names(out) <- str_replace(basename(out_files), ".csv", "")
 loghis <- seq(0, 8.7, length.out = 101)
 outprobs <- map(out, calc_all_probs, loghis)
 outprobs_sum <- map(outprobs, sum_outprob)
+
+# Protective titre levels
+prot_his <- out %>%
+  map(find_prot_titre_levels_all) %>%
+  bind_rows(.id = "name")
+save_summ(prot_his, "prot-his")
 
 # Prior distributions
 han_priors_r <- tibble(
