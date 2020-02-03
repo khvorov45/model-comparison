@@ -40,8 +40,11 @@ calc_probs <- function(out) {
       loghi = loghi,
       inf = 1 - 1 / (1 + exp(b0 + b1 * loghi)),
       prot = 1 - inf,
+      prot_rel = prot / (1 / (1 + exp(b0 + b1 * log(5))))
     ) %>%
-    pivot_longer(c(prot, inf), names_to = "prob_type", values_to = "prob")
+    pivot_longer(
+      c(prot, inf, prot_rel), names_to = "prob_type", values_to = "prob"
+    )
 }
 
 summ_probs <- function(dat) {
