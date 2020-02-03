@@ -74,7 +74,7 @@ plot_counts <- function(dat, facet_type = "vir") {
     ggplot(aes(log(prehi), inf_prop)) +
     dark_theme_bw(verbose = FALSE) +
     theme(
-      strip.background = element_rect(fill = NA),
+      strip.background = element_blank(),
       panel.spacing = unit(0, "null"),
       axis.text.x = element_text(angle = 45, hjust = 1),
       panel.grid.minor.y = element_blank()
@@ -105,7 +105,7 @@ plot_scatter <- function(dat, y_breaks = 5 * 2^(0:8), facet_type = "vir") {
     ggplot(aes(status_bin_lbl, prehi)) +
     dark_theme_bw(verbose = FALSE) +
     theme(
-      strip.background = element_rect(fill = NA),
+      strip.background = element_blank(),
       panel.grid.minor = element_blank(), panel.spacing = unit(0, "lines")
     ) +
     xlab("Status") +
