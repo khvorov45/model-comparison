@@ -59,7 +59,7 @@ recode_viruses <- function(dat) {
   dat %>%
     mutate(
       virus = recode(
-        virus, "h1pdm" = "H1N1pdm", "h3" = "H3N2", "bvic" = "B VIC"
+        virus, "h1pdm" = "H1N1pdm", "h3" = "H3N2", "bvic" = "B Vic"
       )
     )
 }
