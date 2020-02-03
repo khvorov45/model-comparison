@@ -1,7 +1,7 @@
 # Plots of the ordinary logistic fit
 # Arseniy Khvorov
 # Created 2020-01-28
-# Last edit 2020-02-03
+# Last edit 2020-02-04
 
 library(tidyverse)
 library(ggdark) # devtools::install_github("khvorov45/ggdark")
@@ -78,6 +78,15 @@ read_kv_lrres <- function(name) {
   )
 }
 
+convert_to_prot <- function(dat) {
+  dat %>%
+    mutate(
+      fit = 1 - fit,
+      fit_low = 1 - fit_low,
+      fit_high = 1 - fit_high
+    )
+}
+
 # Elements common to both plots
 common_plot_els <- function() {
   xbreaks <- c(5 * 2^(0:10))
@@ -101,7 +110,7 @@ common_plot_els <- function() {
   )
 }
 
-prot_curve_fun <- function(outsum, facets = "virpop") {
+prot_curve_fun <- function(outsum, facets = "virpop", xmin = 5, xmax = 1280) {
   facets <- rlang::arg_match(facets, c("vir", "virpop"))
   if (facets == "virpop") {
     faceting <- facet_grid(population ~ virus)
@@ -109,11 +118,10 @@ prot_curve_fun <- function(outsum, facets = "virpop") {
     faceting <- facet_wrap(~virus, nrow = 1)
   }
   outsum %>%
-    ggplot(aes(loghi, prob_med, ymin = prob_lb, ymax = prob_ub)) +
+    ggplot(aes(loghimid, fit, ymin = fit_low, ymax = fit_high)) +
     ylab("Protection") +
-    coord_cartesian(xlim = c(log(5), log(1280))) +
+    coord_cartesian(xlim = c(log(xmin), log(xmax)), ylim = c(0, 1)) +
     faceting +
-    geom_line(aes(y = prob_ub_prior), lty = "3333", col = "gray50") +
     common_plot_els()
 }
 
@@ -177,10 +185,19 @@ kv_main_summ <- read_kv_summ("kiddyvaxmain-summ") %>% recode_viruses()
 han_hi_lr <- read_hanam_lrres("hanam-hi")
 kvm_lr <- read_kv_lrres("kiddyvaxmain") %>% recode_viruses()
 
+han_hi_lr_prot <- convert_to_prot(han_hi_lr)
+kvm_lr_prot <- convert_to_prot(kvm_lr)
+
 # Hanam plots
 han_hi_lr_plot <- inf_curve_fun(han_hi_lr, han_hi_summ, "virpop", 5, 1280)
-save_plot(han_hi_lr_plot, "hanam-hi")
+save_plot(han_hi_lr_plot, "hanam-hi-inf")
+
+han_hi_lr_prot_plot <- prot_curve_fun(han_hi_lr_prot, "virpop", 5, 1280)
+save_plot(han_hi_lr_prot_plot, "hanam-hi-prot")
 
 # Kiddyvax plots
 kvm_lr_plot <- inf_curve_fun(kvm_lr, kv_main_summ, "vir", 5, 5120, 0, 0.27)
-save_plot(kvm_lr_plot, "kiddyvaxmain", 10, 7.5)
+save_plot(kvm_lr_plot, "kiddyvaxmain-inf", 10, 7.5)
+
+kvm_lr_prot_plot <- prot_curve_fun(kvm_lr_prot, "vir", 5, 5120)
+save_plot(kvm_lr_prot_plot, "kiddyvaxmain-prot", 10, 7.5)
