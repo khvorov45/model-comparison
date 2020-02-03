@@ -167,6 +167,11 @@ inf_data <- out_summ %>% filter(prob_type == "inf")
 prot_curve_han <- prot_curve_fun(filter(prot_data, study == "hanam"), "virpop")
 save_plot(prot_curve_han, "hanam-hi-prot")
 
+prot_curve_han <- prot_curve_fun(
+  filter(prot_data, study == "hanam", population == "Exposed"), "vir"
+)
+save_plot(prot_curve_han, "hanam-hi-exp-prot", 10, 7.5)
+
 prot_curve_kv <- prot_curve_fun(
   filter(prot_data, study == "kiddyvaxmain"), "vir"
 )
