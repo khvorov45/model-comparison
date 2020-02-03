@@ -20,7 +20,9 @@ read_hanam_raw <- function(name) {
       season = col_integer(),
       virus = col_character(),
       status = col_character(),
-      preHI = col_integer()
+      preHI = col_integer(),
+      dob = col_date(),
+      measure_date = col_date()
     )
   ) %>%
     rename(prehi = preHI)
@@ -45,7 +47,8 @@ hanam_extra <- hanam %>%
       prehi == 5L ~ log(5),
       prehi == 1280L ~ log(1280),
       TRUE ~ loghi + log(2) / 2
-    )
+    ),
+    age_years = (measure_date - dob) / 365.25
   )
 
 hanam_hi_info <- filter(hanam_extra, !is.na(prehi) | !is.na(status))
