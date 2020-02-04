@@ -209,3 +209,6 @@ save_plot(kvm_lr_b_inf_plot, "kiddyvaxmain-inf", 10, 7.5)
 
 kvm_lr_b_prot_plot <- prot_curve_fun(kvm_lr_b_prot, "vir", 5, 5120)
 save_plot(kvm_lr_b_prot_plot, "kiddyvaxmain-prot", 10, 7.5)
+
+kvm_lr_b_prot_rel_plot <- prot_curve_fun(kvm_lr_b_prot_rel, "vir", 5, 5120)
+save_plot(kvm_lr_b_prot_rel_plot, "kiddyvaxmain-prot-rel", 10, 7.5)
