@@ -31,12 +31,13 @@ fit_cox_one <- function(dat, formula) {
 }
 
 predict_cox_one <- function(fit, loghis, loghirel) {
-  rel <- predict(fit, data.frame(loghimid = hirel))
+  rel <- predict(fit, data.frame(loghimid = loghirel))
   tibble(
     loghimid = loghis,
     loghr = predict(fit, data.frame(loghimid = loghis)),
     loghr_rel = loghr - rel,
-    hr_rel = exp(loghr_rel)
+    hr_rel = exp(loghr_rel),
+    prot_rel = 1 - hr_rel
   )
 }
 
@@ -73,4 +74,4 @@ loghis <- seq(0, 8.7, length.out = 101)
 loghirel <- log(5)
 preds <- fits_cox %>%
   map_dfr(predict_cox_one, loghis, loghirel, .id = "virus")
-
+save_cox_pred(preds, "kiddyvaxmain")
