@@ -31,15 +31,12 @@ fit_cox_one <- function(dat, formula) {
 }
 
 predict_cox_one <- function(fit, loghis, loghirel) {
-  rel <- predict(fit, data.frame(loghimid = loghirel))
-  pred <- predict(fit, data.frame(loghimid = loghis), se.fit = TRUE)
   tibble(
     loghimid = loghis,
-    loghr = pred$fit,
-    loghr_se = pred$se.fit,
-    loghr_rel = loghr - rel,
-    loghr_rel_low = loghr_rel - qnorm(0.975) * loghr_se,
-    loghr_rel_high = loghr_rel + qnorm(0.975) * loghr_se,
+    loghr_rel = coef(fit) * (loghimid - loghirel),
+    loghr_rel_se = sqrt((loghimid - loghirel)^2 * vcov(fit)[1, 1]),
+    loghr_rel_low = loghr_rel - qnorm(0.975) * loghr_rel_se,
+    loghr_rel_high = loghr_rel + qnorm(0.975) * loghr_rel_se,
     hr_rel = exp(loghr_rel),
     hr_rel_low = exp(loghr_rel_low),
     hr_rel_high = exp(loghr_rel_high),
@@ -83,3 +80,8 @@ loghirel <- log(5)
 preds <- fits_cox %>%
   map_dfr(predict_cox_one, loghis, loghirel, .id = "virus")
 save_cox_pred(preds, "kiddyvaxmain")
+
+
+
+temp <- predict(fits_cox[[1]], data.frame(loghimid = log(5)), type = "lp")
+attr(temp, "constant")
