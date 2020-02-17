@@ -80,8 +80,3 @@ loghirel <- log(5)
 preds <- fits_cox %>%
   map_dfr(predict_cox_one, loghis, loghirel, .id = "virus")
 save_cox_pred(preds, "kiddyvaxmain")
-
-
-
-temp <- predict(fits_cox[[1]], data.frame(loghimid = log(5)), type = "lp")
-attr(temp, "constant")
