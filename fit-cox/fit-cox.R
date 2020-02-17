@@ -32,12 +32,20 @@ fit_cox_one <- function(dat, formula) {
 
 predict_cox_one <- function(fit, loghis, loghirel) {
   rel <- predict(fit, data.frame(loghimid = loghirel))
+  pred <- predict(fit, data.frame(loghimid = loghis), se.fit = TRUE)
   tibble(
     loghimid = loghis,
-    loghr = predict(fit, data.frame(loghimid = loghis)),
+    loghr = pred$fit,
+    loghr_se = pred$se.fit,
     loghr_rel = loghr - rel,
+    loghr_rel_low = loghr_rel - qnorm(0.975) * loghr_se,
+    loghr_rel_high = loghr_rel + qnorm(0.975) * loghr_se,
     hr_rel = exp(loghr_rel),
-    prot_rel = 1 - hr_rel
+    hr_rel_low = exp(loghr_rel_low),
+    hr_rel_high = exp(loghr_rel_high),
+    prot_rel = 1 - hr_rel,
+    prot_rel_low = 1 - hr_rel_high,
+    prot_rel_high = 1 - hr_rel_low
   )
 }
 
