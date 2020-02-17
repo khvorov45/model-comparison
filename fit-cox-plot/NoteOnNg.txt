@@ -1,0 +1,2 @@
+These look different from Ng (2013) because the model is different and
+I remember that variance of the linear predictor changes with covariate values.
