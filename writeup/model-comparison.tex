@@ -275,7 +275,7 @@ Standard errors of the $\beta$ regression estimates ($\beta_0$ being the interce
 
 \pagebreak
 %
-\section{Application example}
+\section{Hanam application}
 
 This section shows an application of the scaled logit model to the Hanam cohort which is plotted in Figure \ref{HanamCounts}. For this cohort, the Cox model is inapplicable due to absence of reliable data on disease activity. The standard logistic model is inappropriate due to unjustified assumption of baseline of 1.
 
@@ -368,6 +368,76 @@ The other option for generating a protection curve is to calculate the fitted pr
 While the relative-to-5 protection curves (Figure \ref{lr-prot-rel}) appear more plausible than the relative-to-baseline protection curves (Figure \ref{lr-prot-abs}), both result from fitting a model with an unsatisfied assumption and neither method of generating protection curves from logistic regression model fit will reliably produce accurate results.
 
 The relative-to-5 curve (Figure \ref{lr-prot-rel}) presents an additional problem. The curve shows how much ``better'' different titres are at protecting against infection than the titre of 5 (or some other threshold). There is nothing inherently special about this threshold of 5 and its choice is arbitrary. The curves may look substantially different if a different threshold (e.g. 10 or 1) is chosen.
+
+\pagebreak
+%
+\section{Kiddyvax application}
+
+The data for this study includes post-vaccination HI titres of subjects who were followed up for a year for flu infection. The infection status was determined by PCR which was done for everyone who experienced symptoms. This data is shown in Figure \ref{fig:kiddyvax-main-titre}.
+
+\begin{figure}[htp]
+	\centering
+	\includegraphics[width=0.8\textwidth]{../data-plot/kiddyvax-main-titre.pdf}
+	\caption{
+	Kiddyvax study data. Post-vaccination titres are shown for those who got infected (PCR-confirmed symptomatic infection) over the course of the study and those who did not. Panels correspond to the five tested viruses.
+	}
+	\label{fig:kiddyvax-main-titre}
+\end{figure}
+
+Analyses were done on the data for B Vic and A(H1pdm) viruses in the same way as for the Hanam data with the addition of the Cox proportional hazards model.
+
+\subsection{Scaled logit fit}
+
+The same model was fit in the same way using the same prior distributions as for the Hanam data. The protection curves are in \ref{fig:kiddyvaxmain-prot-bayes-sclr}.
+
+\begin{figure}[htp]
+	\centering
+	\includegraphics[width=0.8\textwidth]{../fit-sclr-bayesian-plot/kiddyvaxmain-prot.pdf}
+	\caption{
+Fitted infection curve and credible interval from the scaled logit model Bayesian fit to subsets of kiddyvax data (shown in Figure \ref{fig:kiddyvax-main-titre}). The solid line is the median of the posterior distribution. The shaded region is the 95\% credible interval. The dashed line is the prior distribution, i.e. the bounds of the shaded region that would have been obtained if the data contained no information to estimate model parameters.
+	}
+	\label{fig:kiddyvaxmain-prot-bayes-sclr}
+\end{figure}
+
+The credible intervals are very broad due to the fact there are very few infections the the sample.
+
+\subsection{Standard logistic fit}
+
+The relative protection curves are in \ref{fig:kiddyvaxmain-prot-rel-lr-boot}
+
+\begin{figure}[htp]
+	\centering
+	\includegraphics[width=0.8\textwidth]{../fit-logistic-boot-plot/kiddyvaxmain-prot-rel.pdf}
+	\caption{
+	Fitted relative-to-5 protection curves and confidence intervals from the standard logistic model fit to kiddyvax data (shown in Figure \ref{fig:kiddyvax-main-titre}) using maximum likelihood with no accounting of censored titres (observations of 5 (below detectable) were unchanged, all other observations were moved to the midpoints of the corresponding censored intervals on a log scale). The solid line is the point estimates. The shaded region is the 95\% confidence interval.
+	}
+	\label{fig:kiddyvaxmain-prot-rel-lr-boot}
+\end{figure}
+
+\subsection{Cox proportional hazards fit}
+
+For those who got infected, the time at risk was taken to be the time from start of follow-up to infection. For those who did not get infected the time at risk was take to be the time from start of follow-up to end of follow-up.
+
+The model was
+
+\begin{align*}
+\begin{gathered}
+h(t) = h_0\text{exp)(\beta_T X_{\text{logtitre}})
+\end{gathered}
+\end{align*}
+
+where $h$ is the hazard function and $X_{\text{logtitre}$ is the post-vaccination titre measurement on the log scale.
+
+The resulting protection curve (relative to the titre of 5) is in \ref{fig:kiddyvaxmain-cox}
+
+\begin{figure}[htp]
+	\centering
+	\includegraphics[width=0.8\textwidth]{../fit-cox-plot/kiddyvaxmain.pdf}
+	\caption{
+	Fitted relative-to-5 protection curves and confidence intervals from the Cox proportional hazards model fit to kiddyvax data (shown in Figure \ref{fig:kiddyvax-main-titre}) with no accounting of censored titres (observations of 5 (below detectable) were unchanged, all other observations were moved to the midpoints of the corresponding censored intervals on a log scale). The solid line is the point estimates. The shaded region is the 95\% confidence interval.
+	}
+	\label{fig:kiddyvaxmain-cox}
+\end{figure}
 
 \pagebreak
 %
