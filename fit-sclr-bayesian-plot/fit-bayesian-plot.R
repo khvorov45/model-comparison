@@ -152,7 +152,6 @@ arrange_topbot <- function(top, bot) {
       axis.ticks.length.x = unit(0, "null")
     )
   top$theme <- ggdark::lighten_theme(top$theme)
-  print(top)
   bot <- bot + theme(
     strip.background = element_blank(), strip.text = element_blank(),
     plot.margin = margin(0, 5.5, 5.5, 5.5)
@@ -161,11 +160,14 @@ arrange_topbot <- function(top, bot) {
   ggarrange(top, bot, ncol = 1, align = "v")
 }
 
-save_plot <- function(pl, name, width = 10, height = 10) {
-  plpath <- file.path(fit_sclr_ba_plot_dir, paste0(name, ".pdf"))
-  ggsave_dark(
-    plot = pl, filename = plpath, dark = FALSE,
-    width = width, height = height, units = "cm", device = "pdf"
+save_plot <- function(pl, name, width = 10, height = 10, formats = "pdf") {
+  plpaths <- file.path(fit_sclr_ba_plot_dir, paste0(name, ".", formats))
+  walk2(
+    formats, plpaths,
+    ~ ggsave_dark(
+      plot = pl, filename = .y, dark = FALSE,
+      width = width, height = height, units = "cm", device = .x
+    )
   )
 }
 
@@ -216,4 +218,4 @@ save_plot(inf_curve_kv, "kiddyvaxmain-inf", 10, 7.5)
 
 # Hanam exposed infection and protection
 curve_han_exp <- arrange_topbot(inf_curve_han_exp, prot_curve_han_exp)
-save_plot(curve_han_exp, "hanam-hi-exp")
+save_plot(curve_han_exp, "hanam-hi-exp", formats = c("pdf", "png"))
