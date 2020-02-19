@@ -1,0 +1,19 @@
+---
+title: "Scaled logit model with inclusion of unexposed population"
+author: "Arseniy Khvorov"
+date: "11/12/2019"
+documentclass: article
+geometry: 
+  margin=1in
+output: 
+  bookdown::pdf_document2:
+    keep_tex: yes
+    toc: no
+    latex_engine: xelatex
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
