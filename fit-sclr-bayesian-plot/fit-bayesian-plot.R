@@ -7,6 +7,7 @@ library(tidyverse)
 library(ggdark) # devtools::install_github("khvorov45/ggdark")
 library(facetscales) # devtools::install_github("khvorov45/facetscales")
 library(ggrepel)
+library(ggpubr)
 
 # Directories to be used later
 fit_sclr_ba_summ_dir <- "fit-sclr-bayesian-summary"
@@ -141,6 +142,25 @@ inf_curve_fun <- function(outsum, data, facets = "virpop",
     )
 }
 
+arrange_topbot <- function(top, bot) {
+  ggdark::lighten_geoms()
+  on.exit(ggdark::darken_geoms())
+  top <- top + rremove("x.axis") + rremove("xlab") +
+    rremove("x.text") + rremove("x.ticks") +
+    theme(
+      plot.margin = margin(5.5, 5.5, 0, 5.5),
+      axis.ticks.length.x = unit(0, "null")
+    )
+  top$theme <- ggdark::lighten_theme(top$theme)
+  print(top)
+  bot <- bot + theme(
+    strip.background = element_blank(), strip.text = element_blank(),
+    plot.margin = margin(0, 5.5, 5.5, 5.5)
+  )
+  bot$theme <- ggdark::lighten_theme(bot$theme)
+  ggarrange(top, bot, ncol = 1, align = "v")
+}
+
 save_plot <- function(pl, name, width = 10, height = 10) {
   plpath <- file.path(fit_sclr_ba_plot_dir, paste0(name, ".pdf"))
   ggsave_dark(
@@ -167,10 +187,10 @@ inf_data <- out_summ %>% filter(prob_type == "inf")
 prot_curve_han <- prot_curve_fun(filter(prot_data, study == "hanam"), "virpop")
 save_plot(prot_curve_han, "hanam-hi-prot")
 
-prot_curve_han <- prot_curve_fun(
+prot_curve_han_exp <- prot_curve_fun(
   filter(prot_data, study == "hanam", population == "Exposed"), "vir"
 )
-save_plot(prot_curve_han, "hanam-hi-exp-prot", 10, 7.5)
+save_plot(prot_curve_han_exp, "hanam-hi-exp-prot", 10, 7.5)
 
 prot_curve_kv <- prot_curve_fun(
   filter(prot_data, study == "kiddyvaxmain"), "vir"
@@ -183,7 +203,17 @@ inf_curve_han <- inf_curve_fun(
 )
 save_plot(inf_curve_han, "hanam-hi-inf")
 
+inf_curve_han_exp <- inf_curve_fun(
+  filter(inf_data, study == "hanam", population == "Exposed"), 
+  filter(han_hi_summ, population == "Exposed"), "vir"
+)
+save_plot(inf_curve_han_exp, "hanam-hi-exp-inf", 10, 7.5)
+
 inf_curve_kv <- inf_curve_fun(
   filter(inf_data, study == "kiddyvaxmain"), kv_main_summ, "vir", xmax = 5120
 )
 save_plot(inf_curve_kv, "kiddyvaxmain-inf", 10, 7.5)
+
+# Hanam exposed infection and protection
+curve_han_exp <- arrange_topbot(inf_curve_han_exp, prot_curve_han_exp)
+save_plot(curve_han_exp, "hanam-hi-exp")
