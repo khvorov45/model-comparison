@@ -25,7 +25,8 @@ mod_soph_dat <- function(data, model_name) {
       model = model_name
     ) %>%
     ungroup() %>%
-    rename(postvax = !!rlang::sym(postvax_name))
+    rename(postvax = !!rlang::sym(postvax_name)) %>%
+    mutate(postvax_og = 2^postvax, postvax = log(postvax_og))
 }
 
 # Sophia's script =============================================================
