@@ -3,3 +3,6 @@ https://academic.oup.com/cid/article/51/12/1370/316441
 
 Ng S 2013 Estimation of the association between antibody titers and protection...
 https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3778972/
+
+Zhang Z 2018 Time-varying covariates and coefficients in Cox regression models
+https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6015946/
