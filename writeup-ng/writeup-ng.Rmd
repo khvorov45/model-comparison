@@ -1,5 +1,5 @@
 ---
-title: "Scaled logit model with inclusion of unexposed population"
+title: "Protection curves of Ng 2013"
 author: "Arseniy Khvorov"
 date: "11/12/2019"
 documentclass: article
@@ -11,6 +11,8 @@ output:
     toc: no
     latex_engine: xelatex
 ---
+
+
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
