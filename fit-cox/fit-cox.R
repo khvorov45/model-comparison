@@ -1,7 +1,7 @@
 # Fitting the cox model to the kiddyvax data
 # Arseniy Khvorov
 # Created 2020-02-17
-# Last edit 2020-02-17
+# Last edit 2020-02-21
 
 library(tidyverse)
 library(survival)
@@ -26,24 +26,56 @@ read_kiddyvax <- function(nme) {
   )
 }
 
+read_sophia <- function(nme) {
+  read_csv(
+    file.path(data_dir, paste0(nme, ".csv")),
+    col_types = cols_only(
+      hhid = col_character(),
+      postvax = col_double(),
+      postvax_og = col_double(),
+      t = col_integer(),
+      start = col_integer(),
+      end = col_integer(),
+      event = col_integer(),
+      proxy = col_double(),
+      model = col_character()
+    )
+  )
+}
+
 fit_cox_one <- function(dat, formula) {
   coxph(formula, dat, model = TRUE)
 }
 
-predict_cox_one <- function(fit, loghis, loghirel) {
-  tibble(
-    loghimid = loghis,
-    loghr_rel = coef(fit) * (loghimid - loghirel),
-    loghr_rel_se = sqrt((loghimid - loghirel)^2 * vcov(fit)[1, 1]),
-    loghr_rel_low = loghr_rel - qnorm(0.975) * loghr_rel_se,
-    loghr_rel_high = loghr_rel + qnorm(0.975) * loghr_rel_se,
-    hr_rel = exp(loghr_rel),
-    hr_rel_low = exp(loghr_rel_low),
-    hr_rel_high = exp(loghr_rel_high),
-    prot_rel = 1 - hr_rel,
-    prot_rel_low = 1 - hr_rel_high,
-    prot_rel_high = 1 - hr_rel_low
-  )
+fit_cox_manymod <- function(dat, formulas) {
+  map(formulas, ~ fit_cox_one(dat, .x))
+}
+
+predict_cox_one <- function(fit, newdata) {
+  terms_noy <- delete.response(fit$terms)
+  model_mat <- model.frame(terms_noy, newdata)
+  ests_mat <- matrix(coef(fit), ncol = 1)
+  loghr <- apply(model_mat, 1, function(x) x %*% ests_mat)
+  sds <- map_dbl(1:nrow(model_mat), function(i) {
+    x <- as.matrix(model_mat[i, ])
+    variance <- x %*% vcov(fit) %*% t(x)
+    sqrt(variance)
+  })
+  newdata %>%
+    mutate(
+      loghr = loghr,
+      se = sds,
+      loghr_low = loghr - qnorm(0.975) * se,
+      loghr_high = loghr + qnorm(0.975) * se,
+      prot = 1 - exp(loghr),
+      prot_low = 1 - exp(loghr_high),
+      prot_high = 1 - exp(loghr_low),
+      se_wrong = sqrt(sum(vcov(fit))),
+      loghr_low_wrong = loghr - qnorm(0.975) * se_wrong,
+      loghr_high_wrong = loghr + qnorm(0.975) * se_wrong,
+      prot_low_wrong = 1 - exp(loghr_high_wrong),
+      prot_high_wrong = 1 - exp(loghr_low_wrong)
+    )
 }
 
 save_cox_pred <- function(pred, name) {
@@ -75,8 +107,35 @@ fits_cox <- kv_fup %>%
 names(fits_cox) <- group_keys(kv_fup, virus)$virus
 
 # Predict
-loghis <- seq(0, 8.7, length.out = 101)
-loghirel <- log(5)
+loghis <- seq(0, 8.7, length.out = 1001)
+loghis_rel <- loghis - log(5)
 preds <- fits_cox %>%
-  map_dfr(predict_cox_one, loghis, loghirel, .id = "virus")
+  map_dfr(
+    predict_cox_one,
+    tibble(loghi = loghis, loghimid = loghis_rel), 
+    .id = "virus"
+  )
 save_cox_pred(preds, "kiddyvaxmain")
+
+# Sophia's data
+sophia <- read_sophia("sophia")
+
+models <- list(
+  sophia = formula(Surv(t, event == 1) ~ postvax + proxy),
+  me = formula(Surv(start, end, event == 1) ~ postvax + proxy + cluster(hhid))
+)
+
+sophia_fits <- sophia %>%
+  group_split(model) %>%
+  map(~ fit_cox_manymod(.x, models))
+names(sophia_fits) <- group_keys(sophia, model)$model
+
+sophia_preds <- sophia_fits %>%
+  map_dfr(function(fits, virus_name) {
+    map_dfr(fits, function(fit, model_name) {
+      predict_cox_one(
+        fit, tibble(loghi = loghis, postvax = loghis_rel, proxy = 0)
+      )
+    }, .id = "model")
+  }, .id = "virus")
+save_cox_pred(sophia_preds, "sophia")
