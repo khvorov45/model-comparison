@@ -6,7 +6,7 @@ fig_studies_dir <- "fig-studies"
 
 # Script ======================================================================
 
-pdf(file = file.path(fig_studies_dir, "studies.pdf"), 8, 3.5)
+pdf(file = file.path(fig_studies_dir, "fig-studies.pdf"), 8, 3.5)
 par(mai = c(0, 2, 0, 0))
 plot(
   NA, NA,
