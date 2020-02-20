@@ -15,28 +15,23 @@ fit_cox_plot_dir <- "fit-cox-plot"
 read_pred <- function(name) {
   read_csv(
     file.path(fit_cox_dir, glue::glue("{name}.csv")),
-    col_types = cols_only(
-      virus = col_character(),
-      loghimid = col_double(),
-      prot_rel = col_double(),
-      prot_rel_low = col_double(),
-      prot_rel_high = col_double()
-    )
+    col_types = cols()
   )
 }
 
 recode_viruses <- function(dat) {
   dat %>%
     mutate(
-      virus = recode(
-        virus, "h1pdm" = "H1N1pdm", "bvic" = "B Vic"
+      virus = factor(
+        virus, levels = c("h1pdm", "bvic"), labels = c("H1N1pdm", "B Vic")
       )
     )
 }
 
 plot_pred <- function(dat) {
   xbreaks <- c(5 * 2^(0:10))
-  ggplot(dat, aes(loghimid, prot_rel)) +
+  dat %>% 
+    ggplot(aes(loghi, prot)) +
     dark_theme_bw(verbose = FALSE) +
     theme(
       strip.background = element_blank(),
@@ -54,7 +49,7 @@ plot_pred <- function(dat) {
       "Relative protection", breaks = seq(0, 1, 0.1),
       labels = scales::percent_format(1)
     ) +
-    geom_ribbon(aes(ymin = prot_rel_low, ymax = prot_rel_high), alpha = 0.5) +
+    geom_ribbon(aes(ymin = prot_low, ymax = prot_high), alpha = 0.5) +
     geom_line()
 }
 
@@ -69,5 +64,24 @@ save_plot <- function(pl, name, width, height) {
 
 preds <- read_pred("kiddyvaxmain") %>% recode_viruses()
 
+preds_sophia <- read_pred("sophia")
+
 pl <- plot_pred(preds)
 save_plot(pl, "kiddyvaxmain", 12, 7.5)
+
+pl_soph_og <- plot_pred(
+  filter(preds_sophia, model == "sophia") %>%
+    mutate(prot_low = prot_low_wrong, prot_high = prot_high_wrong)
+)
+save_plot(pl_soph_og, "sophia-og", 12, 7.5)
+
+pl_soph_ci <- plot_pred(
+  filter(preds_sophia, model == "sophia")
+)
+save_plot(pl_soph_ci, "sophia-ci", 12, 7.5)
+
+pl_soph_ci_mod <- plot_pred(
+  filter(preds_sophia, model == "me")
+)
+save_plot(pl_soph_ci_mod, "sophia-ci-mod", 12, 7.5)
+
