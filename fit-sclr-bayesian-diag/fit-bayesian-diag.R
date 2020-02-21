@@ -103,11 +103,11 @@ save_trace_dens <- function(pl, model_name) {
 
 # Prior distributions
 han_priors <- list(
-  logHImean = function(x) dnorm(x, 2, 2),
-  logHIsd = function(x) dexp(x, rate = 0.1),
+  loghimean = function(x) dnorm(x, 2, 2),
+  loghisd = function(x) dexp(x, rate = 0.1),
   lambda = function(x) dunif(x, 0, 1),
   beta_0 = function(x) dnorm(x, -15, 10),
-  beta_HI = function(x) dnorm(x, 5, 5)
+  beta_hi = function(x) dnorm(x, 5, 5)
 )
 
 # Model output
