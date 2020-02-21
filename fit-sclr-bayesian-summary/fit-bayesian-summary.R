@@ -20,7 +20,7 @@ calc_probs <- function(loghi, out) {
   out %>%
     mutate(
       loghi = loghi,
-      prot = 1 - 1 / (1 + exp(beta_0 + beta_HI * loghi)),
+      prot = 1 - 1 / (1 + exp(beta_0 + beta_hi * loghi)),
       inf = lambda * (1 - prot),
     ) %>%
     pivot_longer(c(prot, inf), names_to = "prob_type", values_to = "prob")
@@ -105,7 +105,7 @@ save_summ(prot_his, "prot-his")
 han_priors_r <- tibble(
   lambda = runif(5e4, 0, 1),
   beta_0 = rnorm(5e4, -15, 10),
-  beta_HI = rnorm(5e4, 5, 5)
+  beta_hi = rnorm(5e4, 5, 5)
 ) %>% calc_all_probs(loghis) %>% sum_outprob()
 names(han_priors_r)[3:5] <- paste0(names(han_priors_r)[3:5], "_prior")
 
