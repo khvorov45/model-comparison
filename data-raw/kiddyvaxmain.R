@@ -177,6 +177,13 @@ save_data(swab_full, "kiddyvaxmain-swab")
 swab_summ <- summarise_swab(swab_full)
 
 full_data <- full_join(swab_summ, serology, by = c("id", "virus"))
+
+# Set status to 0 if not swabbed
+swabbed <- swab_full %>% pull(unique(id))
+all <- full_data %>% pull(unique(id))
+not_swabbed <- all[!all %in% swabbed]
+full_data <- full_data %>%
+  mutate(status = if_else(id %in% not_swabbed, 0L, status))
 save_data(full_data, "kiddyvaxmain")
 
 full_data_summ <- full_data %>%
