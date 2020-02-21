@@ -88,7 +88,7 @@ create_jags_model <- function(dat, ...) {
   list(
     filepath = file.path(fit_sclr_ba_dir, "sclr.jags"),
     data = dat,
-    pars = c("lambda", "beta_0", "beta_HI", "logHImean", "logHIsd"),
+    pars = c("lambda", "beta_0", "beta_hi", "loghimean", "loghisd"),
     inits = list(
       list(lambda = 0.1, beta_0 = 0, beta_HI = 0, logHImean = 0, logHIsd = 1),
       list(lambda = 0.5, beta_0 = 5, beta_HI = 2.5, logHImean = 2, logHIsd = 2),
@@ -100,7 +100,7 @@ create_jags_model <- function(dat, ...) {
 # Script ======================================================================
 
 # HI subset of Hanam data
-han_hi <- map_dfr(c("hanam-HI-gen", "hanam-HI-exp"), read_hanam)
+han_hi <- map_dfr(c("hanam-hi-gen", "hanam-hi-exp"), read_hanam)
 
 # Kiddyvax main study
 kiddyvax_main <- read_kiddyvax("kiddyvaxmain")
