@@ -52,8 +52,14 @@ find_prot_titre_levels <- function(out, prob_name, level = 0.5) {
       pull(var_name)
   }
   
+  cnt <- 0
+  med <- 0
   while (TRUE) {
+    med_prev <- med
     med <- median(c(low, high))
+    print(med)
+    if (med == med_prev) cnt <- cnt + 1
+    if (cnt == 5) return(med)
     pred_med <- get_prot_prob(prob_name, med, out)
     if (near(pred_med, level)) return(med)
     if (pred_med < level) low <- med
