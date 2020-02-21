@@ -139,8 +139,8 @@ save_plot <- function(plot, name, width, height) {
 
 # Script ======================================================================
 
-kiddyvax <- read_kiddyvax("kiddyvax-main")
-swab <- read_swab("kiddyvax-swab")
+kiddyvax <- read_kiddyvax("kiddyvaxmain")
+swab <- read_swab("kiddyvaxmain-swab")
 
 kiddyvax_inf <- inf_plot(kiddyvax)
 save_plot(kiddyvax_inf, "kiddyvax-main-titre", 15, 7.5)
