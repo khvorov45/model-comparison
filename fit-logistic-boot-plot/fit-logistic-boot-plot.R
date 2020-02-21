@@ -45,8 +45,8 @@ read_kv_summ <- function(name) {
 recode_viruses <- function(dat) {
   dat %>%
     mutate(
-      virus = recode(
-        virus, "h1pdm" = "H1N1pdm", "bvic" = "B Vic"
+      virus = factor(
+        virus, levels = c("h1pdm", "bvic"), labels = c("H1N1pdm", "B Vic")
       )
     )
 }
@@ -205,10 +205,10 @@ save_plot(han_hi_lr_b_prot_rel_plot, "hanam-hi-prot-rel")
 kvm_lr_b_inf_plot <- inf_curve_fun(
   kvm_lr_b_inf, kv_main_summ, "vir", 5, 5120, 0, 0.27
 )
-save_plot(kvm_lr_b_inf_plot, "kiddyvaxmain-inf", 10, 7.5)
+save_plot(kvm_lr_b_inf_plot, "kiddyvaxmain-inf", 12, 7.5)
 
 kvm_lr_b_prot_plot <- prot_curve_fun(kvm_lr_b_prot, "vir", 5, 5120)
-save_plot(kvm_lr_b_prot_plot, "kiddyvaxmain-prot", 10, 7.5)
+save_plot(kvm_lr_b_prot_plot, "kiddyvaxmain-prot", 12, 7.5)
 
 kvm_lr_b_prot_rel_plot <- prot_curve_fun(kvm_lr_b_prot_rel, "vir", 5, 5120)
-save_plot(kvm_lr_b_prot_rel_plot, "kiddyvaxmain-prot-rel", 10, 7.5)
+save_plot(kvm_lr_b_prot_rel_plot, "kiddyvaxmain-prot-rel", 12, 7.5)

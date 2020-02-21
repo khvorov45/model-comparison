@@ -45,8 +45,8 @@ read_kv_summ <- function(name) {
 recode_viruses <- function(dat) {
   dat %>%
     mutate(
-      virus = recode(
-        virus, "h1pdm" = "H1N1pdm", "bvic" = "B Vic"
+      virus = factor(
+        virus, levels = c("h1pdm", "bvic"), labels = c("H1N1pdm", "B Vic")
       )
     )
 }

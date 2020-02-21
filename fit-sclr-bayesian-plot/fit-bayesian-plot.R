@@ -59,8 +59,9 @@ read_one_summ <- function(filepath) {
 recode_viruses <- function(dat) {
   dat %>%
     mutate(
-      virus = recode(
-        virus, "h1pdm" = "H1N1pdm", "h3" = "H3N2", "bvic" = "B Vic"
+      virus = factor(
+        virus, levels = c("h1pdm", "bvic", "h3"), 
+        labels = c("H1N1pdm", "B Vic", "H3N2")
       )
     )
 }
