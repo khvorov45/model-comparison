@@ -16,7 +16,7 @@ plot(
 axis(
   2, 
   at = seq(0.5, 3.5, 1), 
-  labels = rep(c("Household\n cohort", "Challenge"), 2), 
+  labels = rep(c("Observational", "Challenge"), 2), 
   las = 2, 
   tick = F, 
   cex.axis = 0.8
@@ -46,7 +46,7 @@ legend(
 )
 legend(
   2.4, 4.4,
-  lty = c(1, 1), col = c(3, 4), box.lty = 0,
+  lty = c(1, 1), col = c(4, 3), box.lty = 0,
   c("Challenge infection", "Seasonal epidemic"), horiz = T, cex = 0.7
 )
 
