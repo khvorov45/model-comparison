@@ -89,22 +89,22 @@
 
 In the study of infectious diseases it is useful to have some measure of whether a person is infected, immune or susceptible to infection. This may be important, for example, to understand disease prevalence, population-level susceptibility or for evaluation of vaccines.  However, direct measurement of immunity is often not possible and instead some \textit{correlate} of protection is used. For viral infectious diseases, an oft-used correlate is the serum antibody titre, which provides a measure of the amount of antibody that recognizes a particular epitope. 
 
-Antibody titres have several limitations. Titres are the inverse of the greatest dilution of antibody that inhibits virus in serial dilutions, with higher values indicating greater inhibition. There is no true zero value, nor is there a true measure of the maximum value; titres can only be as low as the minimum starting concentration and as high as the maximum dilution.  Furthermore, within dilution intervals, the true concentration that inhibits virus is unknown; only the upper and lower bound of each dilution is known. In addition, antibody titres are merely a surrogate measure and their sensitivity and specificity may be imperfect, such that reduces titres may not always correspond to increased susceptibility. 
+Antibody titres have several limitations. Titres are the inverse of the greatest dilution of antibody that inhibits virus in serial dilutions, with higher values indicating greater inhibition. There is no true zero value, nor is there a true measure of the maximum value; titres can only be as low as the minimum starting concentration and as high as the maximum dilution.  Furthermore, within dilution intervals, the true concentration that inhibits virus is unknown; only the upper and lower bound of each dilution is known. In addition, antibody titres are merely a surrogate measure and their sensitivity and specificity may be imperfect, such that reduced titres may not always correspond to increased susceptibility. 
 
-For influenza vaccines, the haemagglutination inhibition (HI) antibody titre is an established correlate of protection. Indeed, the annual reformulation of influenza vaccines is partially dependent on demonstration that circulating viruses are no longer inhibited by vaccine-induced antibodies indicated by HI titres below a certain threshold \citep{Barr;2014}. And annual re-licensing of updated formulations is dependent on demonstrating that a vaccine induces HI titres above a certain threshold \citep{Wood;2003}.  The HI threshold commonly used is a titre of 1:40, thought correspond to a 50\% reduction in risk. This figure is derived from cohort studies among vaccinated or infected individuals who have been followed for infection, and among whom the median titre associated with protection (no detected infection) is calculated \citep{Hobson;1972}\citep{Ng;2013}. 
+For influenza vaccines, the haemagglutination inhibition (HI) antibody titre is an established correlate of protection. Indeed, the annual reformulation of influenza vaccines is partially dependent on demonstration that circulating viruses are no longer inhibited by vaccine-induced antibodies indicated by HI titres below a certain threshold \citep{Barr;2014}. And annual re-licensing of updated formulations is dependent on demonstrating that a vaccine induces HI titres above this same threshold \citep{Wood;2003}.  The HI threshold commonly used is a titre of 1:40, thought correspond to a 50\% reduction in risk. This figure is derived from cohort studies among vaccinated or infected individuals who have been followed for infection, and among whom the median titre associated with protection (no detected infection) is calculated \citep{Hobson;1972}\citep{Ng;2013}. 
 
 %This threshold is also used to interpret susceptibility to infection among unvaccinated individuals for modelling studies and public health interventions. For example during the 2009 pandemic, age-specific susceptibility, established by sero-epidemiology studies \citep{Hardelid;2011}, helped direct targeted vaccination programmes %[need ref]. 
 
-Several methods have been proposed for the analysis of antibody titre data and the calculation of protective thresholds. Each has its own set of assumptions that makes it more or less appropriate for the data being analysed. Here we will consider 3 models that we have seen used in the literature: Cox proportional hazards regression; ordinary logistic regression; and a scaled logit model. Using simulations and data from a large cohort study, we discuss these models' assumptions, limitations and situations in which they may not be appropriate.
+Several methods have been proposed for the analysis of antibody titre data and the calculation of protective thresholds. Each has its own set of assumptions that makes it more or less appropriate for the data being analysed. Here we will consider 3 models that we have seen used in the literature: Cox proportional hazards regression; ordinary logistic regression; and a scaled logit model. Using simulations and data from two published studies, we discuss these models' assumptions, limitations and situations in which they may not be appropriate.
 
 %==============================================================================
 \section{Study designs and motivating examples}
 
 Establishment of the threshold at 40 is based on human challenge studies from the 1960s in which volunteers were either randomised to received vaccine or not, or were challenged with virus \citep{Hobson;1972}. Blood samples were collected pre-challenge. For vaccinated individuals, challenge occurred at least 14 days after vaccination. Nasal swabs taken 48-hours after challenge were used to determine infection by virus culture, and for unvaccinated volunteers challenged with live virus, infection was additionally indicated by pre-to-post-challenge sero-conversion (4-fold rise in titre). In both cases, the protective titre was estimated from the pre-challenge geometric mean titre for uninfected participants. 
 
-While challenge studies permit close observation of participant responses to infection under highly controlled conditions, the infectious dose administered may be unnaturally high. Several household cohort studies of influenza have been established to understand influenza transmission in more realistic conditions. In these studies, participants are determined to be at risk of infection because one or more of their close contacts (i.e. household members) has been identified as influenza-infected.  Infection may be determined by laboratory testing of respiratory samples, or, if unvaccinated, by sero-conversion. In this paper, we will illustrate our findings using two established household studies. 
+While challenge studies permit close observation of participant responses to infection under highly controlled conditions, the infectious dose administered may be unnaturally high. Several observational studies have been established to understand influenza transmission in more realistic conditions. In these studies, participants are determined to be at risk of infection because one or more of their close contacts (i.e. household members) has been identified as influenza-infected or because influenza has been known to be circulating.  Infection may be determined by laboratory testing of respiratory samples, or, if unvaccinated, by sero-conversion. In this paper, we will illustrate our findings using two established household studies. 
 
-\pagebreak
+%\pagebreak
 %------------------------------------------------------------------------------
 \subsection{The Kiddivax study}
 
@@ -128,7 +128,7 @@ The Ha Nam study has followed 270 households in Hanam-Vietnam since 2007. Sera a
 %==============================================================================
 \section{Cox proportional hazards}
 
-In Cox proportional hazards regression, the outcome considered is time to event. This time should normally be time at risk of an observable event. As an illustration, in Figure \ref{CoxExampleFull}, two subjects are followed up until both experience an event (e.g. infection).
+In Cox proportional hazards regression, the outcome considered is time to event. This time should normally be time at risk of an observable event. As an illustration, in Figure \ref{CoxExampleFull}, two subjects are followed until both experience an event (e.g. infection).
 
 \begin{figure}[htp]
 	\centering
@@ -154,9 +154,9 @@ If subjects are not at risk of the event for all of their follow-up time (e.g. n
 
 \pagebreak
 
-In infection data, true time at risk is unobservable due to the inability to control exposure to pathogen (unexposed subjects are not at risk of infection). If follow-up time is completely unrepresentative of true time at risk, the Cox model will not produce reliable results. However, if the total time of follow-up is assumed to be, on average, proportional to the total time at risk (e.g. subjects who are followed up for longer can be expected to have been exposed for longer) then the situation illustrated in Figure  \ref{CoxExamplePartial} will be ``averaged out'' and the model may still produce reliable results.
+In infection data, true time at risk is unobservable because the risk of infection among susceptible individuals depends on exposure to the pathogen, which cannot be controlled. If follow-up time is completely unrepresentative of true time at risk, the Cox model will not produce reliable results. However, if the total time of follow-up is assumed to be, on average, proportional to the total time at risk (e.g. subjects who are followed up for longer can be expected to have been exposed for longer) then the situation illustrated in Figure  \ref{CoxExamplePartial} will be ``averaged out'' and the model may still produce reliable results.
 
-To investigate this, I simulated data. The model behind the simulations was
+To investigate this, we generated a simulated dataset, based on the following model:
 
 \begin{align*}
 \begin{gathered}
@@ -172,13 +172,11 @@ Each individual was assigned a proportion of time they were exposed to the virus
 
 Recorded time for each individual was 200 for everyone not infected (i.e. they were followed for the entire follow-up period and did not experience the event) and the true survival time divided by ``time at risk proportion'' for everyone infected (i.e. they were followed for that amount of time before experiencing the event).
 
-I did 10,000 simulations with 10,000 observations in each at different values of the expected proportion of time at risk. I fit the Cox proportional hazards model to each simulated dataset. From 10,000 simulations at each value of the expected proportion at risk, I took the mean of the estimated coefficient (a measure of its expected value at that proportion) and its standard deviation (a measure of its expected standard error at that proportion and sample size). The results are summarised in Figure \ref{CoxSimResults}.
+Each simulation included 10,000 observations and was run 10,000 times at different values of the expected proportion of time at risk. The Cox proportional hazards model was fit to each simulated dataset. From 10,000 simulations at each value of the expected proportion at risk, the mean of the estimated coefficient (a measure of its expected value at that proportion) and its standard deviation (a measure of its expected standard error at that proportion and sample size) were saved. The results are summarised in Figure \ref{CoxSimResults}.
 
 In the ideal case (proportion of time at risk set to 1) the estimate is unbiased and has the smallest error. As the proportion of time at risk decreases, bias is introduced while the error remains almost constant. When the proportion is small (less than 20\%), bias appears to decrease while error increases.
 
 The maximum bias was less than 4\% away from the true value. The standard error increases notably only when the expected proportion at risk is very small (less than 10\%). This shows that under the assumption that the time of follow-up is proportional to time at risk, the Cox model can be expected to produce reliable results.
-
-\pagebreak
 
 \begin{figure}[htp]
 	\centering
@@ -189,7 +187,7 @@ The maximum bias was less than 4\% away from the true value. The standard error 
 	\label{CoxSimResults}
 \end{figure}
 
-The assumption of time at risk being proportional to tome of follow-up is likely to hold when everyone in the sample is followed up through the period of similar disease activity. There may still be subjects who are not exposed (or over-exposed) but as long as the level of exposure does not correlate with the covariates of interest (e.g. antibody titres), then with a large enough sample size the average exposure for any covariate pattern (e.g. antibody titre level) should be proportional in the same way to the time of follow-up. If the disease is seasonal, the start of follow-up can be set to the start of the season. For those who do not get infected, end of follow-up can then be the end of the season. For those who do get infected, end of follow-up can be the infection time assuming that infection grants immunity for the rest of the season. An illustration is in Figure \ref{CoxIdeal}.
+The assumption of time at risk being proportional to time of follow-up is likely to hold when everyone in the sample is followed through a period of similar disease activity. There may still be subjects who are not exposed (or over-exposed) but as long as the level of exposure does not correlate with the covariates of interest (e.g. antibody titres), then with a large enough sample size the average exposure for any covariate pattern (e.g. antibody titre level) should be proportional in the same way to the time of follow-up. If the disease is seasonal, the start of follow-up can be set to the start of the season. For those who do not get infected, end of follow-up can then be the end of the season. For those who do get infected, end of follow-up can be the infection time assuming that infection grants immunity for the rest of the season. An illustration is in Figure \ref{CoxIdeal}.
 
 \begin{figure}[htp]
 	\centering
@@ -200,22 +198,20 @@ The assumption of time at risk being proportional to tome of follow-up is likely
 	\label{CoxIdeal}
 \end{figure}
 
-\pagebreak
-
 The assumption will likely not hold if, with a seasonal disease, there are people in the sample whose follow-up starts before the season. An illustration is in Figure \ref{CoxNotIdeal}. For those with earlier follow-up start, their follow-up time will be large regardless of their titres (since they spend a proportion of that time not being at risk). This should make it seem like the titres have a smaller effect than they actually do thus biasing the estimate of titre effect towards the null.
 
 \begin{figure}[htp]
 	\centering
 	\includegraphics[width=0.59\textwidth]{../curve-cox/timeplot_4_light.pdf}
 	\caption{
-	An illustration of a pattern of follow-up where the assumption of true time at risk being proportional to time of follow-up is likely to not hold. The shaded region marks the period of time when the disease is active. Subject 1 gets infected at 150 days, their follow-up would end there assuming infection grants immunity (their total recorded time of follow-up would be 50 days). Subject 2 does not get infected through the season, their time of follow-up ends at the end of the season (their total recorded time of follow-up would be 100 days). Subjects 3 (recorded follow up of 100 days) and 4 (recorded follow-up of 175 days) had follow-up started prior to season onset.
+	An illustration of a pattern of follow-up where the assumption of true time at risk being proportional to time of follow-up is likely to not hold. The shaded region marks the period of time when the disease is active. Subject 1 gets infected at 150 days, at which point their follow-up would end if it can be assumed that infection grants immunity (their total recorded time of follow-up would be 50 days). Subject 2 does not get infected within the season, their follow-up ends at the end of the season (their total recorded time of follow-up would be 100 days). For subjects 3 (recorded follow up of 100 days) and 4 (recorded follow-up of 175 days) follow-up commenced prior to season onset.
 	}
 	\label{CoxNotIdeal}
 \end{figure}
 
-\pagebreak
+%\pagebreak
 
-To demonstrate this problem, we performed some additional simulations using the same procedure as described above except subjects were randomly chosen to have had their follow-up started earlier. For those chosen, a uniform random number between 0 and 200 (days) was added to their recorded follow-up time. The proportion of time at risk was set to 1. The bias resulting from varying the proportion of the sample with earlier follow-up is shown in Figure \ref{CoxSimLong}. The estimate is unbiased when follow-up starts at the start of the season. Bias towards the null increases rapidly even when only a small (10\%) proportion of the sample has starts follow-up prior to the season. For this reason, it would be advisable to record follow-up time in such a way so that true unobservable time at risk can be reasonably expected to be proportional to the recorded time of follow-up (i.e. the longer a subject is followed, the longer they are likely to have been at risk).
+To demonstrate this problem, we performed some additional simulations using the same procedure as described above except subjects were randomly chosen to have had their follow-up started earlier. For those chosen, a uniform random number between 0 and 200 (days) was added to their recorded follow-up time. The proportion of time at risk was set to 1. The bias resulting from varying the proportion of the sample with earlier follow-up is shown in Figure \ref{CoxSimLong}. The estimate is unbiased when follow-up starts at the start of the season. Bias towards the null increases rapidly even when only a small (10\%) proportion of the sample has started follow-up prior to the season. For this reason, it would be advisable to record follow-up time in such a way so that true unobservable time at risk can be reasonably expected to be proportional to the recorded time of follow-up (i.e. the longer a subject is followed, the longer they are likely to have been at risk).
 
 \begin{figure}[htp]
 	\centering
@@ -226,7 +222,7 @@ To demonstrate this problem, we performed some additional simulations using the 
 	\label{CoxSimLong}
 \end{figure}
 
-\pagebreak
+%\pagebreak
 %==============================================================================
 \section{Logistic regression}
 
@@ -238,7 +234,7 @@ P(Y=1) = \frac{\text{exp}(\beta_0 + \beta_T X_{\text{logtitre}})}{1 + \text{exp}
 \end{gathered}
 \end{align*}
 
-A potentially large problem with the application of this model to antibody data is that low antibody titres do not necessarily guarantee infection (which is one of the model's assumptions). This assumption of baseline risk of 1 can be justified if it is shown that subjects with low antibody titres always (or almost always) get infected. If a large proportion of subjects with low titres do not get infected, this assumption is not justified. As an example, this assumption is not justified in the Ha Nam data as shown in Figure \ref{HanamCounts}. In both the general and the exposed populations, less than half the subjects with the titres below detectable levels (recorded as 5) were infected.
+A potentially large problem with the application of this model to antibody data is that low antibody titres do not necessarily guarantee infection (which is one of the model's assumptions). This assumption of baseline risk of 1 can be justified if it is shown that subjects with low antibody titres always (or almost always) get infected. If a large proportion of subjects with low titres do not get infected, this assumption is not justified. As an example, this assumption is not justified in the Ha Nam data as shown in Figure \ref{HanamCounts}. In both the general and the exposed populations, less than half the subjects with the titres below detectable levels (recorded as 5) were infected. %???during what time period?  I don't think we specified the period for which you have data
 
 \begin{figure}[htp]
 	\centering
@@ -249,9 +245,10 @@ A potentially large problem with the application of this model to antibody data 
 	\label{HanamCounts}
 \end{figure}
 
-If the assumption of the baseline probability being 1 is not satisfied, the fitted probability curve will be flatter than the real one thereby misrepresenting the true probability of infection across the titre range. An illustration is in Figure \ref{LogisticFit}.
+If baseline risk cannot justifiably be assumed to be 1, the fitted probability curve will be flatter than the true curve, thereby misrepresenting the true probability of infection across the titre range. An illustration is in Figure \ref{LogisticFit}. Thus, ignoring the baseline risk assumption will lead to biased estimates.
 
-\pagebreak
+
+%\pagebreak
 
 \begin{figure}[htp]
 	\centering
@@ -262,9 +259,8 @@ If the assumption of the baseline probability being 1 is not satisfied, the fitt
 	\label{LogisticFit}
 \end{figure}
 
-The potential bias in the estimates coming from fitting the logistic model is the reason why the logistic model is unreliable whenever the assumption of the baseline risk of 1 cannot be justified.
 
-\pagebreak
+%\pagebreak
 %==============================================================================
 \section{Scaled logistic regression}
 
@@ -284,7 +280,7 @@ Compared to logistic regression, the scaled logit model requires a larger sample
 
 Standard errors of the $\beta$ regression estimates ($\beta_0$ being the intercept and $\beta_T$ being $X_{\text{logtitre}}$ coefficient) were consistently higher with the scaled logit model. In order to reliably converge (under the chosen true parameter values) the scaled logit model required the sample size to be over 500. The standard logistic model always converged.
 
-\pagebreak
+%\pagebreak
 
 \begin{figure}[htp]
 	\centering
@@ -304,7 +300,7 @@ Standard errors of the $\beta$ regression estimates ($\beta_0$ being the interce
 	\label{SclrConv}
 \end{figure}
 
-\pagebreak
+%\pagebreak
 %==============================================================================
 \section{Ha Nam application}
 
@@ -354,9 +350,9 @@ The fitted infection curve is shown in Figure \ref{SclrBayesInf}. The fitted pro
 	\label{SclrBayesProt}
 \end{figure}
 
-Limiting the sample to just those exposed to the virus (at least one household infection in a season) improved the precision of the estimates. Despite a fairly large sample, reasonably precise estimates of 50\% protection can only be obtained for the H3N2 virus (inferring from the model fitted to the exposed subset). The general lack of precision in the estimates is likely due the number of parameters in the model (3 parameters with 1 covariate) and the censored nature of HI titre measurements, particularly the fact that any titre below 10 is undetectable which means that it is impossible to distinguish between many of the observations (e.g. some subjects with undetectable titres may have had a true titre of 9 while others --- of 2, but both were recorded as 5) which makes it harder to estimate the baseline probability (as seen in the credible bounds increasing at small (<10) titres).
+Limiting the sample to just those exposed to the virus (at least one household infection in a season) improved the precision of the estimates. Despite a fairly large sample, reasonably precise estimates of 50\% protection can only be obtained for the H3N2 virus (inferring from the model fitted to the exposed subset). The general lack of precision in the estimates is likely due to the number of parameters in the model (3 parameters with 1 covariate) and the censored nature of HI titre measurements, particularly the fact that any titre below 10 is undetectable which means that it is impossible to distinguish between many of the observations (e.g. some subjects with undetectable titres may have had a true titre of 9 while others --- of 2, but both were recorded as 5) which makes it harder to estimate the baseline probability (as seen in the credible bounds increasing at small (<10) titres).
 
-\pagebreak
+%\pagebreak
 %------------------------------------------------------------------------------
 \subsection{Comparison to standard logistic fit}
 
@@ -392,20 +388,21 @@ The other option for generating a protection curve is to calculate the fitted pr
 	\centering
 	\includegraphics[width=0.8\textwidth]{../fit-logistic-boot-plot/hanam-hi-prot-rel.pdf}
 	\caption{
-	Fitted relative-to-5 protection curves and confidence intervals from the standard logistic model fit to Ha Nam data (also shown in Figure \ref{HanamCounts}) using maximum likelihood with no accounting of censored titres (observations of 5 (below detectable) and 1280 (above detectable) were unchanged, all other observations were moved to the midpoints of the corresponding censored intervals on a log scale). The solid line is the point estimates. The shaded region is the 95\% confidence interval.
+	Fitted relative-to-5 protection curves and confidence intervals from the standard logistic model fit to Ha Nam data (also shown in Figure \ref{HanamCounts}) using maximum likelihood with no accounting of censored titres (observations of 5 (below detectable) and 1280 (above detectable) were unchanged, all other observations were moved to the midpoints of the corresponding censored intervals on a log scale). Solid lines are the point estimates, with shaded regions the 95\% confidence interval.
 	}
 	\label{lr-prot-rel}
 \end{figure}
 
-While the relative-to-5 protection curves (Figure \ref{lr-prot-rel}) appear more plausible than the relative-to-baseline protection curves (Figure \ref{lr-prot-abs}), both result from fitting a model with an unsatisfied assumption and neither method of generating protection curves from logistic regression model fit will reliably produce accurate results.
+While the relative-to-5 protection curves (Figure \ref{lr-prot-rel}) appear more plausible than the relative-to-baseline protection curves (Figure \ref{lr-prot-abs}), both result from fitting a model with an unsatisfied assumption and neither method of generating protection curves from logistic regression model reliably produce accurate results.
 
-The relative-to-5 curve (Figure \ref{lr-prot-rel}) presents an additional problem. The curve shows how much ``better'' different titres are at protecting against infection than the titre of 5 (or some other threshold). There is nothing inherently special about this threshold of 5 and its choice is arbitrary. The curves may look substantially different if a different threshold (e.g. 10 or 1) is chosen.
+The relative-to-5 curve (Figure \ref{lr-prot-rel}) presents an additional problem. The curve shows how much ``better'' different titres are at protecting against infection than the titre of 5. 
+There is nothing inherently special about this threshold of 5. Its choice is based on the lower dilution of 10. Pre-treatment of the sera necessitates dilution, so the lower bound can never be 1, but could be something more than 1 such as <5.  Nevertheless, the curves may look substantially different if a different threshold (e.g. 10 or 1) is chosen.
 
 \pagebreak
 %==============================================================================
 \section{Kiddyvax application}
 
-The data for this study includes post-vaccination HI titres of subjects who were followed up for a year for flu infection. The infection status was determined by PCR which was done for everyone who experienced symptoms. This data is shown in Figure \ref{fig:kiddyvax-main-titre}.
+The data for this study includes post-vaccination HI titres of subjects who were followed for up to one year for flu infection. The infection status was determined by PCR which was done for everyone who experienced symptoms. This data is shown in Figure \ref{fig:kiddyvax-main-titre}.
 
 \begin{figure}[htp]
 	\centering
@@ -418,11 +415,11 @@ The data for this study includes post-vaccination HI titres of subjects who were
 
 Analyses were done on the data for B Vic and A(H1pdm) viruses in the same way as for the Ha Nam data with the addition of the Cox proportional hazards model.
 
-\pagebreak
+%\pagebreak
 %
 \subsection{Scaled logit fit}
 
-The same model was fit in the same way using the same prior distributions as for the Ha Nam data. The protection curves are in Figure \ref{fig:kiddyvaxmain-prot-bayes-sclr}.
+The same scaled logit model was fit in the same way using the same prior distributions as for the Ha Nam data. The protection curves are in Figure \ref{fig:kiddyvaxmain-prot-bayes-sclr}. The credible intervals are very broad due to the fact there are very few infections the sample.
 
 \begin{figure}[htp]
 	\centering
@@ -433,13 +430,13 @@ Fitted infection curve and credible interval from the scaled logit model Bayesia
 	\label{fig:kiddyvaxmain-prot-bayes-sclr}
 \end{figure}
 
-The credible intervals are very broad due to the fact there are very few infections the the sample.
 
-\pagebreak
+
+%\pagebreak
 %
 \subsection{Standard logistic fit}
 
-The relative protection curves are in Figure \ref{fig:kiddyvaxmain-prot-rel-lr-boot}.
+The relative protection curves are in Figure \ref{fig:kiddyvaxmain-prot-rel-lr-boot}. The same considerations regarding the unjustified assumption of baseline risk of 1 apply here as they did with Ha Nam (Figure \ref{fig:kiddyvax-main-titre} shows many uninfected subjects with undetectable titres).
 
 \begin{figure}[htp]
 	\centering
@@ -450,13 +447,11 @@ The relative protection curves are in Figure \ref{fig:kiddyvaxmain-prot-rel-lr-b
 	\label{fig:kiddyvaxmain-prot-rel-lr-boot}
 \end{figure}
 
-The same considerations regarding the unjustified assumption of baseline risk of 1 apply here as they did with Ha Nam (Figure \ref{fig:kiddyvax-main-titre} shows many uninfected subjects with undetectable titres).
-
-\pagebreak
+%\pagebreak
 %------------------------------------------------------------------------------
 \subsection{Cox proportional hazards fit}
 
-For those who got infected, the time at risk was taken to be the time from start of follow-up to infection. For those who did not get infected the time at risk was take to be the time from start of follow-up to end of follow-up.
+For infected individuals, the time at risk was taken to be the time from start of follow-up to infection. For those who did not get infected the time at risk was take to be the time from start of follow-up to end of follow-up.
 
 The model was
 
@@ -466,9 +461,7 @@ h(t) = h_0\text{exp}(\beta_T X_{\text{logtitre}})
 \end{gathered}
 \end{align*}
 
-where $h$ is the hazard function and $X_{\text{logtitre}}$ is the post-vaccination titre measurement on the log scale.
-
-The resulting protection curves (relative to the titre of 5) are in Figure \ref{fig:kiddyvaxmain-cox}.
+where $h$ is the hazard function and $X_{\text{logtitre}}$ is the post-vaccination titre measurement on the log scale. The resulting protection curves (relative to the titre of 5) are in Figure \ref{fig:kiddyvaxmain-cox}. Although the point estimates are similar to those recovered from the model; however standard errors are inflated. 
 
 \begin{figure}[htp]
 	\centering
@@ -497,7 +490,7 @@ Scaled logit & Requires a large sample size. \\
 \end{tabular}
 \end{table}
 
-In presence of good time to event data where every subject's follow-up time is at least proportional to their time at risk, the Cox model will likely perform best out the the three due to it having the least number of parameters allowing for more precise estimates. In absence of such data, logistic regression may be applicable if the assumption of everyone being infected at low antibody titres can be justified. If this assumption cannot be justified, the scaled logit model can be applied but the sample needs to be fairly large (>500) in order to obtain useful estimates.
+In this paper we have explored three different models for estimating protective antibody titres using data from influenza vaccine and infection studies.  We have shown that in the presence of good time-to-event data where every subject's follow-up time is at least proportional to their time at risk, the Cox model will likely perform best out the three models explored due to it having the least number of parameters allowing for more precise estimates. Absent such data, logistic regression may be appropriate if the assumption of everyone being infected at low antibody titres can be justified. If this assumption cannot be justified, which is probably the case for influenza studies, the scaled logit model can be applied but the sample needs to be fairly large (>500) in order to obtain useful estimates.
 
 \pagebreak
 \bibliography{bibliography}

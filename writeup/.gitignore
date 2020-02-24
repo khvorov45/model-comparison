@@ -1,3 +1,4 @@
 .syntex.gz
 *.log
 *.bbl
+*.aux
