@@ -309,48 +309,18 @@ This section shows an application of the scaled logit model to the Ha Nam cohort
 %------------------------------------------------------------------------------
 \subsection{Scaled logit fit}
 
-The scaled logit model was fit in a Bayesian way to better handle missing data and censored titre measurements. The full specification is
-
-\begin{align*}
-\begin{gathered}
-Y_i \sim \text{Bernoulli}(p_i) \\
-p_i = \frac{\lambda}{1 + \text{exp}(\beta_0 + \beta_T T_i)} \\
-T_i \sim N(\mu, \sigma^2) \ \text{truncated}(L_{i}, H_{i}) \\
-\mu \sim N(2, 2^2) \quad \sigma \sim \text{Exponential}(\text{rate} = 0.1) \\
-\lambda \sim \text{Uniform}(0, 1) \\
-\beta_0 \sim N(-15, 10^2) \quad \beta_T \sim N(5, 5^2)
-\end{gathered}
-\end{align*}
-
-Where $i$ is observation index, $Y_i$ is infection status (0 --- infected (both symptomatic and asymptomatic), 1 --- not infected), $T_i$ is true log HI titre, $L_i$ is the low bound of observed HI interval (e.g. for observation of 20 this is log(20)), $H_i$ is the high bound of observed HI interval (e.g. for observation of 20 this is log(40)).
-
-The prior distributions for the mean and standard deviation of log HI titres were chosen to be broad but still somewhat reflect the expected distribution in the general population --- mean high enough to allow a fair proportion (>20\%) to have titres above detectable level (log(10)) and standard deviation low enough to not result in titres above highest detectable level (log(1280)) to be more prevalent than titres between log(640) and log(1280).
-
-The prior distribution for the baseline risk parameter $\lambda$ gives equal probability to all of its possible values. The prior distributions for the logistic curve parameters $\beta_0$ and $\beta_T$ was chosen to be spread around all of their plausible values --- $\beta_0$ is likely below 0 (otherwise the probability of infection would be close to 0 and not change across the observed titre range) and not too low (e.g. a value below -30 would result in the probability of infection being equal to $\lambda$ and not changing across the observed titre range); while $\beta_T$ is likely above 0 (since titres are protective) but not too high since it would result in a very steep curve (e.g. a titre of 20 may have the expected infection probability of $\lambda$ while a titre of 40 has the expected infection probability of 0).
-
-The fitted infection curve is shown in Figure \ref{SclrBayesInf}. The fitted protection curve is shown in Figure \ref{SclrBayesProt}.
+The scaled logit model was fit using the maximum likelihood method. The fitted protection curves are in Figure \ref{fig:fit-sclr-prot}.
 
 \begin{figure}[htp]
 	\centering
-	\includegraphics[width=0.8\textwidth]{../fit-sclr-bayesian-plot/hanam-hi-inf.pdf}
+	\includegraphics[width=0.8\textwidth]{../fit-sclr-plot/hanam-hi-prot.pdf}
 	\caption{
-	Fitted infection curve and credible interval from the scaled logit model Bayesian fit to Ha Nam data (also shown in Figure \ref{HanamCounts}). The solid line is the median of the posterior distribution. The shaded region is the 95\% credible interval. The dashed line is the prior distribution, i.e. the bounds of the shaded region that would have been obtained if the data contained no information to estimate model parameters. The upper bound is above 90\% and therefore not visible. The points are the infected proportions at the corresponding titre measurements. The numbers next to the points are the total sample size of the corresponding groups. Note that the titre measurements were shifted to midpoints of the corresponding intervals to better represent average underlying titres, e.g. the measurement of 20 was shifted to the log-scale midpoint between 20 and 40 (except the measurement of 5 which represents undetectable titres and the measurement of 1280 which represents titres above the highest detectable level).
+	Fitted protection curves and confidence intervals from the scaled logit fit to Ha Nam data (also shown in Figure \ref{HanamCounts}) using the maximum likelihood method. The solid line is the point estimate. The shaded region is the 95\% confidence interval.
 	}
-	\label{SclrBayesInf}
+	\label{fig:fit-sclr-prot}
 \end{figure}
 
-\pagebreak
-
-\begin{figure}[htp]
-	\centering
-	\includegraphics[width=0.8\textwidth]{../fit-sclr-bayesian-plot/hanam-hi-prot.pdf}
-	\caption{
-	Fitted protection curve and credible interval from the scaled logit model Bayesian fit to Ha Nam data (also shown in Figure \ref{HanamCounts}). The solid line is the median of the posterior distribution. The shaded region is the 95\% credible interval. The dashed line is the prior distribution, i.e. the bounds of the shaded region that would have been obtained if the data contained no information to estimate model parameters.
-	}
-	\label{SclrBayesProt}
-\end{figure}
-
-Limiting the sample to just those exposed to the virus (at least one household infection in a season) improved the precision of the estimates. Despite a fairly large sample, reasonably precise estimates of 50\% protection can only be obtained for the H3N2 virus (inferring from the model fitted to the exposed subset). The general lack of precision in the estimates is likely due to the number of parameters in the model (3 parameters with 1 covariate) and the censored nature of HI titre measurements, particularly the fact that any titre below 10 is undetectable which means that it is impossible to distinguish between many of the observations (e.g. some subjects with undetectable titres may have had a true titre of 9 while others --- of 2, but both were recorded as 5) which makes it harder to estimate the baseline probability (as seen in the credible bounds increasing at small (<10) titres).
+There is not enough data in the H1N1pdm subset to generate useful estimates. For H3N2 subset, limiting the sample to just those exposed to the virus (at least one household infection in a season) improved the precision of the estimates. The general lack of precision in the estimates is likely due to the number of parameters in the model (3 parameters with 1 covariate) and the censored nature of HI titre measurements, particularly the fact that any titre below 10 is undetectable which means that it is impossible to distinguish between many of the observations (e.g. some subjects with undetectable titres may have had a true titre of 9 while others --- of 2, but both were recorded as 5) which makes it harder to estimate the baseline probability (as seen in the confidence bounds increasing at small (<10) titres).
 
 %\pagebreak
 %------------------------------------------------------------------------------
@@ -380,7 +350,7 @@ While the infection curves appear to fit the data well, it is problematic to gen
 	\label{lr-prot-abs}
 \end{figure}
 
-The other option for generating a protection curve is to calculate the fitted probability of infection at a give titre and divide that by the fitted probability of infection at the titre of 5 (or any other) thereby generating a curve that shows relative-to-5 infection probabilities (as opposed to relative-to-baseline). Subtracting these relative-to-5 infection probabilities from 1 generates curves shown in Figure \ref{lr-prot-rel}
+The other option for generating a protection curve is to calculate the fitted probability of infection at a give titre and divide that by the fitted probability of infection at the titre of 5 (or any other) thereby generating a curve that shows relative-to-5 infection probabilities (as opposed to relative-to-baseline). The variance of this quantity may be estimated by using the bootstrap method. Subtracting these relative-to-5 infection probabilities from 1 generates curves shown in Figure \ref{lr-prot-rel}.
 
 \pagebreak
 
@@ -388,7 +358,7 @@ The other option for generating a protection curve is to calculate the fitted pr
 	\centering
 	\includegraphics[width=0.8\textwidth]{../fit-logistic-boot-plot/hanam-hi-prot-rel.pdf}
 	\caption{
-	Fitted relative-to-5 protection curves and confidence intervals from the standard logistic model fit to Ha Nam data (also shown in Figure \ref{HanamCounts}) using maximum likelihood with no accounting of censored titres (observations of 5 (below detectable) and 1280 (above detectable) were unchanged, all other observations were moved to the midpoints of the corresponding censored intervals on a log scale). Solid lines are the point estimates, with shaded regions the 95\% confidence interval.
+	Fitted relative-to-5 protection curves and confidence intervals from the standard logistic model fit to Ha Nam data (also shown in Figure \ref{HanamCounts}) using maximum likelihood with no accounting of censored titres (observations of 5 (below detectable) and 1280 (above detectable) were unchanged, all other observations were moved to the midpoints of the corresponding censored intervals on a log scale). Solid lines are the point estimates, with shaded regions the 95\% confidence interval. The bounds for the confidence interval were obtained by using the bootstrap method (10,000 samples).
 	}
 	\label{lr-prot-rel}
 \end{figure}
@@ -419,18 +389,16 @@ Analyses were done on the data for B Vic and A(H1pdm) viruses in the same way as
 %
 \subsection{Scaled logit fit}
 
-The same scaled logit model was fit in the same way using the same prior distributions as for the Ha Nam data. The protection curves are in Figure \ref{fig:kiddyvaxmain-prot-bayes-sclr}. The credible intervals are very broad due to the fact there are very few infections the sample.
+The same scaled logit model was fit in the same way as for the Ha Nam data. The protection curves are in Figure \ref{fig:kiddyvaxmain-sclr-prot}. The model fails to produce useful estimates due to there being very few infections in the sample.
 
 \begin{figure}[htp]
 	\centering
-	\includegraphics[width=0.8\textwidth]{../fit-sclr-bayesian-plot/kiddyvaxmain-prot.pdf}
+	\includegraphics[width=0.8\textwidth]{../fit-sclr-plot/kiddyvaxmain-prot.pdf}
 	\caption{
-Fitted infection curve and credible interval from the scaled logit model Bayesian fit to subsets of kiddyvax data (shown in Figure \ref{fig:kiddyvax-main-titre}). The solid line is the median of the posterior distribution. The shaded region is the 95\% credible interval. The dashed line is the prior distribution, i.e. the bounds of the shaded region that would have been obtained if the data contained no information to estimate model parameters.
+	Fitted protection curves and confidence intervals from the scaled logit fit to Kiddyvax data (also shown in Figure \ref{fig:kiddyvax-main-titre}) using the maximum likelihood method. The solid line is the point estimate. The shaded region is the 95\% confidence interval.
 	}
-	\label{fig:kiddyvaxmain-prot-bayes-sclr}
+	\label{fig:kiddyvaxmain-sclr-prot}
 \end{figure}
-
-
 
 %\pagebreak
 %
@@ -442,7 +410,7 @@ The relative protection curves are in Figure \ref{fig:kiddyvaxmain-prot-rel-lr-b
 	\centering
 	\includegraphics[width=0.8\textwidth]{../fit-logistic-boot-plot/kiddyvaxmain-prot-rel.pdf}
 	\caption{
-	Fitted relative-to-5 protection curves and confidence intervals from the standard logistic model fit to kiddyvax data (shown in Figure \ref{fig:kiddyvax-main-titre}) using maximum likelihood with no accounting of censored titres (observations of 5 (below detectable) were unchanged, all other observations were moved to the midpoints of the corresponding censored intervals on a log scale). The solid line is the point estimates. The shaded region is the 95\% confidence interval.
+	Fitted relative-to-5 protection curves and confidence intervals from the standard logistic model fit to kiddyvax data (shown in Figure \ref{fig:kiddyvax-main-titre}) using maximum likelihood with no accounting of censored titres (observations of 5 (below detectable) were unchanged, all other observations were moved to the midpoints of the corresponding censored intervals on a log scale). The solid line is the point estimates. The shaded region is the 95\% confidence interval. The bounds for the confidence interval were obtained by using the bootstrap method (10,000 samples).
 	}
 	\label{fig:kiddyvaxmain-prot-rel-lr-boot}
 \end{figure}
@@ -461,7 +429,7 @@ h(t) = h_0\text{exp}(\beta_T X_{\text{logtitre}})
 \end{gathered}
 \end{align*}
 
-where $h$ is the hazard function and $X_{\text{logtitre}}$ is the post-vaccination titre measurement on the log scale. The resulting protection curves (relative to the titre of 5) are in Figure \ref{fig:kiddyvaxmain-cox}. Although the point estimates are similar to those recovered from the model; however standard errors are inflated. 
+where $h$ is the hazard function and $X_{\text{logtitre}}$ is the post-vaccination titre measurement on the log scale. The resulting protection curves (relative to the titre of 5) are in Figure \ref{fig:kiddyvaxmain-cox}. Although the point estimates are similar to those recovered from the model; however standard errors are inflated.
 
 \begin{figure}[htp]
 	\centering
