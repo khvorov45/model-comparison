@@ -1,0 +1,15 @@
+\begin{table}[htp]
+\centering
+\caption{Summary of the three considered models in terms of their application to antibody data}
+\begin{tabular}{cp{25em}}
+\toprule
+Model & Potential problem \\
+\midrule
+Cox PH & Biased if follow-up time is not proportional to time at risk for everyone in the sample \\
+Logistic & Biased if low antibody titres do not guarantee immunity \\
+Scaled logit & Requires a large sample size. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+In this paper we have explored three different models for estimating protective antibody titres using data from influenza vaccine and infection studies.  We have shown that in the presence of good time-to-event data where every subject's follow-up time is at least proportional to their time at risk, the Cox model will likely perform best out the three models explored due to it having the least number of parameters allowing for more precise estimates. Absent such data, logistic regression may be appropriate if the assumption of everyone being infected at low antibody titres can be justified. If this assumption cannot be justified, which is probably the case for influenza studies, the scaled logit model can be applied but the sample needs to be fairly large (>500) in order to obtain useful estimates.
