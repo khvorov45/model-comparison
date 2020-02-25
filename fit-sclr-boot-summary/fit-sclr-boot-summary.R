@@ -35,15 +35,15 @@ widen_bootstraps <- function(bootstr) {
 }
 
 calc_probs <- function(out) {
+  invlogit <- function(x) 1 - 1 / (1 + exp(x))
   out %>%
     mutate(
       loghi = loghi,
-      inf = 1 - 1 / (1 + exp(beta_0 + beta_loghimid * loghi)),
-      prot = 1 - inf,
-      prot_rel = 1 - inf / (1 - 1 / (1 + exp(beta_0 + beta_loghimid * log(5))))
+      prot = invlogit(beta_0 + beta_loghimid * loghi),
+      inf = invlogit(theta) * (1 - prot),
     ) %>%
     pivot_longer(
-      c(prot, inf, prot_rel), names_to = "prob_type", values_to = "prob"
+      c(prot, inf), names_to = "prob_type", values_to = "prob"
     )
 }
 
