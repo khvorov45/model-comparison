@@ -68,7 +68,7 @@ save_lr_boot <- function(samples, name) {
 # Script ======================================================================
 
 # Hanam data
-han <- map_dfr(c("hanam-HI-exp", "hanam-HI-gen"), read_hanam) %>%
+han <- map_dfr(c("hanam-hi-exp", "hanam-hi-gen"), read_hanam) %>%
   filter(virus != "H1N1seas")
 
 # Kiddyvax data
