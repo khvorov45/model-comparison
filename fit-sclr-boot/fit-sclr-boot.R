@@ -1,7 +1,7 @@
-# Fit the scaled logit model to hanam data
+# Fit the scaled logit model, bootstraps
 # Arseniy Khvorov
-# Created 2019/12/04
-# Last edit 2019/12/04
+# Created 2019-12-04
+# Last edit 2020-02-25
 
 library(tidyverse)
 library(sclr)
@@ -15,6 +15,30 @@ fit_sclr_boot_dir <- "fit-sclr-boot"
 data_dir <- "data"
 
 # Functions ===================================================================
+
+read_hanam <- function(nme) {
+  read_csv(
+    file.path(data_dir, paste0(nme, ".csv")), 
+    col_types = cols_only(
+      status_bin = col_integer(),
+      loghimid = col_double(),
+      virus = col_character(),
+      population = col_character()
+    )
+  ) %>%
+    rename(status = status_bin)
+}
+
+read_kiddyvax <- function(nme) {
+  read_csv(
+    file.path(data_dir, paste0(nme, ".csv")),
+    col_types = cols_only(
+      virus = col_character(),
+      status = col_integer(),
+      loghimid = col_double()
+    )
+  )
+}
 
 boot_fit <- function(dat, formula, n_res = 1000) {
   resamples <- bootstraps(dat, times = n_res)
@@ -31,30 +55,31 @@ boot_fit <- function(dat, formula, n_res = 1000) {
   future_imap_dfr(resamples$splits, fit_one)
 }
 
+save_lr_boot <- function(samples, name) {
+  write_csv(
+    samples,
+    file.path(fit_sclr_boot_dir, paste0(name, ".csv"))
+  )
+}
+
 # Script ======================================================================
 
 # Hanam data
-han <- read_csv(file.path(data_dir, "hanam.csv"))
+han <- map_dfr(c("hanam-hi-exp", "hanam-hi-gen"), read_hanam) %>%
+  filter(virus != "H1N1seas")
 
-# Prepare
-han_prep <- han %>%
-  filter(!is.na(status) | !is.na(preHI), virus != "H1N1seas") %>%
-  mutate(
-    logHI = log(preHI),
-    logHImid = case_when(
-      preHI == 5 ~ log(5),
-      preHI == 1280 ~ log(2560),
-      TRUE ~ logHI + log(2) / 2
-    ),
-    status_bin = if_else(status == "Not infected", 0 ,1)
-  ) %>%
-  select(status, status_bin, preHI, logHI, logHImid, virus)
+# Kiddyvax data
+kv <- read_kiddyvax("kiddyvaxmain") %>%
+  filter(virus %in% c("bvic", "h1pdm"))
 
-# Fit to viruses separately
-fit_bootstraps <- han_prep %>% # To get se's for the infection curve
+# Fit hanam to viruses and populations separately
+fit_bootstraps_han <- han %>%
+  group_by(virus, population) %>%
+  group_modify(~ boot_fit(.x, status ~ loghimid, 5))
+save_lr_boot(fit_bootstraps_han, "hanam-hi")
+
+# Fit kiddyvax to viruses separately
+fit_lr_boot_kv <- kv %>%
   group_by(virus) %>%
-  group_modify(~ boot_fit(.x, status_bin ~ logHImid, 1e3))
-write_csv(
-  fit_bootstraps,
-  file.path(fit_sclr_boot_dir, "samples.csv")
-)
+  group_modify(~ boot_fit(.x, status ~ loghimid, 5))
+save_lr_boot(fit_lr_boot_kv, "kiddyvaxmain")
