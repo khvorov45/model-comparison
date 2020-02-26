@@ -31,6 +31,9 @@
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
 
+% Sans-serif font
+\renewcommand{\familydefault}{\sfdefault}
+
 \usepackage{makecell}
 
 \renewcommand{\arraystretch}{1.1}
@@ -46,6 +49,7 @@
 \fancyfoot[R]{\thepage}
 \renewcommand{\headrulewidth}{0pt}
 \renewcommand{\footrulewidth}{0pt}
+\setlength{\headheight}{52pt}
 
 \fancypagestyle{plain}{
 	\fancyhf{} % clear all header and footer fields
@@ -64,10 +68,10 @@
 % (This matches ConTeXt defaults)
 
 %%% ToC (table of contents) APPEARANCE
-\usepackage[nottoc,notlof,notlot]{tocbibind} % Put the bibliography in the ToC
-\usepackage[titles,subfigure]{tocloft} % Alter the style of the Table of Contents
-\renewcommand{\cftsecfont}{\rmfamily\mdseries\upshape}
-\renewcommand{\cftsecpagefont}{\rmfamily\mdseries\upshape} % No bold!
+%\usepackage[nottoc,notlof,notlot]{tocbibind} % Put the bibliography in the ToC
+%\usepackage[titles,subfigure]{tocloft} % Alter the style of the Table of Contents
+%\renewcommand{\cftsecfont}{\rmfamily\mdseries\upshape}
+%\renewcommand{\cftsecpagefont}{\rmfamily\mdseries\upshape} % No bold!
 
 \usepackage[bookmarks,bookmarksnumbered,bookmarksopen,hidelinks]{hyperref}
 
@@ -75,8 +79,8 @@
 
 
 %%% TITLE
-\title{Models for antibody data}
-\author{Arseniy Khvorov, David Price, Annette Fox, Sheena G. Sullivan}
+\title{Statistical modelling of antibody data}
+\author{Arseniy Khvorov, David J. Price, Annette Fox, Sheena G. Sullivan}
 \begin{document}
 
 %%% Title
@@ -94,7 +98,6 @@
 
 \input{study-designs-and-motivating-examples}
 
-%\pagebreak
 %------------------------------------------------------------------------------
 \subsection{The Kiddivax study}
 
@@ -113,19 +116,16 @@
 
 \input{cox-proportional-hazards}
 
-%\pagebreak
 %==============================================================================
 \section{Logistic regression}
 
 \input{logistic-regression}
 
-%\pagebreak
 %==============================================================================
 \section{Scaled logistic regression}
 
 \input{scaled-logistic-regression}
 
-%\pagebreak
 %==============================================================================
 \section{Ha Nam application}
 
@@ -136,37 +136,31 @@
 
 \input{hanam-scaled-logit-fit}
 
-%\pagebreak
 %------------------------------------------------------------------------------
 \subsection{Comparison to standard logistic fit}
 
 \input{hanam-logistic-fit}
 
-%\pagebreak
 %==============================================================================
 \section{Kiddyvax application}
 
 \input{kiddyvax-application}
 
-%\pagebreak
 %------------------------------------------------------------------------------
 \subsection{Scaled logit fit}
 
 \input{kiddyvax-scaled-logit-fit}
 
-%\pagebreak
 %------------------------------------------------------------------------------
 \subsection{Standard logistic fit}
 
 \input{kiddyvax-logistic-fit}
 
-%\pagebreak
 %------------------------------------------------------------------------------
 \subsection{Cox proportional hazards fit}
 
 \input{kiddyvax-cox-fit}
 
-%\pagebreak
 %==============================================================================
 \section{Conclusion}
 
