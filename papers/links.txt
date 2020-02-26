@@ -6,3 +6,6 @@ https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3778972/
 
 Zhang Z 2018 Time-varying covariates and coefficients in Cox regression models
 https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6015946/
+
+Horby P 2012 The Epidemiology of Interpandemic and Pandemic Influenza in Vietnam, 2007–2010
+https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3353138/
