@@ -9,3 +9,6 @@ https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6015946/
 
 Horby P 2012 The Epidemiology of Interpandemic and Pandemic Influenza in Vietnam, 2007–2010
 https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3353138/
+
+George B 2014 Survival analysis and regression models
+https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4111957/
