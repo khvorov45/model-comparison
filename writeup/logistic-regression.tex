@@ -6,7 +6,9 @@ P(Y=1) = \frac{\text{exp}(\beta_0 + \beta_T X_{\text{logtitre}})}{1 + \text{exp}
 \end{gathered}
 \end{align*}
 
-A potentially large problem with the application of this model to antibody data is that low antibody titres do not necessarily guarantee infection (which is one of the model's assumptions). This assumption of baseline risk of 1 can be justified if it is shown that subjects with low antibody titres always (or almost always) get infected. If a large proportion of subjects with low titres do not get infected, this assumption is not justified. As an example, this assumption is not justified in the Ha Nam data as shown in Figure \ref{HanamCounts}. In both the general and the exposed populations, less than half the subjects with the titres below detectable levels (recorded as 5) were infected. %???during what time period?  I don't think we specified the period for which you have data
+Where $\beta_0$ is the log-odds of infection when $X_{\text{logtitre}}=0$ and $\beta_T$ is the log-odds ratio of infection of subjects with a given $X_{\text{logtitre}}$ compared to subjects subjects whose $X_{\text{logtitre}}$ is 1 unit lower. 
+
+A potentially large problem with the application of this model to antibody data is that low antibody titres do not necessarily correlate with a high probability of infection (which is one of the model's assumptions). This assumption of baseline risk of 1 can be justified if it is the case that subjects with low antibody titres always (or almost always) get infected. If a large proportion of subjects with low titres do not get infected, this assumption is not justified and this model will produce a poor fit. As an example, this assumption is not justified in the Ha Nam data as shown in Figure \ref{HanamCounts}. In both the general and the exposed populations, less than half the subjects with the titres below detectable levels (recorded as 5) were infected. %???during what time period?  I don't think we specified the period for which you have data
 
 \begin{figure}[htp]
 	\centering
@@ -17,7 +19,7 @@ A potentially large problem with the application of this model to antibody data 
 	\label{HanamCounts}
 \end{figure}
 
-If baseline risk cannot justifiably be assumed to be 1, the fitted probability curve will be flatter than the true curve, thereby misrepresenting the true probability of infection across the titre range. An illustration is in Figure \ref{LogisticFit}. Thus, ignoring the baseline risk assumption will lead to biased estimates.
+If the baseline risk cannot justifiably be assumed to be 1, the fitted probability curve will be flatter than the true curve, thereby misrepresenting the true probability of infection across the titre range. An illustration is in Figure \ref{LogisticFit}. Thus, ignoring the baseline risk assumption will lead to biased estimates.
 
 
 %\pagebreak
