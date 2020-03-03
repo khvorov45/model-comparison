@@ -46,13 +46,13 @@ Each simulation included 10,000 observations and was run 10,000 times at each of
 
 In the ideal case (proportion of time at risk set to 1) the estimate is unbiased and has the smallest error. As the proportion of time at risk decreases, bias is introduced while the error remains almost constant. When the proportion is small (less than 30\%), bias appears to decrease while error increases.
 
-The maximum bias was less than 4\% away from the true value. The standard error increases notably only when the expected proportion at risk is very small (less than 10\%). This shows that under the assumption that the time of follow-up is proportional to time at risk, the Cox model can be expected to produce reliable results.
+The maximum bias was less than 3\% away from the true value. The standard error increases notably only when the expected proportion at risk is very small (less than 10\%). This shows that under the assumption that the time of follow-up is proportional to time at risk, the Cox model can be expected to produce reliable results.
 
 \begin{figure}[htp]
 	\centering
 	\includegraphics[width=1\textwidth]{../cox-tarprop-plot/risk.pdf}
 	\caption{
-	The results of time-to-event simulations. For each proportion of time at risk the mean of the estimated coefficient (left panel) is shown as well its standard deviation (right panel) obtained from 10,000 simulations. Points represent the values of expected proportion for which the simulations were performed. The dotted horizontal line is the true value of the estimated parameter.
+	The results of fitting a Cox PH model to the time-to-event simulations. For each time-at-risk proportion, the relative bias of the mean of the estimate (left panel) is shown as well the standard deviation of the estimate (right panel) obtained from 10,000 simulations. Points represent the values of expected time-at-risk proportion for which the simulations were performed.
 	}
 	\label{CoxSimResults}
 \end{figure}
