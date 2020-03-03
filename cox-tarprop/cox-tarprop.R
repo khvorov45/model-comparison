@@ -29,14 +29,10 @@ vary_list <- list(
 
 # Survival data with exponential survival time (hazard constant with time)
 sim_cox <- function(nsam, beta_0, beta_logTitre, risk_prop_expected,
-                    long_prop_expected, max_follow, 
+                    long_prop_expected, max_follow, kappa,
                     seed = sample.int(.Machine$integer.max, 1)) {
   set.seed(seed)
-  
-  # beta of beta distirbution given alpha and mean
-  get_sh2 <- function(prop_exp, sh1) sh1 * (1 - prop_exp) / prop_exp
-  sh1 <- 10
-  
+
   pop <- tibble(
     logTitre = rnorm(nsam, 2, 2),
     loghazard = beta_0 + beta_logTitre * logTitre,
@@ -44,7 +40,9 @@ sim_cox <- function(nsam, beta_0, beta_logTitre, risk_prop_expected,
     risk_proportion = case_when(
       risk_prop_expected == 1 ~ rep(1, nsam),
       risk_prop_expected == 0 ~ rep(0, nsam),
-      TRUE ~ rbeta(nsam, sh1, get_sh2(risk_prop_expected, sh1))
+      TRUE ~ rbeta(
+        nsam, risk_prop_expected * kappa, (1 - risk_prop_expected) * kappa
+      )
     ),
     time_at_risk_max = max_follow * risk_proportion,
     status = as.integer(time_at_risk_required <= time_at_risk_max),
@@ -64,7 +62,7 @@ sim_cox <- function(nsam, beta_0, beta_logTitre, risk_prop_expected,
   
   attr(pop, "true_values") <- tibble(
     nsam, beta_0, beta_logTitre, risk_prop_expected, 
-    long_prop_expected, max_follow
+    long_prop_expected, max_follow, kappa
   ) 
   attr(pop, "seed") <- seed
   
@@ -161,16 +159,36 @@ vary_par_1aat <- function(vary_list, nsim, data_name, data_dict,
   )
 }
 
-# Script ======================================================================
-
-data_dict <- list(
-  std = list(
+std_data <- function(kappa) {
+  list(
     sim_fun = sim_cox,
     sim_args = list(
       nsam = 1e4, beta_0 = -3, beta_logTitre = -1.5, risk_prop_expected = 1, 
-      long_prop_expected = 0, max_follow = 100
+      long_prop_expected = 0, max_follow = 100, kappa = kappa
     )
   )
+}
+
+sim_all_data <- function(vary_list, nsim, data_dict, 
+                         model_name, model_dict) {
+  total_sims <- sum(map_dbl(vary_list, length)) * nsim
+  imap_dfr(
+    names(data_dict), 
+    ~ vary_par_1aat(
+      vary_list,
+      nsim, .x, data_dict, model_name, model_dict, (.y - 1) * total_sims
+    )
+  )
+}
+
+# Script ======================================================================
+
+data_dict <- list(
+  std_1000 = std_data(1000),
+  std_100 = std_data(100),
+  std_10 = std_data(10),
+  std_1 = std_data(1),
+  std_05 = std_data(0.5)
 )
 
 model_dict <- list(
@@ -180,10 +198,7 @@ model_dict <- list(
   )
 )
 
-fits_summs <- vary_par_1aat(
-  vary_list,
-  nsim, "std", data_dict, "std", model_dict, 20191202
-)
+fits_summs <- sim_all_data(vary_list, nsim, data_dict, "std", model_dict)
 
 write_csv(
   fits_summs,
