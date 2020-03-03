@@ -1,26 +1,73 @@
 # Graphing of simulation results
 # Arseniy Khvorov
-# Created 2019/09/20
-# Last edit 2019/12/02
+# Created 2019-09-20
+# Last edit 2020-03-03
 
 library(tidyverse)
 library(ggdark) # devtools::install_github("khvorov45/ggdark")
-library(ggpubr)
 
 # Directories to be used later
 cox_tarprop_summ_dir <- "cox-tarprop-summary"
 cox_tarprop_plot_dir <- "cox-tarprop-plot"
 
+# Settings ===================================================================
+
+y_var_labs <- c(
+  "est_mean" = "Mean estimate",
+  "rel_bias" = "Relative bias",
+  "est_sd" = "Estimate SD"
+)
+
 # Functions ===================================================================
 
-plot_fun <- function(res, x_name, x_lab) {
-  true_value_extr <- first(res$true_val)
+read_res <- function(name) {
+  read_csv(
+    file.path(cox_tarprop_summ_dir, glue::glue("{name}.csv")),
+    col_types = cols_only(
+      est_mean = col_double(),
+      est_sd = col_double(),
+      true_val = col_double(),
+      par_varied = col_character(),
+      risk_prop_expected = col_double(),
+      long_prop_expected = col_double()
+    )
+  )
+}
+
+add_hline <- function(name, val, y_vars) {
+  geom_hline(
+    data = tibble(name = factor(name, levels = y_vars), val = val),
+    mapping = aes(yintercept = val),
+    lty = "1111"
+  )
+}
+
+add_plot_els <- function(y_vars, true_value_extr) {
+  add_els <- list()
+  if ("est_mean" %in% y_vars) {
+    add_els <- c(add_els, list(
+      add_hline("est_mean", true_value_extr, y_vars)
+    ))
+  }
+  if ("rel_bias" %in% y_vars) {
+    add_els <- c(add_els, list(
+      add_hline("rel_bias", 0, y_vars)
+    ))
+  }
+  add_els
+}
+
+plot_fun <- function(res, x_name, x_lab, y_vars = names(y_var_labs)) {
   res %>%
-    filter(par_varied == x_name) %>%
-    select(x_name, est_mean, est_sd, true_val) %>%
-    pivot_longer(
-      c(est_mean, est_sd), names_to = "name", values_to = "value"
+    mutate(rel_bias = (est_mean - true_val) / abs(true_val)) %>%
+    filter(par_varied == tidyselect::all_of(x_name)) %>%
+    select(
+      tidyselect::all_of(x_name), true_val, tidyselect::all_of(y_vars)
     ) %>%
+    pivot_longer(
+      tidyselect::all_of(y_vars), names_to = "name", values_to = "value"
+    ) %>%
+    mutate(name = factor(name, levels = y_vars)) %>%
     ggplot(aes(!!sym(x_name), value)) +
     dark_theme_bw(verbose = FALSE) +
     theme(
@@ -32,9 +79,7 @@ plot_fun <- function(res, x_name, x_lab) {
     ) +
     facet_wrap(
       ~name, scales = "free_y", nrow = 1, strip.position = "left",
-      labeller = as_labeller(
-        c("est_mean" = "Estimate mean", "est_sd" = "Estimate SD")
-      )
+      labeller = as_labeller(y_var_labs)
     ) +
     xlab(x_lab) +
     ylab(NULL) +
@@ -43,11 +88,7 @@ plot_fun <- function(res, x_name, x_lab) {
     ) +
     geom_line() +
     geom_point(shape = 18) +
-    geom_hline(
-      data = tibble(name = "est_mean", val = true_value_extr),
-      mapping = aes(yintercept = val),
-      lty = "1111"
-    )
+    add_plot_els(y_vars, first(res$true_val))
 }
 
 save_plot <- function(pl, name) {
@@ -60,16 +101,18 @@ save_plot <- function(pl, name) {
 
 # Script ======================================================================
 
-summ <- read_csv(file.path(cox_tarprop_summ_dir, "summary-10000sims.csv"))
+summ <- read_res("summary-10000sims")
 
 pl_risk <- plot_fun(
   summ, 
-  "risk_prop_expected", "Expected proportion of time at risk"
+  "risk_prop_expected", "Expected proportion of time at risk",
+  c("rel_bias", "est_sd")
 )
 save_plot(pl_risk, "risk")
 
 pl_long <- plot_fun(
   summ, 
-  "long_prop_expected", "Expected proportion with earlier follow-up start"
+  "long_prop_expected", "Expected proportion with earlier follow-up start",
+  c("rel_bias", "est_sd")
 )
 save_plot(pl_long, "long")
