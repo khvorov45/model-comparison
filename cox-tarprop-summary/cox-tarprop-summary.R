@@ -1,7 +1,7 @@
 # Summary of Cox simulations
 # Arseniy Khvorov
-# Created 2019/12/02
-# Last edit 2019/12/02
+# Created 2019-12-02
+# Last edit 2019-12-02
 
 library(tidyverse)
 

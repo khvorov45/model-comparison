@@ -2,8 +2,8 @@
 # being proportional to follow-up time
 #
 # Arseniy Khvorov
-# Created 2019/09/20
-# Last edit 2019/12/02
+# Created 2019-09-20
+# Last edit 2020-03-04
 
 library(tidyverse)
 library(broom)
