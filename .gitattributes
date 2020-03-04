@@ -1,3 +1,4 @@
 # Auto detect text files and perform LF normalization
 * text=auto
 logistic/result-10000sims.csv filter=lfs diff=lfs merge=lfs -text
+cox-tarprop/result-10000sims.csv filter=lfs diff=lfs merge=lfs -text
