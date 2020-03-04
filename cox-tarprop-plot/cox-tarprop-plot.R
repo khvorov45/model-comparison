@@ -44,6 +44,11 @@ label_facets <- function(lbls) {
   label_parsed(lbls)
 }
 
+label_kappa <- function(brks) {
+  brks <- str_replace(brks, "std_", "")
+  recode(brks, "05" = "0.5")
+}
+
 read_res <- function(name) {
   read_csv(
     file.path(cox_tarprop_summ_dir, glue::glue("{name}.csv")),
@@ -96,7 +101,7 @@ plot_fun <- function(res, x_name, x_lab, y_vars = names(y_var_labs),
       tidyselect::all_of(y_vars), names_to = "name", values_to = "value"
     ) %>%
     mutate(name = factor(name, levels = y_vars)) %>%
-    ggplot(aes(!!sym(x_name), value)) +
+    ggplot(aes(!!sym(x_name), value, color = data_name)) +
     dark_theme_bw(verbose = FALSE) +
     theme(
       strip.background = element_blank(),
@@ -107,7 +112,7 @@ plot_fun <- function(res, x_name, x_lab, y_vars = names(y_var_labs),
       axis.text.x = element_text(angle = 45, hjust = 1)
     ) +
     facet_grid(
-      name ~ data_name, scales = "free_y",
+      name ~ ., scales = "free_y",
       labeller = label_facets, switch = "y"
     ) +
     xlab(x_lab) +
@@ -115,6 +120,7 @@ plot_fun <- function(res, x_name, x_lab, y_vars = names(y_var_labs),
     scale_x_continuous(
       breaks = unique(res[[x_name]]), labels = scales::percent_format(1)
     ) +
+    scale_color_discrete(TeX("$\\kappa$"), labels = label_kappa) +
     geom_line() +
     geom_point(shape = 18)# +
     #add_plot_els(y_vars, first(res$true_val))
@@ -135,13 +141,13 @@ summ <- read_res("summary-10000sims")
 pl_risk <- plot_fun(
   summ, 
   "risk_prop_expected", "Expected proportion of time at risk",
-  c("rel_bias", "est_sd"), pops
+  c("rel_bias", "est_sd")
 )
 save_plot(pl_risk, "risk")
 
 pl_long <- plot_fun(
   summ, 
   "long_prop_expected", "Expected proportion with earlier follow-up start",
-  c("rel_bias", "est_sd"), pops
+  c("rel_bias", "est_sd")
 )
 save_plot(pl_long, "long")
