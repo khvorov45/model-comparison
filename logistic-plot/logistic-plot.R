@@ -13,12 +13,15 @@ logistic_summ_dir <- "logistic-summary"
 
 # Functions ===================================================================
 
-sclr_curve <- function(x, l, b0, b1) l / (1 + exp(b0 + b1 * x)) 
+sclr_curve <- function(x, l, b0, b1) l / (1 + exp(b0 + b1 * x))
 
 calc_fit_prob <- function(data) {
   l <- data$est_mean[data$term == "theta"]
-  if (identical(l, numeric(0))) l <- 1
-  else l <- 1 - 1 / (1 + exp(l))
+  if (identical(l, numeric(0))) {
+    l <- 1
+  } else {
+    l <- 1 - 1 / (1 + exp(l))
+  }
   b0 <- data$est_mean[data$term == "beta_0"]
   b1 <- data$est_mean[data$term == "beta_logTitre"]
   tibble(.rows = 101) %>%
@@ -28,31 +31,32 @@ calc_fit_prob <- function(data) {
     )
 }
 
-ex_plot_1 <- function(data) {
+ex_plot_1 <- function(data, x_name = "x", y_name = "fit_prob") {
   xbreaks <- c(1, 2, 5 * 2^(0:8))
+  colshlab <- as_labeller(
+    c("logistic" = "Logistic", "scaled_logit" = "Scaled logit")
+  )
   data %>%
-    ggplot(aes(x, fit_prob)) +
+    ggplot(aes(!!rlang::sym(x_name), !!rlang::sym(y_name))) +
     dark_theme_bw(verbose = FALSE) +
     theme(
       legend.position = "bottom",
       legend.box.spacing = unit(0, "lines")
     ) +
-    xlab("Titre") + 
+    xlab("Titre") +
     ylab("Infection probability") +
-    labs(lty = "Model") +
-    scale_linetype_discrete(
-      labels = as_labeller(
-        c("logistic" = "Logistic", "scaled_logit" = "Scaled logit")
-      )
-    ) +
+    labs(lty = "Model", col = "Model", fill = "Model") +
+    scale_color_discrete(labels = colshlab) +
+    scale_linetype_manual(labels = colshlab, values = c("31", "11")) +
+    scale_fill_discrete(labels = colshlab) +
     scale_x_continuous(
       labels = xbreaks, breaks = log(xbreaks),
       minor_breaks = log(c(1.5, 3.5, 7.5 * 2^(0:8)))
     ) +
     scale_y_continuous(labels = scales::percent_format()) +
     coord_cartesian(ylim = c(0, 1)) +
-    stat_function(fun = sclr_curve, args = list(0.5, -5, 1.5), lty = "1111") +
-    geom_line(aes(lty = model))
+    stat_function(fun = sclr_curve, args = list(0.5, -5, 1.5)) +
+    geom_line(aes(lty = model, col = model))
 }
 
 vary_par_conv <- function(x_name, xlims, x_lab, data) {
@@ -72,7 +76,8 @@ vary_par_conv <- function(x_name, xlims, x_lab, data) {
     labs(shape = "Model", lty = "Model") +
     scale_x_continuous(x_lab, breaks = unique(data[[x_name]])) +
     scale_y_continuous(
-      "Proportion converged", labels = scales::percent_format(1)
+      "Proportion converged",
+      labels = scales::percent_format(1)
     ) +
     scale_linetype_discrete(labels = model_labs) +
     scale_shape_manual(labels = model_labs, values = c(17, 18)) +
@@ -84,7 +89,8 @@ vary_par_conv <- function(x_name, xlims, x_lab, data) {
 vary_par_se <- function(x_name, xlims, x_lab, data) {
   term_labeller <- function(term_names) {
     term_names[, 1] <- recode(
-      term_names[, 1], "beta_0" = TeX("$\\beta_0$"), 
+      term_names[, 1],
+      "beta_0" = TeX("$\\beta_0$"),
       "beta_logTitre" = TeX("$\\beta_T$")
     )
     label_parsed(term_names)
@@ -110,7 +116,8 @@ vary_par_se <- function(x_name, xlims, x_lab, data) {
     scale_shape_manual(labels = model_labs, values = c(17, 18)) +
     coord_cartesian(xlim = xlims) +
     facet_wrap(
-      ~term, ncol = 1, labeller = term_labeller, strip.position = "right"
+      ~term,
+      ncol = 1, labeller = term_labeller, strip.position = "right"
     ) +
     geom_line() +
     geom_point()
@@ -129,17 +136,17 @@ plot_pres_series <- function(b0, b1) {
   ) %>%
     ggplot(aes(x, y)) +
     dark_theme_bw(verbose = FALSE) +
-    xlab("Titre") + 
+    xlab("Titre") +
     ylab("Infection probability") +
     scale_x_continuous(
       labels = xbreaks, breaks = log(xbreaks),
       minor_breaks = log(c(1.5, 3.5, 7.5 * 2^(0:8)))
     ) +
     scale_y_continuous(labels = scales::percent_format()) +
-    coord_cartesian(ylim = c(0, 1)) 
+    coord_cartesian(ylim = c(0, 1))
   pl1 <- pl0 +
     stat_function(fun = sclr_curve, args = list(0.5, -5, 1.5), lty = "1111")
-  pl2 <- pl1 + 
+  pl2 <- pl1 +
     stat_function(fun = sclr_curve, args = list(1, b0, b1))
   pl3 <- pl0 +
     stat_function(fun = sclr_curve, args = list(1, -5, 1.5), lty = "1111") +
@@ -153,7 +160,7 @@ plot_pres_series <- function(b0, b1) {
   pl6 <- pl0 +
     stat_function(
       fun = sclr_curve_rel, args = list(0.5, -5, 1.5), lty = "1111"
-    ) + 
+    ) +
     ylab("Infection probability (relative to log(5))")
   pl7 <- pl6 +
     stat_function(fun = sclr_curve_rel, args = list(1, b0, b1))
@@ -198,7 +205,7 @@ save_plot(vary_nsam, "vary_nsam", FALSE, 6)
 
 # Convergence at varying lambdas
 vary_theta <- vary_par_conv(
-  "lambda", c(0, 1), "Lambda", 
+  "lambda", c(0, 1), "Lambda",
   summ %>% mutate(lambda = 1 - 1 / (1 + exp(theta)))
 )
 save_plot(vary_theta, "vary_lambda", FALSE)
@@ -206,3 +213,16 @@ save_plot(vary_theta, "vary_lambda", FALSE)
 # SE with sample size
 nsam_se_plot <- vary_par_se("nsam", c(0, 800), "Sample size", summ)
 save_plot(nsam_se_plot, "vary_nsam_se", FALSE)
+
+# Poor logistic fit with SEs
+preds <- read_csv(file.path(logistic_summ_dir, "preds-10000sims.csv"))
+
+preds_plot <- preds %>%
+  filter(nsam == 500, theta_true == 0) %>%
+  ex_plot_1("logTitre", "50%") +
+  geom_ribbon(
+    aes(x = logTitre, ymin = `2.5%`, ymax = `97.5%`, fill = model),
+    inherit.aes = FALSE, alpha = 0.5
+  )
+
+save_plot(preds_plot, "predsplot", FALSE)
