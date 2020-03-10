@@ -65,7 +65,9 @@ vary_par_conv <- function(x_name, xlims, x_lab, data) {
   )
   data %>%
     filter(par_varied == x_name) %>%
-    ggplot(aes(!!sym(x_name), converged, shape = model, lty = model)) +
+    ggplot(
+      aes(!!sym(x_name), converged, shape = model, lty = model, col = model)
+    ) +
     dark_theme_bw(verbose = FALSE) +
     theme(
       panel.grid.minor = element_blank(),
@@ -73,20 +75,22 @@ vary_par_conv <- function(x_name, xlims, x_lab, data) {
       legend.box.spacing = unit(0, "null"),
       legend.margin = margin(0, 0, 0, 0, "null")
     ) +
-    labs(shape = "Model", lty = "Model") +
+    labs(shape = "Model", lty = "Model", col = "Model") +
     scale_x_continuous(x_lab, breaks = unique(data[[x_name]])) +
     scale_y_continuous(
       "Proportion converged",
       labels = scales::percent_format(1)
     ) +
-    scale_linetype_discrete(labels = model_labs) +
+    scale_linetype_manual(labels = model_labs, values = c("31", "11")) +
+    scale_color_discrete(labels = model_labs) +
     scale_shape_manual(labels = model_labs, values = c(17, 18)) +
     coord_cartesian(xlim = xlims) +
     geom_line() +
     geom_point()
 }
 
-vary_par_se <- function(x_name, xlims, x_lab, data) {
+vary_par_se <- function(x_name, xlims, x_lab, data, y_name = "se_mean",
+                        y_lab = "Expected standard error") {
   term_labeller <- function(term_names) {
     term_names[, 1] <- recode(
       term_names[, 1],
@@ -100,24 +104,29 @@ vary_par_se <- function(x_name, xlims, x_lab, data) {
   )
   data %>%
     filter(par_varied == x_name, term != "theta") %>%
-    ggplot(aes(!!sym(x_name), se_mean, shape = model, lty = model)) +
+    ggplot(
+      aes(!!sym(x_name), !!sym(y_name), shape = model, lty = model, col = model)
+    ) +
     dark_theme_bw(verbose = FALSE) +
     theme(
       panel.grid.minor = element_blank(),
       legend.position = "bottom",
       legend.box.spacing = unit(0, "null"),
       panel.spacing = unit(0, "null"),
-      strip.background = element_rect(fill = NA)
+      strip.background = element_blank(),
+      panel.spacing.y = unit(0.5, "lines")
     ) +
-    labs(shape = "Model", lty = "Model") +
+    labs(shape = "Model", lty = "Model", col = "Model") +
     scale_x_continuous(x_lab, breaks = unique(data[[x_name]])) +
-    scale_y_continuous("Expected standard error") +
-    scale_linetype_discrete(labels = model_labs) +
+    scale_y_continuous(y_lab) +
+    scale_linetype_manual(labels = model_labs, values = c("31", "11")) +
     scale_shape_manual(labels = model_labs, values = c(17, 18)) +
+    scale_color_discrete(labels = model_labs) +
     coord_cartesian(xlim = xlims) +
     facet_wrap(
       ~term,
-      ncol = 1, labeller = term_labeller, strip.position = "right"
+      ncol = 1, labeller = term_labeller, strip.position = "right",
+      scales = "free_y"
     ) +
     geom_line() +
     geom_point()
@@ -213,6 +222,13 @@ save_plot(vary_theta, "vary_lambda", FALSE)
 # SE with sample size
 nsam_se_plot <- vary_par_se("nsam", c(0, 800), "Sample size", summ)
 save_plot(nsam_se_plot, "vary_nsam_se", FALSE)
+
+# Means with sample size
+nsam_mean_plot <- vary_par_se(
+  "nsam", c(0, 800), "Sample size", summ, "est_mean", "Estimate mean"
+) +
+  geom_hline(aes(yintercept = true_value))
+save_plot(nsam_mean_plot, "vary_nsam_mean", FALSE)
 
 # Poor logistic fit with SEs
 preds <- read_csv(file.path(logistic_summ_dir, "preds-10000sims.csv"))
