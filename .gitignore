@@ -5,3 +5,9 @@
 data/hanam*
 edu-article/*
 *.synctex.gz
+*.log
+*.bbl
+*.aux
+*.fls
+*.fdb_latexmk
+*.blg

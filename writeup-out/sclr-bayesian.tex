@@ -97,26 +97,26 @@ The scaled logit model was fit in a Bayesian way to better handle missing data a
 \begin{gathered}
 Y_i \sim \text{Bernoulli}(p_i) \\
 p_i = \frac{\lambda}{1 + \text{exp}(\beta_0 + \beta_T T_i)} \\
-T_i \sim N(\mu, \sigma^2) \ \text{truncated}(L_{i}, H_{i}) \\
+T_i \sim TN[L_{i}, H_{i}](\mu, \sigma^2) \\
 \mu \sim N(2, 2^2) \quad \sigma \sim \text{Exponential}(\text{rate} = 0.1) \\
 \lambda \sim \text{Uniform}(0, 1) \\
 \beta_0 \sim N(-15, 10^2) \quad \beta_T \sim N(5, 5^2)
 \end{gathered}
 \end{align*}
 
-Where $i$ is observation index, $Y_i$ is infection status (0 --- infected (both symptomatic and asymptomatic), 1 --- not infected), $T_i$ is true log HI titre, $L_i$ is the low bound of observed HI interval (e.g. for observation of 20 this is log(20)), $H_i$ is the high bound of observed HI interval (e.g. for observation of 20 this is log(40)).
+Where $TN[a, b](\mu, \sigma^2)$ is a normal distibution truncated at $[a, b]$, $i$ is observation index, $Y_i$ is infection status (0 --- infected (both symptomatic and asymptomatic), 1 --- not infected), $T_i$ is true log HI titre, $L_i$ is the low bound of observed HI interval (e.g. for observation of 20 this is log(20)), $H_i$ is the high bound of observed HI interval (e.g. for observation of 20 this is log(40)).
 
 The prior distributions for the mean and standard deviation of log HI titres were chosen to be broad but still somewhat reflect the expected distribution in the general population --- mean high enough to allow a fair proportion (>20\%) to have titres above detectable level (log(10)) and standard deviation low enough to not result in titres above highest detectable level (log(1280)) to be more prevalent than titres between log(640) and log(1280).
 
-The prior distribution for the baseline risk parameter $\lambda$ gives equal probability to all of its possible values. The prior distributions for the logistic curve parameters $\beta_0$ and $\beta_T$ was chosen to be spread around all of their plausible values --- $\beta_0$ is likely below 0 (otherwise the probability of infection would be close to 0 and not change across the observed titre range) and not too low (e.g. a value below -30 would result in the probability of infection being equal to $\lambda$ and not changing across the observed titre range); while $\beta_T$ is likely above 0 (since titres are protective) but not too high since it would result in a very steep curve (e.g. a titre of 20 may have the expected infection probability of $\lambda$ while a titre of 40 has the expected infection probability of 0).
+The prior distribution for the baseline risk parameter $\lambda$ gives equal probability to all possible values in $[0, 1]$. The prior distributions for the logistic curve parameters $\beta_0$ and $\beta_T$ was chosen to be spread around all of their plausible values --- $\beta_0$ is likely below 0 (otherwise the probability of infection would be close to 0 and not change across the observed titre range) and not too low (e.g. a value below -30 would result in the probability of infection being equal to $\lambda$ and not changing across the observed titre range); while $\beta_T$ is likely above 0 (since titres are protective) but not too high since it would result in a very steep curve (e.g. a titre of 20 may have the expected infection probability of $\lambda$ while a titre of 40 has the expected infection probability of 0).
 
-The fitted infection curve is shown in Figure \ref{SclrBayesInf}. The fitted protection curve is shown in Figure \ref{SclrBayesProt}.
+The fitted probability of infection curves are shown in Figure \ref{SclrBayesInf} and the corresponding protection curves are in Figure \ref{SclrBayesProt}.
 
 \begin{figure}[htp]
 	\centering
 	\includegraphics[width=0.8\textwidth]{../fit-sclr-bayesian-plot/hanam-hi-inf.pdf}
 	\caption{
-	Fitted infection curve and credible interval from the scaled logit model Bayesian fit to Ha Nam data (also shown in Figure \ref{HanamCounts}). The solid line is the median of the posterior distribution. The shaded region is the 95\% credible interval. The dashed line is the prior distribution, i.e. the bounds of the shaded region that would have been obtained if the data contained no information to estimate model parameters. The upper bound is above 90\% and therefore not visible. The points are the infected proportions at the corresponding titre measurements. The numbers next to the points are the total sample size of the corresponding groups. Note that the titre measurements were shifted to midpoints of the corresponding intervals to better represent average underlying titres, e.g. the measurement of 20 was shifted to the log-scale midpoint between 20 and 40 (except the measurement of 5 which represents undetectable titres and the measurement of 1280 which represents titres above the highest detectable level).
+	Fitted probability of infection curve and 95\% credible intervals from the scaled logit model Bayesian fit to Ha Nam data (also shown in Figure \ref{HanamCounts}). The solid line is the median of the posterior distribution. The shaded region is the 95\% credible interval. The dashed line is the prior distribution, i.e. the bounds of the shaded region that would have been obtained if the data contained no information to estimate model parameters. The upper bound is above 90\% and therefore not visible. The points are the infected proportions at the corresponding titre measurements. The numbers next to the points are the total sample size of the corresponding groups. Note that for the puposes of the figure, the titre measurements were shifted to midpoints of the corresponding intervals to better represent average underlying titres, e.g. the measurement of 20 was shifted to the log-scale midpoint between 20 and 40 (except the measurement of 5 which represents undetectable titres and the measurement of 1280 which represents titres above the highest detectable level).
 	}
 	\label{SclrBayesInf}
 \end{figure}
@@ -127,12 +127,12 @@ The fitted infection curve is shown in Figure \ref{SclrBayesInf}. The fitted pro
 	\centering
 	\includegraphics[width=0.8\textwidth]{../fit-sclr-bayesian-plot/hanam-hi-prot.pdf}
 	\caption{
-	Fitted protection curve and credible interval from the scaled logit model Bayesian fit to Ha Nam data (also shown in Figure \ref{HanamCounts}). The solid line is the median of the posterior distribution. The shaded region is the 95\% credible interval. The dashed line is the prior distribution, i.e. the bounds of the shaded region that would have been obtained if the data contained no information to estimate model parameters.
+	Fitted probability of protection curves and 95\% credible intervals from the scaled logit model Bayesian fit to Ha Nam data (also shown in Figure \ref{HanamCounts}). The solid line is the median of the posterior distribution. The shaded region is the 95\% credible interval. The dashed line is the prior distribution, i.e. the bounds of the shaded region that would have been obtained if the data contained no information to estimate model parameters.
 	}
 	\label{SclrBayesProt}
 \end{figure}
 
-Limiting the sample to just those exposed to the virus (at least one household infection in a season) improved the precision of the estimates. Despite a fairly large sample, reasonably precise estimates of 50\% protection can only be obtained for the H3N2 virus (inferring from the model fitted to the exposed subset). The general lack of precision in the estimates is likely due to the number of parameters in the model (3 parameters with 1 covariate) and the censored nature of HI titre measurements, particularly the fact that any titre below 10 is undetectable which means that it is impossible to distinguish between many of the observations (e.g. some subjects with undetectable titres may have had a true titre of 9 while others --- of 2, but both were recorded as 5) which makes it harder to estimate the baseline probability (as seen in the credible bounds increasing at small (<10) titres).
+Limiting the sample to just those exposed to the virus (at least one household infection in a season) improved the precision of the estimates and shifted curves to the right suggesting that mixing exposed and those potentially not exposed may lead to an overestimate of protection. Despite a fairly large sample, reasonably precise estimates of 50\% protection can only be obtained for the H3N2 virus (inferring from the model fitted to the exposed subset). The general lack of precision in the estimates is likely due to the number of parameters in the model (3 parameters with 1 covariate) and the censored nature of HI titre measurements. In particular, the fact that any titre below 10 is undetectable which means that it is impossible to distinguish between many of the observations (e.g. some subjects with undetectable titres may have had a true titre of 9 while others --- of 2, but both were recorded as 5) and hence it is harder to estimate the baseline probability (as seen in the credible bounds increasing at small (<10) titres).
 
 %==============================================================================
 \section{Kiddyvax application}
