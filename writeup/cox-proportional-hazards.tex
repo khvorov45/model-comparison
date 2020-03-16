@@ -1,6 +1,14 @@
-The Cox PH is a common approach to analysing time-to-event data \cite{George;2014}. It assumes that the subjects being followed up are at risk of an event (e.g., death). This risk can change over time and it is called "hazard". The hazard then is a function of time which proportionately changes with covariates. For example, consider a study of how tumour size affects survival. For simplicity, say there are two sizes --- large and small. It may be found that large tumours increase the risk of death by 2 as compared to small tumours. This would mean that the hazard for the large-tumour group is twice the hazard for the small-tumour group at any time.
+The Cox PH is a common approach to analysing time-to-event data \cite{George;2014}. It assumes that the subjects being followed up are at risk of an event (e.g., death). This risk can change over time and it is called "hazard" and commonly denoted as $h$. The hazard then is a function of time $t$ and it proportionately changes with covariates.
 
-For the Cox PH regression, the outcome is time-to-event. This time should normally be time at risk of an observable event. As an illustration, in Figure \ref{CoxExampleFull}, two subjects are followed until both experience an event (e.g., infection).
+$$
+h(t) = h_0(t) \ \text{exp}(\beta_XX)
+$$
+
+Where $h_0$ is the baseline hazard. In this example, $h_0$ corresponds to the hazard when $X$ (the log-titre) is 0 i.e. at a titre measurement of 1. The coefficient $\beta_X$ corresponds to the change in hazard with a change in $X$. When $X$ increases by 1 (if $X$ is a log2 titre, then this corresponds to a 2-fold titre increase), the hazard changes by $\text{exp}(\beta_X)$, i.e. the hazard is multiplied by a constant.
+
+For the Cox PH regression, the outcome is time-to-event $t$. Infection status $Y$ acts as an indicator of whether the event has occured at the end of the corresponding time period. We will assume that all subjects experience at most one event. In the context of infection this assumption is justified when being infected once grants immunity for the rest of the follow-up period.
+
+Time-to-event time should normally be time at risk of an observable event. As an illustration, in Figure \ref{CoxExampleFull}, two subjects are followed until both experience an event (e.g., infection).
 
 \begin{figure}[htp]
 	\centering
@@ -11,7 +19,7 @@ For the Cox PH regression, the outcome is time-to-event. This time should normal
 	\label{CoxExampleFull}
 \end{figure}
 
-Since subject 2 experienced the event later (i.e., ``survived'' for longer), the covariate pattern (e.g., antibody titre) of subject 2 would be considered by the model to be more ``protective'' than that of subject 1. That is, their covariates would be consistent with a reduced hazard. For the purposes of this discussion, we will assume that a subject can only experience one event after which they are no longer at risk for the remainder of the follow-up time. For seasonal infectious diseases this may be a reasonable assumption if the follow-up is confined to one season and infection grants immunity for the rest of the season (or is fatal).
+Since subject 2 experienced the event later (i.e., ``survived'' for longer), the covariate pattern (e.g., antibody titre) of subject 2 would be considered by the model to be more ``protective'' than that of subject 1. That is, their covariates would be consistent with a reduced hazard. Since we assume that at most one event is possible for any subject, both subjects are no longer at risk after the event. For subject 1, $t=100,\ Y=1$. For subject 2, $t=150,\ Y=1$. For any subject who does not experience the event, $t$ is their total follow-up time and $Y=0$.
 
 If subjects are not at risk for all of their follow-up time (e.g., not exposed to the virus), then the total follow-up time may be misleading as illustrated in Figure \ref{CoxExamplePartial}. Taking the actual time at risk into account would lead to the opposite conclusion in this example --- it is subject 1 who is more ``protected'' since they were at risk for longer.
 

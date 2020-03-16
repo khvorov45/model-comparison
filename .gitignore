@@ -11,3 +11,4 @@ edu-article/*
 *.fls
 *.fdb_latexmk
 *.blg
+*.dvi
