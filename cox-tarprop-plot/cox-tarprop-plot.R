@@ -72,23 +72,17 @@ add_hline <- function(name, val, y_vars) {
   )
 }
 
-add_plot_els <- function(y_vars, true_value_extr) {
-  add_els <- list()
-  if ("est_mean" %in% y_vars) {
-    add_els <- c(add_els, list(
-      add_hline("est_mean", true_value_extr, y_vars)
-    ))
-  }
-  if ("rel_bias" %in% y_vars) {
-    add_els <- c(add_els, list(
-      add_hline("rel_bias", 0, y_vars)
-    ))
-  }
-  add_els
-}
-
-plot_fun <- function(res, x_name, x_lab, y_vars = names(y_var_labs), 
+plot_fun <- function(res, x_name, x_lab, y_vars = names(y_var_labs),
                      pops = names(pop_labs)) {
+  if (length(unique(res$data_name)) > 1L) {
+    my_ggplot <- function(dat) {
+      ggplot(dat, aes(!!sym(x_name), value, color = data_name))
+    }
+  } else {
+    my_ggplot <- function(dat) {
+      ggplot(dat, aes(!!sym(x_name), value))
+    }
+  }
   res %>%
     filter(data_name %in% pops) %>%
     mutate(rel_bias = (est_mean - true_val) / abs(true_val)) %>%
@@ -98,10 +92,11 @@ plot_fun <- function(res, x_name, x_lab, y_vars = names(y_var_labs),
       data_name
     ) %>%
     pivot_longer(
-      tidyselect::all_of(y_vars), names_to = "name", values_to = "value"
+      tidyselect::all_of(y_vars),
+      names_to = "name", values_to = "value"
     ) %>%
     mutate(name = factor(name, levels = y_vars)) %>%
-    ggplot(aes(!!sym(x_name), value, color = data_name)) +
+    my_ggplot() +
     dark_theme_bw(verbose = FALSE) +
     theme(
       strip.background = element_blank(),
@@ -112,7 +107,8 @@ plot_fun <- function(res, x_name, x_lab, y_vars = names(y_var_labs),
       axis.text.x = element_text(angle = 45, hjust = 1)
     ) +
     facet_grid(
-      name ~ ., scales = "free_y",
+      name ~ .,
+      scales = "free_y",
       labeller = label_facets, switch = "y"
     ) +
     xlab(x_lab) +
@@ -122,13 +118,12 @@ plot_fun <- function(res, x_name, x_lab, y_vars = names(y_var_labs),
     ) +
     scale_color_discrete(TeX("$\\kappa$"), labels = label_kappa) +
     geom_line() +
-    geom_point(shape = 18)# +
-    #add_plot_els(y_vars, first(res$true_val))
+    geom_point(shape = 18)
 }
 
 save_plot <- function(pl, name, width = 15, height = 7) {
   ggsave_dark(
-    pl, 
+    pl,
     filename = file.path(cox_tarprop_plot_dir, paste0(name, ".pdf")),
     dark = FALSE, width = width, height = height, units = "cm", device = "pdf"
   )
@@ -139,14 +134,14 @@ save_plot <- function(pl, name, width = 15, height = 7) {
 summ <- read_res("summary-10000sims")
 
 pl_risk <- plot_fun(
-  summ, 
+  summ,
   "risk_prop_expected", "Expected proportion of time at risk",
   c("rel_bias", "est_sd")
 )
 save_plot(pl_risk, "risk")
 
 pl_long <- plot_fun(
-  summ, 
+  filter(summ, data_name == "std_05"),
   "long_prop_expected", "Expected proportion with earlier follow-up start",
   c("rel_bias", "est_sd")
 )
