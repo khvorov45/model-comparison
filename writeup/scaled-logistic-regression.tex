@@ -1,57 +1,9 @@
-This model is the same as logistic regression except that it estimates the baseline probability of outcome (i.e. the probability at low covariate values assuming a protective covariate) as opposed to assuming that it is equal to 1. If there is only one covariate which is the antibody titre measurement then the model is
+The scaled logit model is the same as logistic regression except that it estimates the baseline probability of outcome (i.e., the probability at low covariate values assuming a protective covariate) as opposed to assuming that it is equal to 1 \cite{Dunning;2006}. If there is only one covariate which is the antibody titre measurement then the model is
 
 \begin{align*}
 \begin{gathered}
-P(Y=1) = \frac{\lambda}{1 + \text{exp}(\beta_0 + \beta_T X_{\text{logtitre}})}
+P(Y=1) = \frac{\lambda}{1 + \text{exp}(\beta_0 + \beta_X X)}
 \end{gathered}
 \end{align*}
 
-Note that with the above parameterisation, the $\beta_i \ (i=0,T)$ parameters are negated relative to logistic regression.
-
-The model still assumes that low probability bound is 0 (i.e. that high titres correlate with immunity in a univariate model). This assumption is justified if there is a reasonable number of people in the sample who have high titres and none (or very few) of whom get infected. In the Ha Nam data (Figure \ref{HanamCounts}), there is a total of 131 observations with titres above 160. None of those subjects got infected in the corresponding season. For the Ha Nam data, the assumption of immunity at high titres is not unreasonable.
-
-Compared to logistic regression, the scaled logit model requires a larger sample size. This is because the scaled logit model estimates an additional parameter. Hence for the same samplt size, estimates from the sclaed logit model will have larger standard errors. 
-
-Figures \ref{SclrSE}, \ref{SclrConv} and \ref{SclrMean} summarise 10,000 simulation results from the model 
-
-\begin{align*}
-\begin{gathered}
-\frac{0.5}{\text{exp}(-5 + 1.5 X_{\text{logtitre}})} \\
-X_{\text{logtitre}} \sim N(2, 2^2)
-\end{gathered}
-\end{align*}
-
-Standard errors of the regression estimates were consistently higher with the scaled logit model.
-
-In order to reliably converge (under the chosen true parameter values) the scaled logit model required the sample size to be over 500. The standard logistic model always converged.
-
-The bias of the scaled logit estimates evident in Figure \ref{SclrMean} is likely due to the fact that the subset of the simulated datasets for which the scaled logit model converged is not a random subset. Datasets for which the scaled logit model is more likely to converge have certain properties, e.g. a large number of infections, a large number of subjects with detectable titres. Label these as "informative" datasets. Informative datasets are balanced out by simulated datasets where the opposite properies occur --- small infection numbers, small numbers with detectable titres. Label these "non-informative" datasets. With a large enough sample size, we can obtain estimates from both the informative and the non-informative datasets. With a small sample size, we can obtain estimates only from the informative datasets (the model does not converge for the non-informative), i.e. a non-random subset of simulated data. Aggregating estimates only over the informative datasets leads to bias.
-
-%\pagebreak
-
-\begin{figure}[htp]
-	\centering
-	\includegraphics[width=0.69\textwidth]{../logistic-plot/vary_nsam_se.pdf}
-	\caption{
-	Simulation results of fitting the standard logistic and the scaled logit models to the same simulated datasets. 10,000 datasets were simulated. Shown is the mean standard error of the regression estimates from the standard logistic (the dashed line) and the scaled logit (the dotted line). Points indicate parameter values at which the simulations were performed.
-	}
-	\label{SclrSE}
-\end{figure}
-
-\begin{figure}[htp]
-	\centering
-	\includegraphics[width=0.69\textwidth]{../logistic-plot/vary_nsam.pdf}
-	\caption{
-	Simulation results of fitting the standard logistic and the scaled logit models to the same simulated datasets. 10,000 datasets were simulated. Shown is the proportion of successful attempts to fit the standard logistic (the dashed line) and the scaled logit (the dotted line) model. Points indicate parameter values at which the simulations were performed.
-	}
-	\label{SclrConv}
-\end{figure}
-
-\begin{figure}[htp]
-	\centering
-	\includegraphics[width=0.69\textwidth]{../logistic-plot/vary_nsam_mean.pdf}
-	\caption{
-	Simulation results of fitting the standard logistic and the scaled logit models to the same simulated datasets. 10,000 datasets were simulated. Shown is the mean of the regression estimates from the standard logistic (the dashed line) and the scaled logit (the dotted line). Points indicate parameter values at which the simulations were performed. The solid lines are the true parameter values.
-	}
-	\label{SclrMean}
-\end{figure}
+Note that with the above parameterisation, the $\beta_0$ and $\beta_X$ parameters are negated relative to logistic regression. The new parameter $\lambda$ is the baseline risk, $\text{exp}(\beta_0)$ is the reduction in the baseline risk (protection) at $X=0$, $\beta_X$ is the ratio of protection of subjects with a given $X$ compared to subjects whose $X$ is 1 unit lower.

@@ -95,7 +95,7 @@ vary_par_se <- function(x_name, xlims, x_lab, data, y_name = "se_mean",
     term_names[, 1] <- recode(
       term_names[, 1],
       "beta_0" = TeX("$\\beta_0$"),
-      "beta_logTitre" = TeX("$\\beta_T$")
+      "beta_logTitre" = TeX("$\\beta_X$")
     )
     label_parsed(term_names)
   }
@@ -199,36 +199,36 @@ summ_ex <- summ %>%
   group_by(model) %>%
   group_modify(~ calc_fit_prob(.x))
 lrex1 <- ex_plot_1(summ_ex)
-save_plot(lrex1, "lrex", FALSE)
+# save_plot(lrex1, "lrex", FALSE)
 
 # For presentation
 b_lr <- summ %>% filter(model == "logistic", theta == 0, nsam == 1e4)
 b0 <- b_lr$est_mean[b_lr$term == "beta_0"]
 b1 <- b_lr$est_mean[b_lr$term == "beta_logTitre"]
 pres_series <- plot_pres_series(b0, b1)
-iwalk(pres_series, ~ save_plot(.x, paste0("lrex_pres", .y), TRUE))
+# iwalk(pres_series, ~ save_plot(.x, paste0("lrex_pres", .y), TRUE))
 
 # Convergence with sample size
 vary_nsam <- vary_par_conv("nsam", c(0, 600), "Sample size", summ)
-save_plot(vary_nsam, "vary_nsam", FALSE, 6)
+# save_plot(vary_nsam, "vary_nsam", FALSE, 6)
 
 # Convergence at varying lambdas
 vary_theta <- vary_par_conv(
   "lambda", c(0, 1), "Lambda",
   summ %>% mutate(lambda = 1 - 1 / (1 + exp(theta)))
 )
-save_plot(vary_theta, "vary_lambda", FALSE)
+# save_plot(vary_theta, "vary_lambda", FALSE)
 
 # SE with sample size
 nsam_se_plot <- vary_par_se("nsam", c(0, 800), "Sample size", summ)
-save_plot(nsam_se_plot, "vary_nsam_se", FALSE)
+# save_plot(nsam_se_plot, "vary_nsam_se", FALSE)
 
 # Means with sample size
 nsam_mean_plot <- vary_par_se(
   "nsam", c(0, 800), "Sample size", summ, "est_mean", "Estimate mean"
 ) +
   geom_hline(aes(yintercept = true_value))
-save_plot(nsam_mean_plot, "vary_nsam_mean", FALSE)
+# save_plot(nsam_mean_plot, "vary_nsam_mean", FALSE)
 
 # Poor logistic fit with SEs
 preds <- read_csv(file.path(logistic_summ_dir, "preds-10000sims.csv"))
@@ -241,4 +241,4 @@ preds_plot <- preds %>%
     inherit.aes = FALSE, alpha = 0.5
   )
 
-save_plot(preds_plot, "predsplot", FALSE)
+# save_plot(preds_plot, "predsplot", FALSE)

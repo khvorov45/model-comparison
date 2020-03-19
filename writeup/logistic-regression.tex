@@ -2,34 +2,8 @@ The logistic model assumes that the probability of outcome follows a logistic cu
 
 \begin{align*}
 \begin{gathered}
-P(Y=1) = \frac{\text{exp}(\beta_0 + \beta_T X_{\text{logtitre}})}{1 + \text{exp}(\beta_0 + \beta_T X_{\text{logtitre}})}
+P(Y=1) = \frac{\text{exp}(\beta_0 + \beta_X X)}{1 + \text{exp}(\beta_0 + \beta_X X)}
 \end{gathered}
 \end{align*}
 
-Where $\beta_0$ is the log-odds of infection when $X_{\text{logtitre}}=0$ and $\beta_T$ is the log-odds ratio of infection of subjects with a given $X_{\text{logtitre}}$ compared to subjects subjects whose $X_{\text{logtitre}}$ is 1 unit lower. 
-
-A potentially large problem with the application of this model to antibody data is that low antibody titres do not necessarily correlate with a high probability of infection (which is one of the model's assumptions). This assumption of baseline risk of 1 can be justified if it is the case that subjects with low antibody titres always (or almost always) get infected. If a large proportion of subjects with low titres do not get infected, this assumption is not justified and this model will produce a poor fit. As an example, this assumption is not justified in the Ha Nam data as shown in Figure \ref{HanamCounts}. In both the general and the exposed populations, less than half the subjects with the titres below detectable levels (recorded as 5) were infected. %???during what time period?  I don't think we specified the period for which you have data
-
-\begin{figure}[htp]
-	\centering
-	\includegraphics[width=0.9\textwidth]{../data-plot/hanam-hi-summ-light.pdf}
-	\caption{
-	Ha Nam cohort data. Subjects were grouped by virus and measured HI titre. Numbers next to points are the total number of observations in the corresponding group. The top row is all observations. The bottom row are the observations from households with at least one infection in a given season. The left column is observations for the H1N1pdm virus, the right row --- for H3N2 virus.
-	}
-	\label{HanamCounts}
-\end{figure}
-
-If the baseline risk cannot justifiably be assumed to be 1, the fitted probability curve will be flatter than the true curve, thereby misrepresenting the true probability of infection across the titre range as depicted in Figure \ref{LogisticFit}. Thus, ignoring the baseline risk assumption will lead to poor model fit and hence biased estimates of titre effect.
-
-%\pagebreak
-
-\begin{figure}[htp]
-	\centering
-	\includegraphics[width=0.6\textwidth]{../logistic-plot/predsplot.pdf}
-	\caption{
-	An illustration of a bad fit of the logistic model. The solid line ($0.5\frac{\text{exp}(5 - 1.5 X_{\text{logtitre}})}{1 + \text{exp}(5 - 1.5 X_{\text{logtitre}})}$) is the true probability curve where the baseline risk is 0.5. The dashed line is the expected fitted probability curve from standard logistic regression. The dotted line is the fitted probability curve from scaled logistic regression. The shaded regions are the 95\% confidence intervals. The expected curves and CIs was obtained from 10,000 simulations each with 500 observations simulated from the true curve. The models were fitted to each simulated dataset and the means of the regression estimates were taken from all simulations.
-}
-	\label{LogisticFit}
-\end{figure}
-
-Estimating the baseline risk in the above model leads to a "scaled logistic" model which accounts for the issue \cite{Dunning;2006}.
+Where $\beta_0$ is the log-odds of infection when $X=0$ and $\beta_X$ is the log-odds ratio of infection of subjects with a given $X$ compared to subjects subjects whose $X$ is 1 unit lower.

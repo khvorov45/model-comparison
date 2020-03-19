@@ -11,7 +11,7 @@ To illustrate why the inablility to observe true time-at-risk may be a problem, 
 	\label{CoxExampleFull}
 \end{figure}
 
-Since subject 2 got infected later (i.e., ``survived'' for longer), the covariate pattern (e.g., antibody titre) of subject 2 would be considered by the model to be more ``protective'' than that of subject 1. That is, their covariates would be consistent with a reduced hazard. Since we assume that at most one infection is possible for any subject, both subjects are no longer at risk after the event. For subject 1, $t=100,\ Y=1$. For subject 2, $t=150,\ Y=1$. For any subject who does not get infected, $t$ is their total follow-up time and $Y=0$.
+Since subject 2 got infected later (i.e., ``survived'' for longer), the covariate pattern (e.g., antibody titre) of subject 2 would be considered by the model to be more ``protective'' than that of subject 1. That is, their covariates would be consistent with a reduced hazard. Since we assume that at most one infection is possible for any subject, both subjects are no longer at risk after the event. For subject 1, $t=100,\ Y=1$. For subject 2, $t=150,\ Y=1$. For any subject who does not get infected, $t$ would be their total follow-up time and $Y=0$.
 
 If subjects are not at risk for all of their follow-up time (e.g., not exposed to the virus), then the total follow-up time may be misleading as illustrated in Figure \ref{CoxExamplePartial}. Taking the actual time at risk into account would lead to the opposite conclusion in this example --- it is subject 1 who is more ``protected'' since they were at risk for longer.
 
