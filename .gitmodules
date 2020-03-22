@@ -1,0 +1,3 @@
+[submodule "sclr-lowbase"]
+	path = sclr-lowbase
+	url = https://github.com/khvorov45/sclr-lowbase

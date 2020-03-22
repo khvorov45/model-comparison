@@ -1,9 +1,19 @@
 The scaled logit model is the same as logistic regression except that it estimates the baseline probability of outcome (i.e., the probability at low covariate values assuming a protective covariate) as opposed to assuming that it is equal to 1 \cite{Dunning;2006}. If there is only one covariate which is the antibody titre measurement then the model is
 
 \begin{align*}
-\begin{gathered}
-P(Y=1) = \frac{\lambda}{1 + \text{exp}(\beta_0 + \beta_X X)}
-\end{gathered}
+    \begin{gathered}
+        P(Y=1) = \frac{\lambda}{1 + \text{exp}(\beta_0 + \beta_X X)}
+    \end{gathered}
 \end{align*}
 
 Note that with the above parameterisation, the $\beta_0$ and $\beta_X$ parameters are negated relative to logistic regression. The new parameter $\lambda$ is the baseline risk, $\text{exp}(\beta_0)$ is the reduction in the baseline risk (protection) at $X=0$, $\beta_X$ is the ratio of protection of subjects with a given $X$ compared to subjects whose $X$ is 1 unit lower.
+
+The baseline risk parameter $\lambda$ is bounded to $[0, 1]$. This may present problems for optimisation. The model can be parameterised as follows to avoid bounded parameters
+
+\begin{align*}
+    \begin{gathered}
+        P(Y=1) = \frac{\text{exp}(\theta)}{(1 + \text{exp}(\theta))(1 + \text{exp}(\beta_0 + \beta_X X))}
+    \end{gathered}
+\end{align*}
+
+Where $\theta$ is baseline log-odds rather than baseline probability.
