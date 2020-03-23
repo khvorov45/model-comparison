@@ -10,10 +10,21 @@ Note that with the above parameterisation, the $\beta_0$ and $\beta_X$ parameter
 
 The baseline risk parameter $\lambda$ is bounded to $[0, 1]$. This may present problems for optimisation. The model can be parameterised as follows to avoid bounded parameters
 
-\begin{align*}
-    \begin{gathered}
-        P(Y=1) = \frac{\text{exp}(\theta)}{(1 + \text{exp}(\theta))(1 + \text{exp}(\beta_0 + \beta_X X))}
-    \end{gathered}
-\end{align*}
+\begin{gather*}
+    P(Y=1) = \frac{\text{exp}(\theta)}{(1 + \text{exp}(\theta))(1 + \text{exp}(\beta_0 + \beta_X X))}
+\end{gather*}
 
 Where $\theta$ is baseline log-odds rather than baseline probability.
+
+$$
+    \theta = \text{log}\frac{\lambda}{1 - \lambda}
+$$
+
+With either parameterisation, the protection is
+
+\begin{gather}
+    D(X) = 1 - \frac{\hat{P}(Y=1)}{\hat{\lambda}} = \frac{\text{exp}(\hat{\beta}_0 + \hat{\beta}_X X)}{1 + \text{exp}(\hat{\beta}_0 + \hat{\beta}_X X)}
+    \label{eq:sclr-prot}
+\end{gather}
+
+The quantity in Eq.~\ref{eq:sclr-prot} represents the reduction in the baseline probablity of infection at a given $X$.

@@ -14,7 +14,7 @@ graph_data_dir <- "data-plot"
 
 read_hanam <- function(nme) {
   read_csv(
-    file.path(data_dir, paste0(nme, ".csv")), 
+    file.path(data_dir, paste0(nme, ".csv")),
     col_types = cols(
       hhold = col_character(),
       ind = col_character(),
@@ -33,7 +33,7 @@ read_hanam <- function(nme) {
 
 read_hanam_summ <- function(nme) {
   read_csv(
-    file.path(data_dir, paste0(nme, ".csv")), 
+    file.path(data_dir, paste0(nme, ".csv")),
     col_types = cols(
       population = col_factor(levels = c("General", "Exposed")),
       virus = col_character(),
@@ -49,7 +49,8 @@ lbl_status_bin <- function(dat) {
   dat %>%
     mutate(
       status_bin_lbl = factor(
-        status_bin, levels = c(0, 1), labels = c("Not infected", "Infected")
+        status_bin,
+        levels = c(0, 1), labels = c("Not infected", "Infected")
       )
     )
 }
@@ -60,7 +61,7 @@ plot_counts <- function(dat, facet_type = "vir") {
   ybreaks <- seq(0, 1, 0.1)
   facets <- list(
     "vir" = list(
-      facet_wrap(vars(virus), nrow = 1), 
+      facet_wrap(vars(virus), nrow = 1),
       coord_cartesian(xlim = c(log(5), log(1280)), ylim = c(0, 0.3)),
       scale_y_continuous(breaks = ybreaks, labels = scales::percent_format(1))
     ),
@@ -79,7 +80,8 @@ plot_counts <- function(dat, facet_type = "vir") {
       axis.text.x = element_text(angle = 45, hjust = 1),
       panel.grid.minor.y = element_blank()
     ) +
-    xlab("HI titre") + ylab("Infected proportion") +
+    xlab("HI titre") +
+    ylab("Infected proportion") +
     scale_x_continuous(
       breaks = log(xbreaks), labels = xbreaks,
       minor_breaks = log((xbreaks + xbreaks * 2) / 2)
@@ -90,7 +92,7 @@ plot_counts <- function(dat, facet_type = "vir") {
       shape = 18
     ) +
     ggrepel::geom_text_repel(
-      data = dat, mapping = aes(log(prehi), inf_prop, label = ntot), 
+      data = dat, mapping = aes(log(prehi), inf_prop, label = ntot),
       inherit.aes = FALSE, color = "gray50"
     )
 }
@@ -140,13 +142,13 @@ han_cnts <- read_hanam_summ("hanam-hi-summ") %>%
   filter(virus != "H1N1seas")
 
 pls_cnts <- plot_counts(han_cnts, "virpop")
-save_plot_dl(pls_cnts, "hanam-hi-summ", graph_data_dir, 10)
+# save_plot_dl(pls_cnts, "hanam-hi-summ", graph_data_dir, 10)
 
 pls_scat_gen <- plot_scatter(filter(han_dat, population == "General"))
-save_plot(pls_scat_gen, TRUE, "hanam-hi-gen-scatter", graph_data_dir)
+# save_plot(pls_scat_gen, TRUE, "hanam-hi-gen-scatter", graph_data_dir)
 
 pls_scat <- plot_scatter(han_dat, facet_type = "virpop")
-save_plot_dl(pls_scat, "hanam-hi-scatter", graph_data_dir)
+# save_plot_dl(pls_scat, "hanam-hi-scatter", graph_data_dir)
 
 pls_cnts_gen <- plot_counts(filter(han_cnts, population == "General"), "vir")
-save_plot(pls_cnts_gen, TRUE, "hanam-hi-summ-gen", graph_data_dir)
+# save_plot(pls_cnts_gen, TRUE, "hanam-hi-summ-gen", graph_data_dir)

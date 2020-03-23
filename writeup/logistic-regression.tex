@@ -1,9 +1,27 @@
 The logistic model assumes that the probability of outcome follows a logistic curve from 1 (at low covariate values assuming a protective covariate) to 0 (at high covariate values). If there is only one covariate which is the antibody titre measurement, then the model is:
 
 \begin{align*}
-\begin{gathered}
-P(Y=1) = \frac{\text{exp}(\beta_0 + \beta_X X)}{1 + \text{exp}(\beta_0 + \beta_X X)}
-\end{gathered}
+    \begin{gathered}
+        P(Y=1) = \frac{\text{exp}(\beta_0 + \beta_X X)}{1 + \text{exp}(\beta_0 + \beta_X X)}
+    \end{gathered}
 \end{align*}
 
 Where $\beta_0$ is the log-odds of infection when $X=0$ and $\beta_X$ is the log-odds ratio of infection of subjects with a given $X$ compared to subjects subjects whose $X$ is 1 unit lower.
+
+One way to generate a protection curve from this model is to subtract the fitted probability $\hat{P}$ from 1
+
+\begin{gather}
+    D(X) = 1 - \hat{P}(Y=1)
+    \label{eq:lr-prot-abs}
+\end{gather}
+
+The quantity in Eq.~\ref{eq:lr-prot-abs} represents the probability of not getting infected (i.e., the probability of being protected) at a given $X$.
+
+Another way to generate a protection curve from the logistic model is to divide the fitted probability of infection at a given $X$ by the fitted propbability of infection when $X$ is equal to some threshold, e.g. $\text{log}(5)$, to obtain the relative probability of infection and then subtract this quantity from 1
+
+\begin{gather}
+    D(X) = 1 - \frac{\hat{P}(Y=1 | X)}{\hat{P}(Y=1 | X = \text{log}(5))}
+    \label{eq:lr-prot-rel}
+\end{gather}
+
+The quantity in Eq.~\ref{eq:lr-prot-rel} represents the probability of being protected at a given $X$ relative to the probability of protection when $X$ is equal to $\text{log}(5)$. Note that it is difficult to obtain the variance of the quantity in Eq.~\ref{eq:lr-prot-rel} analytically, so a method such as bootstrapping may be required.
