@@ -4,19 +4,36 @@ $$
     h(t) = h_0(t) \ \text{exp}(\beta_XX)
 $$
 
-Where $h_0$ is the baseline hazard. In this example, $h_0$ corresponds to the hazard when $X$ (the log-titre) is 0 i.e. at a titre measurement of 1. The coefficient $\beta_X$ corresponds to the change in hazard with a change in $X$. When $X$ increases by 1 (if $X$ is a log2 titre, then this corresponds to a 2-fold titre increase), the hazard changes by $\text{exp}(\beta_X)$, i.e. the hazard is multiplied by a constant.
+Where $h_0$ is the baseline hazard. In this example, $h_0$ corresponds to the hazard when $X$ (the log-titre) is 0 i.e. at a titre measurement of 1. The coefficient $\beta_X$ corresponds to the change in hazard with a change in $X$. When $X$ increases by 1 (if $X$ is a log2 titre, then this corresponds to a 2-fold titre increase), the hazard changes by $\text{exp}(\beta_X)$, i.e. the hazard is multiplied by a constant. Note that the "linear predictor" $L(X)$ part of the model is $\beta_XX$
 
 For the Cox PH regression, the outcome is time-to-event $t$. Infection status $Y$ acts as an indicator of whether the event has occured at the end of the corresponding time period. We will assume that all subjects experience at most one event. In the context of infection this assumption is justified when being infected once grants immunity for the rest of the follow-up period.
 
 Time $t$ is assumed by the model to be time-at-risk of an observable event. For subjects who do not get infected over the follow-up period, $t$ is their total follow-up time and $Y=0$. This represents a right-censored observation, i.e. these subjects "survived" for at least the time they were followed. For subjects who do get infected, $Y=1$ and $t$ is the time it took for them to get infected. The time after infection to end-of-follow-up does not count when we assume that infection grants immunity since the subjects are no longer at risk after infection.
 
-Once the model is fitted, protection $D$ at different values of $X$ can be generated as follows
+Once the model is fitted, an estimate of $\beta_X$ ($\hat{\beta}_X$) is obtained as well as its variance $\text{Var}(\hat{\beta}_X)$. From these quantities, protection $D$ at different values of $X$ can be estimated as follows
 
 \begin{gather}
-    D(X) = \text{exp}(\hat{\beta}_X X) = \frac{\hat{h}(t)}{\hat{h}_0(t)}
+    \hat{D}(X) = 1 - \text{exp}(\hat{\beta}_X X) = 1 - \frac{\hat{h}(t)}{\hat{h}_0(t)}
     \label{eq:cox-prot}
 \end{gather}
 
 Where $\hat{\beta}_X$ is the estimate of $\beta_X$ and $\hat{h}$ is the estimated hazard.
 
-The quantity in Eq.~\ref{eq:cox-prot} represents the hazard at a given $X$ relative to the baseline hazard (i.e., hazard when $X=0$). If a threshold other than $0$ is desired, the $X$ values can be centered around the desired threshold (e.g., $\text{log}(5)$) prior to fiting the model.
+Assuming $X$ is protective, the quantity in Eq.~\ref{eq:cox-prot} represents the decrease in the hazard at a given $X$ relative to the baseline hazard (i.e., hazard when $X=0$). If a threshold other than $0$ is desired, the $X$ values can be centered around the desired threshold (e.g., $\text{log}(5)$) prior to fiting the model.
+
+The confidence interval for $D$ at any $X$, i.e. $(\hat{D}(X)_{\text{low}},~\hat{D}(X)_{\text{high}})$ can be generated from the interval for the linear predictor as follows
+
+\begin{gather*}
+    \big(\hat{D}(X)_{\text{low}},~\hat{D}(X)_{\text{high}}\big)  =
+    \big(
+    1 - \text{exp}(\hat{L}(X)_{\text{high}}),~
+    1 - \text{exp}(\hat{L}(X)_{\text{low}})
+    \big)                                                       \\
+    \big(\hat{L}(X)_{\text{low}},~\hat{L}(X)_{\text{high}}\big)  =
+    \big(
+    \hat{L}(X) - 1.96 \sqrt{\text{Var}(\hat{L}(X))},~
+    \hat{L}(X) + 1.96 \sqrt{\text{Var}(\hat{L}(X))}
+    \big)                                                       \\
+    \hat{L}(X) = \hat{\beta}_XX \quad
+    \text{Var}(\hat{L}(X)) = X^2\text{Var}(\hat{\beta}_X)
+\end{gather*}

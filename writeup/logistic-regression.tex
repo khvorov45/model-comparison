@@ -2,11 +2,13 @@ The logistic model assumes that the probability of outcome follows a logistic cu
 
 \begin{align*}
     \begin{gathered}
-        P(Y=1) = \frac{\text{exp}(\beta_0 + \beta_X X)}{1 + \text{exp}(\beta_0 + \beta_X X)}
+        P(Y=1) = \frac{\text{exp}(\beta_0 + \beta_X X)}{1 + \text{exp}(\beta_0 + \beta_X X)} = \text{logit}^{-1}(\beta_0 + \beta_X X)
     \end{gathered}
 \end{align*}
 
-Where $\beta_0$ is the log-odds of infection when $X=0$ and $\beta_X$ is the log-odds ratio of infection of subjects with a given $X$ compared to subjects subjects whose $X$ is 1 unit lower.
+Where $\beta_0$ is the log-odds of infection when $X=0$ and $\beta_X$ is the log-odds ratio of infection of subjects with a given $X$ compared to subjects subjects whose $X$ is 1 unit lower. Note that the linear predictor $L(X)$ is equal to $\beta_0 + \beta_X X$.
+
+Once the model is fitted, estimates of $\beta_0$ ($\hat{\beta}_0$), $\beta_X$ ($\hat{\beta}_X$) are obtained, as well as their variance-covariance matrix which has three terms --- $\text{Var}(\hat{\beta}_0)$, $\text{Var}(\hat{\beta}_X)$ and $\text{Cov}(\hat{\beta}_0, \hat{\beta}_X)$.
 
 One way to generate a protection curve from this model is to subtract the fitted probability $\hat{P}$ from 1
 
@@ -17,6 +19,23 @@ One way to generate a protection curve from this model is to subtract the fitted
 
 The quantity in Eq.~\ref{eq:lr-prot-abs} represents the probability of not getting infected (i.e., the probability of being protected) at a given $X$.
 
+The confidence interval for the quantity in Eq.~\ref{eq:lr-prot-abs} can be generated from the interval for $L(X)$ as follows
+
+\begin{gather*}
+    \big(\hat{D}(X)_{\text{low}},~\hat{D}(X)_{\text{high}}\big)  =
+    \big(
+    1 - \text{logit}^{-1}(\hat{L}(X)_{\text{high}}),~
+    1 - \text{logit}^{-1}(\hat{L}(X)_{\text{low}})
+    \big)                                                       \\
+    \big(\hat{L}(X)_{\text{low}},~\hat{L}(X)_{\text{high}}\big)  =
+    \big(
+    \hat{L}(X) - 1.96 \sqrt{\text{Var}(\hat{L}(X))},~
+    \hat{L}(X) + 1.96 \sqrt{\text{Var}(\hat{L}(X))}
+    \big)                                                       \\
+    \hat{L}(X) = \hat{\beta}_0 + \hat{\beta}_XX \quad
+    \text{Var}(\hat{L}(X)) = X^2\text{Var}(\hat{\beta}_X) + \text{Var}(\hat{\beta}_0) + X \text{Cov}(\beta_0, \beta_X)
+\end{gather*}
+
 Another way to generate a protection curve from the logistic model is to divide the fitted probability of infection at a given $X$ by the fitted propbability of infection when $X$ is equal to some threshold, e.g. $\text{log}(5)$, to obtain the relative probability of infection and then subtract this quantity from 1
 
 \begin{gather}
@@ -24,4 +43,9 @@ Another way to generate a protection curve from the logistic model is to divide 
     \label{eq:lr-prot-rel}
 \end{gather}
 
-The quantity in Eq.~\ref{eq:lr-prot-rel} represents the probability of being protected at a given $X$ relative to the probability of protection when $X$ is equal to $\text{log}(5)$. Note that it is difficult to obtain the variance of the quantity in Eq.~\ref{eq:lr-prot-rel} analytically, so a method such as bootstrapping may be required.
+The quantity in Eq.~\ref{eq:lr-prot-rel} represents the probability of being protected at a given $X$ relative to the probability of protection when $X$ is equal to $\text{log}(5)$.
+
+Note that it is difficult to obtain the confidence interval of the quantity in Eq.~\ref{eq:lr-prot-rel} analytically, so a method such as bootstrapping may be required.
+Bootstrapping involves generating random resamples from the data, fitting the model to each one and generating the quantity in Eq.~\ref{eq:lr-prot-rel} at a range of $X$ values for each obtained estimate of $\beta_0$ and $\beta_X$.
+After fitting the model to $n$ resamples of the original data, $n$ estimates of protection would be obtained at a range of $X$ values.
+The 2.5\% and 97.5\% quantiles of the distribution of protection at any $X$ value formed by the $n$ estimates of protection obtained by bootstrapping can serve as the bounds of the 95\% confidence interval for protection at that $X$ value.
