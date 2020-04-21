@@ -1,6 +1,6 @@
-We discuss all 3 models in the context of a binary outcome $Y$ representing the infection status where 0 --- not infected, 1 --- infected, and a continuous covariate $X$ representing the log-titre measurement.
+We discuss all 3 models in the context of a binary outcome $Y$ representing the infection status where 0 --- not infected, 1 --- infected, and a single continuous covariate $X$ representing the log-titre measurement.
 
-The fitting of all models was done using the standard maximum likelihood framework. All observations with missing values were removed. All censored titre observation were handled as follows: below-detectable values were set to half of the lowest detectable level (e.g., when the lowest detectable level is 10, the below-detectable values were st to 5), above-detectable values were set to the highest dilution used, the other values were set to the geometric mean of the corresponding interval, e.g. a value of 20 was shifted to the geometric mean of 20 and 40.
+The fitting of all models was done using the standard maximum likelihood framework. All observations were treated as independent. All observations with missing values were removed. All censored titre observation were handled as follows: below-detectable values were set to half of the lowest dilution used (e.g., when the lowest dilution is 10, the below-detectable values were st to 5), values corresponding to the highest dilution used were left as-is, the other values were set to the geometric mean of the corresponding interval, e.g. a value of 20 was shifted to the geometric mean of 20 and 40.
 
 Self-contained examples of the application of all discussed methods can be found here
 

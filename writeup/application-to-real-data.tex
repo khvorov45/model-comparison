@@ -1,0 +1,14 @@
+This section demonstrates the application of the models to the Ha Nam and Kiddivax data.
+
+We will use Ha Nam study data from 2009 to 2015 consisting of the subjects' pre-season HI titre measurements against the H3N2 virus as well as the subjects' H3N2 infection status in the season following the titre measurement. The lowest detectable HI titre was 10 (lowest dilution used), the highest --- 1280 (highest dilution used), and measurements within the detectable range were censored to intervals $[10, 20), [20, 40), ..., [640, 1280)$. This Ha Nam data subset is depicted in Figure \ref{fig:hanam-hi-summ-h3n2}.
+
+We will use Kiddivax study data consisting of the titre measurements taken against the B Victoria virus and the subjects' B Victoria infection status following the measurements. The lowest detectable HI titre was 10 (lowest dilution used) and HI measurements above 10 were censored to intervals $[10, 20), [20, 40), ..., [2560, 5120)$. No subject had a titre above 5120 against the B Victoria virus. This Kiddivax data subset is depicted in Figure
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[width=1\textwidth]{../data-plot/hanam-hi-summ-h3n2-light.pdf}
+    \caption{
+        Ha Nam cohort data for the H3N2 virus from 2009 to 2015. Numbers next to points are the total number of observations in the corresponding group. The top row is all observations. The left panel shows data for the entire cohort. The right panel shows data from households with at least one infection in a given season. The measurement of 5 corresponds to titres below detectable levels.
+    }
+    \label{fig:hanam-hi-summ-h3n2}
+\end{figure}

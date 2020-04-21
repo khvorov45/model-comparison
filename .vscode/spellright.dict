@@ -6,7 +6,7 @@ quantiles
 covariance
 logit
 parameterisation
-Kiddyvax
+Kiddivax
 github
 khvorov
 Arseniy
@@ -19,3 +19,12 @@ datasets
 rhombi
 MLE
 sclr
+unvaccinated
+Sera
+pre-season
+H1N1pdm09
+RT-PCR-confirmed
+H1N1pdm
+pre
+sero-conversion
+PCR

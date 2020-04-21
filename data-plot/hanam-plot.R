@@ -69,6 +69,12 @@ plot_counts <- function(dat, facet_type = "vir") {
       facet_grid(population ~ virus, scales = "free_y"),
       scale_y_continuous(labels = scales::percent_format(1)),
       theme(panel.spacing.y = unit(0.25, "lines"))
+    ),
+    "pop" = list(
+      facet_wrap(vars(population), nrow = 1, scales = "free_y"),
+      coord_cartesian(xlim = c(log(5), log(1280))),
+      scale_y_continuous(labels = scales::percent_format(1)),
+      theme(panel.spacing.x = unit(1, "lines"))
     )
   )
   dat %>%
@@ -143,6 +149,9 @@ han_cnts <- read_hanam_summ("hanam-hi-summ") %>%
 
 pls_cnts <- plot_counts(han_cnts, "virpop")
 # save_plot_dl(pls_cnts, "hanam-hi-summ", graph_data_dir, 10)
+
+pls_cnts_h3n2 <- plot_counts(filter(han_cnts, virus == "H3N2"), "pop")
+# save_plot(pls_cnts_h3n2, FALSE, "hanam-hi-summ-h3n2", graph_data_dir, 7.5)
 
 pls_scat_gen <- plot_scatter(filter(han_dat, population == "General"))
 # save_plot(pls_scat_gen, TRUE, "hanam-hi-gen-scatter", graph_data_dir)
