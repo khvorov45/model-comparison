@@ -33,10 +33,10 @@ The confidence interval for the quantity in Eq.~\ref{eq:lr-prot-abs} can be gene
     \hat{L}(X) + 1.96 \sqrt{\text{Var}(\hat{L}(X))}
     \big)                                                       \\
     \hat{L}(X) = \hat{\beta}_0 + \hat{\beta}_XX \quad
-    \text{Var}(\hat{L}(X)) = X^2\text{Var}(\hat{\beta}_X) + \text{Var}(\hat{\beta}_0) + X \text{Cov}(\beta_0, \beta_X)
+    \text{Var}(\hat{L}(X)) = X^2\text{Var}(\hat{\beta}_X) + \text{Var}(\hat{\beta}_0) + X \text{Cov}(\hat{\beta}_0, \hat{\beta}_X)
 \end{gather*}
 
-Another way to generate a protection curve from the logistic model is to divide the fitted probability of infection at a given $X$ by the fitted propbability of infection when $X$ is equal to some threshold, e.g. $\text{log}(5)$, to obtain the relative probability of infection and then subtract this quantity from 1
+Another way to generate a protection curve from the logistic model is to divide the fitted probability of infection at a given $X$ by the fitted probability of infection when $X$ is equal to some threshold, e.g. $\text{log}(5)$, to obtain the relative probability of infection and then subtract this quantity from 1
 
 \begin{gather}
     D(X) = 1 - \frac{\hat{P}(Y=1 | X)}{\hat{P}(Y=1 | X = \text{log}(5))}
@@ -46,6 +46,6 @@ Another way to generate a protection curve from the logistic model is to divide 
 The quantity in Eq.~\ref{eq:lr-prot-rel} represents the probability of being protected at a given $X$ relative to the probability of protection when $X$ is equal to $\text{log}(5)$.
 
 Note that it is difficult to obtain the confidence interval of the quantity in Eq.~\ref{eq:lr-prot-rel} analytically, so a method such as bootstrapping may be required.
-Bootstrapping involves generating random resamples from the data, fitting the model to each one and generating the quantity in Eq.~\ref{eq:lr-prot-rel} at a range of $X$ values for each obtained estimate of $\beta_0$ and $\beta_X$.
-After fitting the model to $n$ resamples of the original data, $n$ estimates of protection would be obtained at a range of $X$ values.
+Bootstrapping involves generating random re-samples from the data, fitting the model to each one and generating the quantity in Eq.~\ref{eq:lr-prot-rel} at a range of $X$ values for each obtained estimate of $\beta_0$ and $\beta_X$.
+After fitting the model to $n$ re-samples of the original data, $n$ estimates of protection would be obtained at a range of $X$ values.
 The 2.5\% and 97.5\% quantiles of the distribution of protection at any $X$ value formed by the $n$ estimates of protection obtained by bootstrapping can serve as the bounds of the 95\% confidence interval for protection at that $X$ value.

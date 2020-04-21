@@ -23,8 +23,25 @@ $$
 With either parameterisation, the protection is
 
 \begin{gather}
-    D(X) = 1 - \frac{\hat{P}(Y=1)}{\hat{\lambda}} = \frac{\text{exp}(\hat{\beta}_0 + \hat{\beta}_X X)}{1 + \text{exp}(\hat{\beta}_0 + \hat{\beta}_X X)}
+    D(X) = 1 - \frac{\hat{P}(Y=1)}{\hat{\lambda}} = \frac{\text{exp}(\hat{\beta}_0 + \hat{\beta}_X X)}{1 + \text{exp}(\hat{\beta}_0 + \hat{\beta}_X X)} = \text{logit}^{-1}(\hat{\beta}_0 + \hat{\beta}_X X)
     \label{eq:sclr-prot}
 \end{gather}
 
-The quantity in Eq.~\ref{eq:sclr-prot} represents the reduction in the baseline probablity of infection at a given $X$.
+The quantity in Eq.~\ref{eq:sclr-prot} represents the reduction in the baseline probability of infection at a given $X$.
+
+The confidence bounds for protection in Eq.~\ref{eq:sclr-prot} can be generated as follows
+
+\begin{gather*}
+    \big(\hat{D}(X)_{\text{low}},~\hat{D}(X)_{\text{high}}\big)  =
+    \big(
+    \text{logit}^{-1}(\hat{L}(X)_{\text{low}}),~
+    \text{logit}^{-1}(\hat{L}(X)_{\text{high}})
+    \big)                                                       \\
+    \big(\hat{L}(X)_{\text{low}},~\hat{L}(X)_{\text{high}}\big)  =
+    \big(
+    \hat{L}(X) - 1.96 \sqrt{\text{Var}(\hat{L}(X))},~
+    \hat{L}(X) + 1.96 \sqrt{\text{Var}(\hat{L}(X))}
+    \big)                                                       \\
+    \hat{L}(X) = \hat{\beta}_0 + \hat{\beta}_XX \quad
+    \text{Var}(\hat{L}(X)) = X^2\text{Var}(\hat{\beta}_X) + \text{Var}(\hat{\beta}_0) + X \text{Cov}(\hat{\beta}_0, \hat{\beta}_X)
+\end{gather*}
