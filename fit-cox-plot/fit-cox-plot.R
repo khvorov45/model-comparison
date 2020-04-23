@@ -73,7 +73,7 @@ pl <- plot_pred(preds)
 # save_plot(pl, "kiddyvaxmain", 12, 7.5)
 
 pl_bvic <- plot_pred(filter(preds, virus == "B Vic"), facet_by_virus = FALSE)
-save_plot(pl_bvic, "kiddyvaxmain-bvic", 7.5, 7.5)
+# save_plot(pl_bvic, "kiddyvaxmain-bvic", 7.5, 7.5)
 
 pl_soph_og <- plot_pred(
   filter(preds_sophia, model == "sophia") %>%

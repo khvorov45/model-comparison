@@ -4,7 +4,7 @@ As mentioned before, the standard logistic model is inappropriate due to unsatis
 	\centering
 	\includegraphics[width=0.8\textwidth]{../fit-logistic-plot/hanam-hi-inf.pdf}
 	\caption{
-	Fitted infection curves and confidence intervals from the standard logistic model fit to Ha Nam data (also shown in Figure \ref{HanamCounts}) using maximum likelihood with no accounting of censored titres (observations of 5 (below detectable) and 1280 (above detectable) were unchanged, all other observations were moved to the midpoints of the corresponding censored intervals on a log scale). The points are the infected proportions at the corresponding modified titre measurements (i.e. interval midpoints). The solid line is the point estimates. The shaded region is the 95\% confidence interval. The numbers next to the points are the total sample size of the corresponding groups.
+		Fitted infection curves and confidence intervals from the standard logistic model fit to Ha Nam data (also shown in Figure \ref{HanamCounts}) using maximum likelihood with no accounting of censored titres (observations of 5 (below detectable) and 1280 (above detectable) were unchanged, all other observations were moved to the midpoints of the corresponding censored intervals on a log scale). The points are the infected proportions at the corresponding modified titre measurements (i.e. interval midpoints). The solid line is the point estimates. The shaded region is the 95\% confidence interval. The numbers next to the points are the total sample size of the corresponding groups.
 	}
 	\label{lr-inf}
 \end{figure}
@@ -17,7 +17,7 @@ The other option for generating a protection curve is to calculate the fitted pr
 	\centering
 	\includegraphics[width=0.8\textwidth]{../fit-logistic-plot/hanam-hi-prot.pdf}
 	\caption{
-	Fitted protection curves and confidence intervals from the standard logistic model fit to Ha Nam data (also shown in Figure \ref{HanamCounts}) using maximum likelihood with no accounting of censored titres (observations of 5 (below detectable) and 1280 (above detectable) were unchanged, all other observations were moved to the midpoints of the corresponding censored intervals on a log scale). The solid line is the point estimates. The shaded region is the 95\% confidence interval.
+		Fitted protection curves and confidence intervals from the standard logistic model fit to Ha Nam data (also shown in Figure \ref{HanamCounts}) using maximum likelihood with no accounting of censored titres (observations of 5 (below detectable) and 1280 (above detectable) were unchanged, all other observations were moved to the midpoints of the corresponding censored intervals on a log scale). The solid line is the point estimates. The shaded region is the 95\% confidence interval.
 	}
 	\label{lr-prot-abs}
 \end{figure}
@@ -26,12 +26,12 @@ The other option for generating a protection curve is to calculate the fitted pr
 	\centering
 	\includegraphics[width=0.8\textwidth]{../fit-logistic-boot-plot/hanam-hi-prot-rel.pdf}
 	\caption{
-	Fitted relative-to-5 protection curves and confidence intervals from the standard logistic model fit to Ha Nam data (also shown in Figure \ref{HanamCounts}) using maximum likelihood with no accounting of censored titres (observations of 5 (below detectable) and 1280 (above detectable) were unchanged, all other observations were moved to the midpoints of the corresponding censored intervals on a log scale). Solid lines are the point estimates, with shaded regions the 95\% confidence interval. The bounds for the confidence interval were obtained by using the bootstrap method (10,000 samples).
+		Fitted relative-to-5 protection curves and confidence intervals from the standard logistic model fit to Ha Nam data (also shown in Figure \ref{HanamCounts}) using maximum likelihood with no accounting of censored titres (observations of 5 (below detectable) and 1280 (above detectable) were unchanged, all other observations were moved to the midpoints of the corresponding censored intervals on a log scale). Solid lines are the point estimates, with shaded regions the 95\% confidence interval. The bounds for the confidence interval were obtained by using the bootstrap method (10,000 samples).
 	}
 	\label{lr-prot-rel}
 \end{figure}
 
-While the relative-to-5 protection curves (Figure \ref{lr-prot-rel}) appear more plausible than the relative-to-baseline protection curves (Figure \ref{lr-prot-abs}), both result from fitting a model with an unsatisfied assumption and neither method of generating protection curves from logistic regression model reliably produces accurate results. In addition, the high confidence in the results (small errors in Figures \ref{lr-prot-rel} and \ref{lr-prot-abs}) is misplaced as it is a result of a string assumtion on the data that is unfounded.
+While the relative-to-5 protection curves (Figure \ref{lr-prot-rel}) appear more plausible than the relative-to-baseline protection curves (Figure \ref{lr-prot-abs}), both result from fitting a model with an unsatisfied assumption and neither method of generating protection curves from logistic regression model reliably produces accurate results. In addition, the high confidence in the results (small errors in Figures \ref{lr-prot-rel} and \ref{lr-prot-abs}) is misplaced as it is a result of a string assumption on the data that is unfounded.
 
-The relative-to-5 curve (Figure \ref{lr-prot-rel}) presents an additional problem. The curve shows how much ``better'' different titres are at protecting against infection than the titre of 5. 
+The relative-to-5 curve (Figure \ref{lr-prot-rel}) presents an additional problem. The curve shows how much ``better'' different titres are at protecting against infection than the titre of 5.
 There is nothing inherently special about this threshold of 5. Its choice is based on the lower dilution of 10 which is necessitated by the pre-treatment of sera. The curves may look substantially different if a different threshold (e.g. 10 or 1) is chosen. This hampers the interpretability and comparison of results.

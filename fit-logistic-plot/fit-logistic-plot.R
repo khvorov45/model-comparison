@@ -46,7 +46,8 @@ recode_viruses <- function(dat) {
   dat %>%
     mutate(
       virus = factor(
-        virus, levels = c("h1pdm", "bvic"), labels = c("H1N1pdm", "B Vic")
+        virus,
+        levels = c("h1pdm", "bvic"), labels = c("H1N1pdm", "B Vic")
       )
     )
 }
@@ -111,11 +112,15 @@ common_plot_els <- function() {
 }
 
 prot_curve_fun <- function(outsum, facets = "virpop", xmin = 5, xmax = 1280) {
-  facets <- rlang::arg_match(facets, c("vir", "virpop"))
+  facets <- rlang::arg_match(facets, c("vir", "virpop", "pop", "none"))
   if (facets == "virpop") {
     faceting <- facet_grid(population ~ virus)
-  } else {
+  } else if (facets == "vir") {
     faceting <- facet_wrap(~virus, nrow = 1)
+  } else if (facets == "pop") {
+    faceting <- facet_wrap(~population, nrow = 1)
+  } else {
+    faceting <- NULL
   }
   outsum %>%
     ggplot(aes(loghimid, fit, ymin = fit_low, ymax = fit_high)) +
@@ -125,13 +130,13 @@ prot_curve_fun <- function(outsum, facets = "virpop", xmin = 5, xmax = 1280) {
     common_plot_els()
 }
 
-inf_curve_fun <- function(outsum, data, facets = "virpop", 
+inf_curve_fun <- function(outsum, data, facets = "virpop",
                           xmin = 5, xmax = 5120, ymin = 0, ymax = 0.5) {
-  facets <- rlang::arg_match(facets, c("vir", "virpop"))
+  facets <- rlang::arg_match(facets, c("vir", "virpop", "pop", "none"))
   if (facets == "virpop") {
     facets_spec <- list(
       facet_grid_sc(
-        population ~ virus, 
+        population ~ virus,
         scales = list(
           y = list(
             General = scale_y_continuous(
@@ -162,7 +167,7 @@ inf_curve_fun <- function(outsum, data, facets = "virpop",
       shape = 18
     ) +
     geom_text_repel(
-      data = data, mapping = aes(loghimid, inf_prop, label = ntot), 
+      data = data, mapping = aes(loghimid, inf_prop, label = ntot),
       inherit.aes = FALSE
     )
 }
@@ -190,14 +195,24 @@ kvm_lr_prot <- convert_to_prot(kvm_lr)
 
 # Hanam plots
 han_hi_lr_plot <- inf_curve_fun(han_hi_lr, han_hi_summ, "virpop", 5, 1280)
-save_plot(han_hi_lr_plot, "hanam-hi-inf")
+# save_plot(han_hi_lr_plot, "hanam-hi-inf")
 
 han_hi_lr_prot_plot <- prot_curve_fun(han_hi_lr_prot, "virpop", 5, 1280)
-save_plot(han_hi_lr_prot_plot, "hanam-hi-prot")
+# save_plot(han_hi_lr_prot_plot, "hanam-hi-prot")
+
+han_h3_lr_prot_plot <- prot_curve_fun(
+  filter(han_hi_lr_prot, virus == "H3N2"), "pop", 5, 1280
+)
+save_plot(han_h3_lr_prot_plot, "hanam-h3-prot", 12, 7.5)
 
 # Kiddyvax plots
 kvm_lr_plot <- inf_curve_fun(kvm_lr, kv_main_summ, "vir", 5, 5120, 0, 0.27)
-save_plot(kvm_lr_plot, "kiddyvaxmain-inf", 10, 7.5)
+# save_plot(kvm_lr_plot, "kiddyvaxmain-inf", 10, 7.5)
 
 kvm_lr_prot_plot <- prot_curve_fun(kvm_lr_prot, "vir", 5, 5120)
-save_plot(kvm_lr_prot_plot, "kiddyvaxmain-prot", 10, 7.5)
+# save_plot(kvm_lr_prot_plot, "kiddyvaxmain-prot", 10, 7.5)
+
+kvm_lr_prot_plot_bvic <- prot_curve_fun(
+  filter(kvm_lr_prot, virus == "B Vic"), "none", 5, 5120
+)
+save_plot(kvm_lr_prot_plot_bvic, "kiddyvaxmain-bvic-prot", 7.5, 7.5)
