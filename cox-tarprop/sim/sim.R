@@ -1,7 +1,7 @@
 # Simulations to see if Cox produces reliable results with time at risk
 # being proportional to follow-up time
 #
-# Takes a while, if you don't want to regenrate results after editing this file
+# Takes a while, if you don't want to regenerate results after editing this file
 # (or if the file is newer than the results for another reason) then manually
 # touch the output
 
