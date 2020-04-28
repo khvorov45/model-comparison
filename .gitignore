@@ -12,3 +12,5 @@ edu-article/*
 *.fdb_latexmk
 *.blg
 *.dvi
+*.pdf
+*.csv

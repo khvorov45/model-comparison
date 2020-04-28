@@ -1,0 +1,31 @@
+rule all:
+    input:
+        "plot/long.pdf",
+        "plot/risk.pdf"
+
+rule sim:
+    input:
+        "sim/sim.R"
+    output:
+        protected("sim/sim.csv")
+    shell:
+        "Rscript sim/sim.R"
+
+rule summ:
+    input:
+        "summ/summ.R",
+        "sim/sim.csv"
+    output:
+        "summ/summ.csv"
+    shell:
+        "Rscript summ/summ.R"
+
+rule plot:
+    input:
+        "plot/plot.R",
+        "summ/summ.csv"
+    output:
+        "plot/long.pdf",
+        "plot/risk.pdf"
+    shell:
+        "Rscript plot/plot.R"

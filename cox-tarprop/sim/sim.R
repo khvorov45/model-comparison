@@ -1,24 +1,22 @@
 # Simulations to see if Cox produces reliable results with time at risk
 # being proportional to follow-up time
 #
-# Arseniy Khvorov
-# Created 2019-09-20
-# Last edit 2020-03-04
+# Takes a while, if you don't want to regenrate results after editing this file
+# (or if the file is newer than the results for another reason) then manually
+# touch the output
 
 library(tidyverse)
-library(broom)
 library(survival)
 library(furrr)
-library(extraDistr)
 
 plan(multiprocess)
 
-# Directories to be used later
-cox_tarprop_dir <- "cox-tarprop"
+# Directories used
+sim_dir <- here::here("sim")
 
 # Settings ====================================================================
 
-nsim <- 5
+nsim <- 1e4
 
 vary_list <- list(
   risk_prop_expected = c(0.01, seq(0.1, 0.9, 0.1), 1),
@@ -46,7 +44,7 @@ sim_cox <- function(nsam, beta_0, beta_logTitre, risk_prop_expected,
     ),
     time_at_risk_max = max_follow * risk_proportion,
     status = as.integer(time_at_risk_required <= time_at_risk_max),
-    is_long = rbern(nsam, long_prop_expected),
+    is_long = extraDistr::rbern(nsam, long_prop_expected),
     time_recorded = if_else(
       status == 1,
       time_at_risk_required / risk_proportion,
@@ -59,20 +57,20 @@ sim_cox <- function(nsam, beta_0, beta_logTitre, risk_prop_expected,
       time_recorded
     )
   )
-  
+
   attr(pop, "true_values") <- tibble(
-    nsam, beta_0, beta_logTitre, risk_prop_expected, 
+    nsam, beta_0, beta_logTitre, risk_prop_expected,
     long_prop_expected, max_follow, kappa
-  ) 
+  )
   attr(pop, "seed") <- seed
-  
+
   pop
 }
 
 # Fit the cox model
 fit_cox <- function(data, formula) {
-  coxph(formula, data) %>% 
-    tidy() %>%
+  coxph(formula, data) %>%
+    broom::tidy() %>%
     select(term, estimate, std_error = std.error) %>%
     mutate(
       term = paste0("beta_", term),
@@ -80,7 +78,7 @@ fit_cox <- function(data, formula) {
     ) %>%
     inner_join(
       attr(data, "true_values") %>%
-        pivot_longer(everything(), names_to = "term", values_to = "true_val"), 
+        pivot_longer(everything(), names_to = "term", values_to = "true_val"),
       by = "term"
     ) %>%
     bind_cols(attr(data, "true_values") %>% slice(rep(1, n())))
@@ -114,17 +112,20 @@ sim_fit_one <- function(data_name, data_dict, model_name, model_dict,
 sim_fit_many <- function(nsim, data_name, data_dict, model_name, model_dict,
                          init_seed = sample.int(.Machine$integer.max, 1)) {
   future_map_dfr(
-    1:nsim, 
-    function(i) sim_fit_one(
-      data_name, data_dict, model_name, model_dict, init_seed + (i - 1)
-    ),
+    1:nsim,
+    function(i) {
+      sim_fit_one(
+        data_name, data_dict, model_name, model_dict, init_seed + (i - 1)
+      )
+    },
     .options = future_options(
-      packages = c("extraDistr", "broom", "survival", "tidyr")
+      packages = c("survival", "tidyr")
     )
   )
 }
 
-vary_par <- function(par_vals, par_name, nsim, data_name, data_dict, 
+# Vary one parameter and run simulations for each value
+vary_par <- function(par_vals, par_name, nsim, data_name, data_dict,
                      model_name, model_dict,
                      init_seed = sample.int(.Machine$integer.max, 1)) {
   imap_dfr(
@@ -140,7 +141,8 @@ vary_par <- function(par_vals, par_name, nsim, data_name, data_dict,
     mutate(par_varied = par_name)
 }
 
-vary_par_1aat <- function(vary_list, nsim, data_name, data_dict, 
+# Vary multiple parameters one at a time
+vary_par_1aat <- function(vary_list, nsim, data_name, data_dict,
                           model_name, model_dict,
                           init_seed = sample.int(.Machine$integer.max, 1)) {
   imap_dfr(
@@ -148,32 +150,32 @@ vary_par_1aat <- function(vary_list, nsim, data_name, data_dict,
     function(par_vals, par_name) {
       i <- which(names(vary_list) == par_name)
       vary_par(
-        par_vals, par_name, 
-        nsim, data_name, data_dict, 
+        par_vals, par_name,
+        nsim, data_name, data_dict,
         model_name, model_dict,
         init_seed + (i - 1) * nsim * length(vary_list[[par_name]])
       )
-      
     }
-    
   )
 }
 
+# Standard data
 std_data <- function(kappa) {
   list(
     sim_fun = sim_cox,
     sim_args = list(
-      nsam = 1e4, beta_0 = -3, beta_logTitre = -1.5, risk_prop_expected = 1, 
+      nsam = 1e4, beta_0 = -3, beta_logTitre = -1.5, risk_prop_expected = 1,
       long_prop_expected = 0, max_follow = 100, kappa = kappa
     )
   )
 }
 
-sim_all_data <- function(vary_list, nsim, data_dict, 
+# Simulate according to a dictionary and a vary list
+sim_all_data <- function(vary_list, nsim, data_dict,
                          model_name, model_dict) {
   total_sims <- sum(map_dbl(vary_list, length)) * nsim
   imap_dfr(
-    names(data_dict), 
+    names(data_dict),
     ~ vary_par_1aat(
       vary_list,
       nsim, .x, data_dict, model_name, model_dict, (.y - 1) * total_sims
@@ -183,6 +185,7 @@ sim_all_data <- function(vary_list, nsim, data_dict,
 
 # Script ======================================================================
 
+# All the datasets to be used in the simulations
 data_dict <- list(
   std_1000 = std_data(1000),
   std_100 = std_data(100),
@@ -191,6 +194,7 @@ data_dict <- list(
   std_05 = std_data(0.5)
 )
 
+# All the models to be fitted to the data
 model_dict <- list(
   std = list(
     fit_fun = fit_cox,
@@ -198,12 +202,8 @@ model_dict <- list(
   )
 )
 
+# Model fit results from each simulated dataset
 fits_summs <- sim_all_data(vary_list, nsim, data_dict, "std", model_dict)
 
-write_csv(
-  fits_summs,
-  file.path(
-    cox_tarprop_dir, 
-    paste0("result-", nsim, "sims.csv")
-  )
-)
+# Save the results to the same folder as the script
+write_csv(fits_summs, file.path(sim_dir, "sim.csv"))

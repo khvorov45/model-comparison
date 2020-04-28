@@ -1,15 +1,11 @@
 # Graphing of simulation results
-# Arseniy Khvorov
-# Created 2019-09-20
-# Last edit 2020-03-03
 
 library(tidyverse)
-library(ggdark) # devtools::install_github("khvorov45/ggdark")
 library(latex2exp)
 
-# Directories to be used later
-cox_tarprop_summ_dir <- "cox-tarprop-summary"
-cox_tarprop_plot_dir <- "cox-tarprop-plot"
+# Directories used
+summ_dir <- here::here("summ")
+plot_dir <- here::here("plot")
 
 # Settings ===================================================================
 
@@ -49,21 +45,6 @@ label_kappa <- function(brks) {
   recode(brks, "05" = "0.5")
 }
 
-read_res <- function(name) {
-  read_csv(
-    file.path(cox_tarprop_summ_dir, glue::glue("{name}.csv")),
-    col_types = cols_only(
-      est_mean = col_double(),
-      est_sd = col_double(),
-      true_val = col_double(),
-      par_varied = col_character(),
-      risk_prop_expected = col_double(),
-      long_prop_expected = col_double(),
-      data_name = col_character()
-    )
-  )
-}
-
 add_hline <- function(name, val, y_vars) {
   geom_hline(
     data = tibble(name = factor(name, levels = y_vars), val = val),
@@ -97,7 +78,7 @@ plot_fun <- function(res, x_name, x_lab, y_vars = names(y_var_labs),
     ) %>%
     mutate(name = factor(name, levels = y_vars)) %>%
     my_ggplot() +
-    dark_theme_bw(verbose = FALSE) +
+    ggdark::dark_theme_bw(verbose = FALSE) +
     theme(
       strip.background = element_blank(),
       strip.placement = "outside",
@@ -122,16 +103,16 @@ plot_fun <- function(res, x_name, x_lab, y_vars = names(y_var_labs),
 }
 
 save_plot <- function(pl, name, width = 15, height = 7) {
-  ggsave_dark(
+  ggdark::ggsave_dark(
     pl,
-    filename = file.path(cox_tarprop_plot_dir, paste0(name, ".pdf")),
+    filename = file.path(plot_dir, paste0(name, ".pdf")),
     dark = FALSE, width = width, height = height, units = "cm", device = "pdf"
   )
 }
 
 # Script ======================================================================
 
-summ <- read_res("summary-10000sims")
+summ <- read_csv(file.path(summ_dir, "summ.csv"), col_types = cols())
 
 pl_risk <- plot_fun(
   summ,
