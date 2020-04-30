@@ -3,8 +3,17 @@ rule all:
         "plot/long.pdf",
         "plot/risk.pdf"
 
+rule install_deps:
+    input:
+        "renv.lock"
+    output:
+        ".deps-installed"
+    shell:
+        """Rscript -e 'renv::restore();file.create(".deps-installed")'"""
+
 rule sim:
     input:
+        ".deps-installed",
         "sim/sim.R"
     output:
         protected("sim/sim.csv")
@@ -13,6 +22,7 @@ rule sim:
 
 rule summ:
     input:
+        ".deps-installed",
         "summ/summ.R",
         "sim/sim.csv"
     output:
@@ -22,6 +32,7 @@ rule summ:
 
 rule plot:
     input:
+        ".deps-installed",
         "plot/plot.R",
         "summ/summ.csv"
     output:

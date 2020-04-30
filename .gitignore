@@ -15,3 +15,4 @@ edu-article/*
 *.pdf
 *.csv
 .snakemake
+.deps-installed
