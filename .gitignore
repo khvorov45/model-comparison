@@ -2,8 +2,7 @@
 .Rhistory
 .RData
 .Ruserdata
-data/hanam*
-edu-article/*
+edu-article
 *.synctex.gz
 *.log
 *.bbl
