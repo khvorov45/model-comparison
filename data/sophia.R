@@ -58,7 +58,7 @@ proxy <- data.frame(ti = fluproxy$ti, proxy = (1 / r) * fluproxy$A.H1N1pdm.proxy
 
 # create smoothed proxy for background risk
 s.proxy <- data.frame(
-  ti = 1:max(proxy$ti), 
+  ti = 1:max(proxy$ti),
   s.proxy = predict(
     smooth.spline(proxy$ti, proxy$proxy, spar = 0.6), 1:max(proxy$ti)
   )$y
@@ -220,7 +220,7 @@ for (j in 2:nrow(kdata3.b0)) {
     hhID = rep(kdata3.b0$hhID[j], mrow), TIV = 1 * (kdata3.b0$intervention[j] == 1), postvax.b = log2(kdata3.b0$postvax.B.Brisbane[j]) + w0 * ((1:mrow) - 1), t = (1:mrow) - 1,
     event = c(rep(0, mrow - 1), 1 * (kdata3.b0$swab.Victoria[j] == 1))
   )
-  
+
   temp$proxy <- s.proxy$s.proxy[kdata3.b0$t0[j]:kdata3.b0$T[j]]
   temp2 <- temp[nrow(temp), ]
   kdata.td.b0 <- rbind(kdata.td.b0, temp)
@@ -234,7 +234,7 @@ vic.vic <- cox.td.B <- coxph(Surv(t, event) ~ postvax.b + proxy, data = kdata.td
 # My script ===================================================================
 
 all_soph_dat <- bind_rows(
-  mod_soph_dat(kdata.td.p, "A H1N1pdm09"), 
+  mod_soph_dat(kdata.td.p, "A H1N1pdm09"),
   mod_soph_dat(kdata.td.b, "B Vic")
 )
 
