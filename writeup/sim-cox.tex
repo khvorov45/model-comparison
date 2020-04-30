@@ -4,7 +4,7 @@ To illustrate why the inability to observe true time-at-risk may be a problem, c
 
 \begin{figure}[htp]
 	\centering
-	\includegraphics[width=0.6\textwidth]{../curve-cox/timeplot_1_light.pdf}
+	\includegraphics[width=0.6\textwidth]{../curve-cox/timeplot_1.pdf}
 	\caption{
 		An example of time-to-event data. Two subjects are followed from time 0. Subject 1 experiences the even at time 100. Subject 2 experiences the event at time 150.
 	}
@@ -17,7 +17,7 @@ If subjects are not at risk for all of their follow-up time (e.g., not exposed t
 
 \begin{figure}[htp]
 	\centering
-	\includegraphics[width=0.6\textwidth]{../curve-cox/timeplot_2_light.pdf}
+	\includegraphics[width=0.6\textwidth]{../curve-cox/timeplot_2.pdf}
 	\caption{
 		An example of time-to-event data. Two subjects are followed from time 0. Subject 1 experiences the even at time 100. Subject 2 experiences the event at time 150. Subject 1 was at risk of the event for a total of 5 days. Subject 2 was at risk of the event for a total of 25 days.
 	}
@@ -64,7 +64,7 @@ The assumption of time at risk being proportional to time of follow-up is likely
 
 \begin{figure}[htp]
 	\centering
-	\includegraphics[width=0.59\textwidth]{../curve-cox/timeplot_3_light.pdf}
+	\includegraphics[width=0.59\textwidth]{../curve-cox/timeplot_3.pdf}
 	\caption{
 		An illustration of a pattern of follow-up where the assumption of true time at risk being proportional to time of follow-up is likely to hold. The shaded region marks the period of time when the disease is active. Both subject's follow-up starts at the beginning of the disease season (activity). Subject 1 gets infected at 150 days, their follow-up would end there assuming infection grants immunity (their total recorded time of follow-up would be 50 days). Subject 2 does not get infected through the season, their time of follow-up ends at the end of the season (their total recorded time of follow-up would be 100 days).
 	}
@@ -75,7 +75,7 @@ This assumption will likely not hold if, with a seasonal disease, there are peop
 
 \begin{figure}[htp]
 	\centering
-	\includegraphics[width=0.59\textwidth]{../curve-cox/timeplot_4_light.pdf}
+	\includegraphics[width=0.59\textwidth]{../curve-cox/timeplot_4.pdf}
 	\caption{
 		An illustration of a pattern of follow-up where the assumption of true time at risk being proportional to time of follow-up is likely to not hold. The shaded region marks the period of time when the disease is active. Subject 1 gets infected at 150 days, at which point their follow-up would end if it can be assumed that infection grants immunity (their total recorded time of follow-up would be 50 days). Subject 2 does not get infected within the season, their follow-up ends at the end of the season (their total recorded time of follow-up would be 100 days). For subjects 3 (recorded follow up of 100 days) and 4 (recorded follow-up of 175 days) follow-up commenced prior to season onset.
 	}
