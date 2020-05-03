@@ -1,0 +1,50 @@
+rule all:
+    input:
+        "plot/vary_nsam.pdf",
+        "plot/vary_lambda.pdf",
+        "plot/vary_nsam_mean.pdf",
+        "plot/vary_nsam_se.pdf",
+        "plot/predsplot.pdf"
+
+rule install_deps:
+    input:
+        "renv.lock"
+    output:
+        ".deps-installed"
+    shell:
+        """Rscript -e 'renv::restore();file.create(".deps-installed")'"""
+
+rule sim:
+    input:
+        ".deps-installed",
+        "sim/sim.R"
+    output:
+        protected("sim/sim.csv")
+    shell:
+        "Rscript sim/sim.R"
+
+rule summ:
+    input:
+        ".deps-installed",
+        "summ/summ.R",
+        "sim/sim.csv"
+    output:
+        "summ/summ.csv",
+        "summ/pred.csv"
+    shell:
+        "Rscript summ/summ.R"
+
+rule plot:
+    input:
+        ".deps-installed",
+        "plot/plot.R",
+        "summ/summ.csv",
+        "summ/pred.csv"
+    output:
+        "plot/vary_nsam.pdf",
+        "plot/vary_lambda.pdf",
+        "plot/vary_nsam_mean.pdf",
+        "plot/vary_nsam_se.pdf",
+        "plot/predsplot.pdf"
+    shell:
+        "Rscript plot/plot.R"

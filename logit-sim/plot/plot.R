@@ -1,15 +1,12 @@
 # Graphing fitting results
-# Arseniy Khvorov
-# Created 2019/09/20
-# Last edit 2019/12/05
 
 library(tidyverse)
-library(ggdark) # devtools::install_github("khvorov45/ggdark")
+library(ggdark)
 library(latex2exp)
 
 # Directories to be used later
-logistic_plot_dir <- "logistic-plot"
-logistic_summ_dir <- "logistic-summary"
+plot_dir <- here::here("plot")
+summ_dir <- here::here("summ")
 
 # Functions ===================================================================
 
@@ -184,54 +181,39 @@ plot_pres_series <- function(b0, b1) {
 
 save_plot <- function(pl, name, dark, height = 7.5) {
   ggsave_dark(
-    file.path(logistic_plot_dir, paste0(name, ".pdf")), pl,
+    file.path(plot_dir, paste0(name, ".pdf")), pl,
     dark = dark, width = 10, height = height, units = "cm", device = "pdf"
   )
 }
 
 # Script ======================================================================
 
-summ <- read_csv(file.path(logistic_summ_dir, "summary-10000sims.csv"))
-
-# Example of poor logistic fit
-summ_ex <- summ %>%
-  filter(theta == 0, nsam == 1e4) %>%
-  group_by(model) %>%
-  group_modify(~ calc_fit_prob(.x))
-lrex1 <- ex_plot_1(summ_ex)
-# save_plot(lrex1, "lrex", FALSE)
-
-# For presentation
-b_lr <- summ %>% filter(model == "logistic", theta == 0, nsam == 1e4)
-b0 <- b_lr$est_mean[b_lr$term == "beta_0"]
-b1 <- b_lr$est_mean[b_lr$term == "beta_logTitre"]
-pres_series <- plot_pres_series(b0, b1)
-# iwalk(pres_series, ~ save_plot(.x, paste0("lrex_pres", .y), TRUE))
+summ <- read_csv(file.path(summ_dir, "summ.csv"), col_types = cols())
 
 # Convergence with sample size
 vary_nsam <- vary_par_conv("nsam", c(0, 600), "Sample size", summ)
-# save_plot(vary_nsam, "vary_nsam", FALSE, 6)
+save_plot(vary_nsam, "vary_nsam", FALSE, 6)
 
 # Convergence at varying lambdas
 vary_theta <- vary_par_conv(
   "lambda", c(0, 1), "Lambda",
   summ %>% mutate(lambda = 1 - 1 / (1 + exp(theta)))
 )
-# save_plot(vary_theta, "vary_lambda", FALSE)
+save_plot(vary_theta, "vary_lambda", FALSE)
 
 # SE with sample size
 nsam_se_plot <- vary_par_se("nsam", c(0, 800), "Sample size", summ)
-# save_plot(nsam_se_plot, "vary_nsam_se", FALSE)
+save_plot(nsam_se_plot, "vary_nsam_se", FALSE)
 
 # Means with sample size
 nsam_mean_plot <- vary_par_se(
   "nsam", c(0, 800), "Sample size", summ, "est_mean", "Estimate mean"
 ) +
   geom_hline(aes(yintercept = true_value))
-# save_plot(nsam_mean_plot, "vary_nsam_mean", FALSE)
+save_plot(nsam_mean_plot, "vary_nsam_mean", FALSE)
 
 # Poor logistic fit with SEs
-preds <- read_csv(file.path(logistic_summ_dir, "preds-10000sims.csv"))
+preds <- read_csv(file.path(summ_dir, "pred.csv"), col_types = cols())
 
 preds_plot <- preds %>%
   filter(nsam == 500, theta_true == 0) %>%
@@ -240,5 +222,4 @@ preds_plot <- preds %>%
     aes(x = logTitre, ymin = `2.5%`, ymax = `97.5%`, fill = model),
     inherit.aes = FALSE, alpha = 0.5
   )
-
-# save_plot(preds_plot, "predsplot", FALSE)
+save_plot(preds_plot, "predsplot", FALSE)

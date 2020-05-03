@@ -4,7 +4,7 @@ If the baseline risk cannot justifiably be assumed to be 1, the fitted probabili
 
 \begin{figure}[htp]
 	\centering
-	\includegraphics[width=0.6\textwidth]{../logistic-plot/predsplot.pdf}
+	\includegraphics[width=0.6\textwidth]{../logit-sim/plot/predsplot.pdf}
 	\caption{
 		An illustration of a bad fit of the logistic model. The solid line ($0.5\ \text{logit}^{-1}(5 - 1.5 X)$) is the true probability curve where the baseline risk is 0.5. The dashed line is the expected fitted probability curve from standard logistic regression. The dotted line is the fitted probability curve from scaled logistic regression. The shaded regions are the 95\% confidence intervals. The expected curves and CIs was obtained from 10,000 simulations each with 500 observations simulated from the true curve. The models were fitted to each simulated dataset and the means of the regression estimates were taken from all simulations.
 	}

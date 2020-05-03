@@ -1,9 +1,5 @@
 # Simulations to see how logistic regression behaves when fit to data with
 # baseline below 1.
-#
-# Arseniy Khvorov
-# Created 2019/09/20
-# Last edit 2019/12/05
 
 library(tidyverse)
 library(sclr)
@@ -15,7 +11,7 @@ library(furrr)
 plan(multiprocess)
 
 # Directories to be used later
-logistic_dir <- "logistic"
+sim_dir <- here::here("sim")
 
 # Settings ====================================================================
 
@@ -51,7 +47,7 @@ sim_pop <- function(nsam, lambda, beta_0, beta_logTitre,
 
 attach_true <- function(.tbl, data) {
   true_vals <- pivot_longer(
-    attr(data, "true_vals"), everything(), 
+    attr(data, "true_vals"), everything(),
     names_to = "term", values_to = "true_value"
   )
   inner_join(.tbl, true_vals, by = "term") %>%
@@ -61,26 +57,38 @@ attach_true <- function(.tbl, data) {
 fit_lr <- function(data) {
   lr_fit <- tryCatch(
     withCallingHandlers(
-      {glm(status ~ logTitre, binomial(link = "logit"), data) %>% 
-        tidy(conf.int = TRUE)}, 
+      {
+        glm(status ~ logTitre, binomial(link = "logit"), data) %>%
+          tidy(conf.int = TRUE)
+      },
       warning = function(w) {
-      if (conditionMessage(w) == 
-          "glm.fit: fitted probabilities numerically 0 or 1 occurred")
-        invokeRestart("muffleWarning")
-    }),
-    warning = function(w) return(NULL),
-    error = function(e) return(NULL)
+        if (conditionMessage(w) ==
+          "glm.fit: fitted probabilities numerically 0 or 1 occurred") {
+          invokeRestart("muffleWarning")
+        }
+      }
+    ),
+    warning = function(w) {
+      return(NULL)
+    },
+    error = function(e) {
+      return(NULL)
+    }
   )
-  if (is.null(lr_fit)) return(NULL)
-  lr_fit %>% 
+  if (is.null(lr_fit)) {
+    return(NULL)
+  }
+  lr_fit %>%
     mutate(
       model = "logistic", seed = attr(data, "seed"),
       term = recode(
-        term, "(Intercept)" = "beta_0", "logTitre" = "beta_logTitre"
+        term,
+        "(Intercept)" = "beta_0", "logTitre" = "beta_logTitre"
       )
     ) %>%
     select(
-      term, estimate, std_error = std.error, conf_low = conf.low, 
+      term, estimate,
+      std_error = std.error, conf_low = conf.low,
       conf_high = conf.high, model, seed
     ) %>%
     attach_true(data)
@@ -89,10 +97,16 @@ fit_lr <- function(data) {
 fit_sclr <- function(data) {
   sclr_fit <- tryCatch(
     sclr(status ~ logTitre, data, algorithm = "newton-raphson"),
-    warning = function(w) return(NULL),
-    error = function(e) return(NULL)
+    warning = function(w) {
+      return(NULL)
+    },
+    error = function(e) {
+      return(NULL)
+    }
   )
-  if (is.null(sclr_fit)) return(NULL)
+  if (is.null(sclr_fit)) {
+    return(NULL)
+  }
   sclr_fit %>%
     tidy() %>%
     mutate(model = "scaled_logit", seed = attr(data, "seed")) %>%
@@ -111,8 +125,8 @@ simfit <- function(data_name, data_dict,
 simfit_many <- function(nsim, data_name, data_dict,
                         init_seed = sample.int(.Machine$integer.max, 1)) {
   future_map_dfr(
-    1:nsim, 
-    ~ simfit(data_name, data_dict, seed = init_seed + (.x - 1)) 
+    1:nsim,
+    ~ simfit(data_name, data_dict, seed = init_seed + (.x - 1))
   )
 }
 
@@ -149,7 +163,4 @@ sims <- vary_par(vary_list$nsam, "nsam", nsim, "std", simpars, 20191203) %>%
     20191203 + length(vary_list$nsam) * nsim
   ))
 
-write_csv(
-  sims,
-  file.path(logistic_dir, paste0("result-", nsim, "sims.csv"))
-)
+write_csv(sims, file.path(sim_dir, "sim.csv"))

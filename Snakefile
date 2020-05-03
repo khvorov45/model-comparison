@@ -6,6 +6,10 @@ subworkflow sclr_lowbase:
     workdir:
         "sclr-lowbase"
 
+subworkflow logit_sim:
+    workdir:
+        "logit-sim"
+
 rule all:
     input:
         ".deps-installed",
@@ -13,6 +17,11 @@ rule all:
         cox_tarprop("plot/risk.pdf"),
         sclr_lowbase("sim-plot/plot2.pdf"),
         sclr_lowbase("sim-plot/plot3.pdf"),
+        logit_sim("plot/vary_nsam.pdf"),
+        logit_sim("plot/vary_lambda.pdf"),
+        logit_sim("plot/vary_nsam_mean.pdf"),
+        logit_sim("plot/vary_nsam_se.pdf"),
+        logit_sim("plot/predsplot.pdf"),
         "curve-cox/timeplot_0.pdf",
         "curve-cox/timeplot_1.pdf",
         "curve-cox/timeplot_2.pdf",

@@ -1,13 +1,10 @@
 # Summary of simualtions in logistic
-# Arseniy Khvorov
-# Created 2019/12/03
-# Last edit 2019/12/03
 
 library(tidyverse)
 
 # Directories to be used later
-logistic_dir <- "logistic"
-logistic_summ_dir <- "logistic-summary"
+sim_dir <- here::here("sim")
+summ_dir <- here::here("summ")
 
 # Functions ===================================================================
 
@@ -26,12 +23,12 @@ calc_pred <- function(x, dat) {
 }
 
 save_csv <- function(dat, name) {
-  write_csv(dat, file.path(logistic_summ_dir, glue::glue("{name}.csv")))
+  write_csv(dat, file.path(summ_dir, glue::glue("{name}.csv")))
 }
 
 # Script ======================================================================
 
-res <- read_csv(file.path(logistic_dir, "result-10000sims.csv"))
+res <- read_csv(file.path(sim_dir, "sim.csv"), col_types = cols())
 
 summ <- res %>%
   negate_lr_est() %>%
@@ -46,7 +43,7 @@ summ <- res %>%
     converged = length(unique(seed)) / 1e4
   )
 
-save_csv(summ, "summary-10000sims")
+save_csv(summ, "summ")
 
 # Predictions
 preds <- res %>%
@@ -73,4 +70,4 @@ preds <- res %>%
   ungroup() %>%
   unnest_wider(fit)
 
-save_csv(preds, "preds-10000sims")
+save_csv(preds, "pred")
