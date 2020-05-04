@@ -22,7 +22,9 @@ rule all:
         logit_sim("plot/vary_nsam_mean.pdf"),
         logit_sim("plot/vary_nsam_se.pdf"),
         logit_sim("plot/predsplot.pdf"),
-        expand("curve-cox/timeplot_{i}.pdf", i = range(0, 5))
+        expand("curve-cox/timeplot_{i}.pdf", i = range(0, 5)),
+        expand("plausible/sclr/pl_{i}.png", i = range(1, 21)),
+        "plausible/plausible-titres.pdf"
 
 rule install_deps:
     input:
@@ -40,3 +42,13 @@ rule curve_cox:
         expand("curve-cox/timeplot_{i}.pdf", i = range(0, 5))
     shell:
         "Rscript curve-cox/curve-cox.R"
+
+rule plausible:
+    input:
+        ".deps-installed",
+        "plausible/plausible.R"
+    output:
+        expand("plausible/sclr/pl_{i}.png", i = range(1, 21)),
+        "plausible/plausible-titres.pdf"
+    shell:
+        "Rscript plausible/plausible.R"

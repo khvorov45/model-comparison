@@ -16,3 +16,4 @@ edu-article
 *.xls
 .snakemake
 .deps-installed
+*.png
