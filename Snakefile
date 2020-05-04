@@ -22,11 +22,7 @@ rule all:
         logit_sim("plot/vary_nsam_mean.pdf"),
         logit_sim("plot/vary_nsam_se.pdf"),
         logit_sim("plot/predsplot.pdf"),
-        "curve-cox/timeplot_0.pdf",
-        "curve-cox/timeplot_1.pdf",
-        "curve-cox/timeplot_2.pdf",
-        "curve-cox/timeplot_3.pdf",
-        "curve-cox/timeplot_4.pdf"
+        expand("curve-cox/timeplot_{i}.pdf", i = range(0, 5))
 
 rule install_deps:
     input:
@@ -41,10 +37,6 @@ rule curve_cox:
         ".deps-installed",
         "curve-cox/curve-cox.R"
     output:
-        "curve-cox/timeplot_0.pdf",
-        "curve-cox/timeplot_1.pdf",
-        "curve-cox/timeplot_2.pdf",
-        "curve-cox/timeplot_3.pdf",
-        "curve-cox/timeplot_4.pdf"
+        expand("curve-cox/timeplot_{i}.pdf", i = range(0, 5))
     shell:
         "Rscript curve-cox/curve-cox.R"
