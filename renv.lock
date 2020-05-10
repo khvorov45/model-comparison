@@ -121,6 +121,13 @@
       "Repository": "CRAN",
       "Hash": "543776ae6848fde2f48ff3816d0628bc"
     },
+    "bookdown": {
+      "Package": "bookdown",
+      "Version": "0.18",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "72e9c52caf3f7aacb4e368b75f6ec72a"
+    },
     "boot": {
       "Package": "boot",
       "Version": "1.3-25",
@@ -356,6 +363,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "71c119f236429d7b19fd29229b013cba"
+    },
+    "gee": {
+      "Package": "gee",
+      "Version": "4.13-20",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "88fb9b6fa715440b91614583342d74ea"
     },
     "generics": {
       "Package": "generics",

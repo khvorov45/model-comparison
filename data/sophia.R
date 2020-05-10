@@ -1,9 +1,7 @@
 # Extract the data behind Cox fits of the lower panel of Figure 1, Ng (2013)
-# Arseniy Khvorov
-# Created 2020-02-20
-# Last edit 2020-02-20
 
 library(tidyverse)
+library(gee)
 
 # Directories used
 data_dir <- "data"
