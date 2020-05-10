@@ -17,3 +17,4 @@ edu-article
 .snakemake
 .deps-installed
 *.png
+*.sh
