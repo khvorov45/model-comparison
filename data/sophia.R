@@ -4,7 +4,7 @@ library(tidyverse)
 library(gee)
 
 # Directories used
-data_dir <- "data"
+data_dir <- here::here("data")
 
 # Functions ===================================================================
 

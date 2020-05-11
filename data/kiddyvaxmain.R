@@ -3,8 +3,8 @@
 library(tidyverse)
 
 # Directories to be used later
-data_raw_dir <- "data-raw"
-data_dir <- "data"
+data_raw_dir <- here::here("data-raw")
+data_dir <- here::here("data")
 
 # Functions ===================================================================
 
