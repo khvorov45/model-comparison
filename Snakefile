@@ -24,7 +24,14 @@ rule all:
         logit_sim("plot/predsplot.pdf"),
         expand("curve-cox/timeplot_{i}.pdf", i = range(0, 5)),
         expand("plausible/sclr/pl_{i}.png", i = range(1, 21)),
-        "plausible/plausible-titres.pdf"
+        "plausible/plausible-titres.pdf",
+        "data/hanam-hi-exp.csv",
+        "data/hanam-hi-gen.csv",
+        "data/hanam-hi-summ.csv",
+        "data/sophia.csv",
+        "data/kiddyvaxmain.csv",
+        "data/kiddyvaxmain-summ.csv",
+        "data/kiddyvaxmain-swab.csv"
 
 rule install_deps:
     input:
@@ -52,3 +59,37 @@ rule plausible:
         "plausible/plausible-titres.pdf"
     shell:
         "Rscript plausible/plausible.R"
+
+rule hanam:
+    input:
+        ".deps-installed",
+        "data/hanam.R",
+        "data-raw/hanam.csv"
+    output:
+        "data/hanam-hi-exp.csv",
+        "data/hanam-hi-gen.csv",
+        "data/hanam-hi-summ.csv"
+    shell:
+        "Rscript data/hanam.R"
+
+rule sophia:
+    input:
+        ".deps-installed",
+        "data/sophia.R"
+    output:
+        "data/sophia.csv"
+    shell:
+        "Rscript data/sophia.R"
+
+rule kiddyvax:
+    input:
+        ".deps-installed",
+        "data/kiddyvaxmain.R",
+        "data-raw/kiddyvaxmain-serology.csv",
+        "data-raw/kiddyvaxmain-swab.csv"
+    output:
+        "data/kiddyvaxmain.csv",
+        "data/kiddyvaxmain-summ.csv",
+        "data/kiddyvaxmain-swab.csv"
+    shell:
+        "Rscript data/kiddyvaxmain.R"
