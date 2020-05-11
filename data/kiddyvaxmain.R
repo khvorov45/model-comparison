@@ -1,7 +1,4 @@
 # Kiddyvax data manipulation
-# Arseniy Khvorov
-# Created 2020-01-17
-# Last edit 2020-01-28
 
 library(tidyverse)
 
@@ -66,26 +63,48 @@ lengthen_swab <- function(swab) {
 # Tests that the reshaped data contains the same information
 test_swab <- function(filepath) {
   swab_og <- read_swab(filepath)
-  swab <- swab_og %>% fix_a_subtypes_swab() %>% lengthen_swab()
-  
-  h1pdm_og <- swab_og %>% filter(h1pdm == "P") %>% pull(id)
-  h1pdm <- swab %>% filter(swab_result == 1 & virus == "h1pdm") %>% pull(id)
+  swab <- swab_og %>%
+    fix_a_subtypes_swab() %>%
+    lengthen_swab()
+
+  h1pdm_og <- swab_og %>%
+    filter(h1pdm == "P") %>%
+    pull(id)
+  h1pdm <- swab %>%
+    filter(swab_result == 1 & virus == "h1pdm") %>%
+    pull(id)
   testthat::expect_equal(h1pdm_og, h1pdm)
-  
-  h1seas_og <- swab_og %>% filter(h1seas == "P") %>% pull(id)
-  h1seas <- swab %>% filter(swab_result == 1 & virus == "h1seas") %>% pull(id)
+
+  h1seas_og <- swab_og %>%
+    filter(h1seas == "P") %>%
+    pull(id)
+  h1seas <- swab %>%
+    filter(swab_result == 1 & virus == "h1seas") %>%
+    pull(id)
   testthat::expect_equal(h1seas_og, h1seas)
-  
-  h3_og <- swab_og %>% filter(h3 == "P") %>% pull(id)
-  h3 <- swab %>% filter(swab_result == 1 & virus == "h3") %>% pull(id)
+
+  h3_og <- swab_og %>%
+    filter(h3 == "P") %>%
+    pull(id)
+  h3 <- swab %>%
+    filter(swab_result == 1 & virus == "h3") %>%
+    pull(id)
   testthat::expect_equal(h3_og, h3)
-  
-  bvic_og <- swab_og %>% filter(b_type == "Victoria") %>% pull(id)
-  bvic <- swab %>% filter(swab_result == 1 & virus == "bvic") %>% pull(id)
+
+  bvic_og <- swab_og %>%
+    filter(b_type == "Victoria") %>%
+    pull(id)
+  bvic <- swab %>%
+    filter(swab_result == 1 & virus == "bvic") %>%
+    pull(id)
   testthat::expect_equal(bvic_og, bvic)
-  
-  byam_og <- swab_og %>% filter(b_type == "Yamagata") %>% pull(id)
-  byam <- swab %>% filter(swab_result == 1 & virus == "byam") %>% pull(id)
+
+  byam_og <- swab_og %>%
+    filter(b_type == "Yamagata") %>%
+    pull(id)
+  byam <- swab %>%
+    filter(swab_result == 1 & virus == "byam") %>%
+    pull(id)
   testthat::expect_equal(byam_og, byam)
 }
 
@@ -93,7 +112,9 @@ test_swab <- function(filepath) {
 # i.e. status is infection at any time during the study
 summarise_swab <- function(swab) {
   find_inf_date <- function(swab_result, swab_date) {
-    if (all(swab_result == 0)) return(as.Date(NA))
+    if (all(swab_result == 0)) {
+      return(as.Date(NA))
+    }
     first(swab_date[swab_result == 1])
   }
   swab %>%
@@ -126,7 +147,7 @@ read_serology <- function(filepath) {
 lengthen_serology <- function(serology) {
   serology %>%
     pivot_longer(
-      starts_with("postvax."), 
+      starts_with("postvax."),
       names_to = "virus", values_to = "hi"
     )
 }
@@ -134,7 +155,7 @@ lengthen_serology <- function(serology) {
 fix_subtypes_serology <- function(serology) {
   serology %>%
     mutate(
-      virus = str_replace(virus, "postvax.", "") %>% 
+      virus = str_replace(virus, "postvax.", "") %>%
         recode(
           "pH1" = "h1pdm", "sH1" = "h1seas", "sH3" = "h3",
           "B.Brisbane" = "bvic", "B.Floride" = "byam"
@@ -158,13 +179,13 @@ save_data <- function(dat, name) {
 
 # Script ======================================================================
 
-swab <- read_swab(file.path(data_raw_dir, "kiddyvaxmain-swab.csv")) %>% 
+swab <- read_swab(file.path(data_raw_dir, "kiddyvaxmain-swab.csv")) %>%
   fix_subtypes_swab() %>%
   lengthen_swab()
 
 serology <- read_serology(
   file.path(data_raw_dir, "kiddyvaxmain-serology.csv")
-) %>% 
+) %>%
   lengthen_serology() %>%
   fix_subtypes_serology() %>%
   add_loghis()

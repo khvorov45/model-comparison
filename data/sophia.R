@@ -51,8 +51,13 @@ fluproxy <- read.csv(file.path(datadir, "influenza_proxy_1998to2013.csv"))
 
 time0 <- "1/10/2009"
 fluproxy <- fluproxy[614:679, ]
-fluproxy$ti <- as.numeric(as.Date(fluproxy$Week.ending, format = "%d/%m/%Y") - as.Date(time0, format = "%d/%m/%Y")) - 1
-proxy <- data.frame(ti = fluproxy$ti, proxy = (1 / r) * fluproxy$A.H1N1pdm.proxy)
+fluproxy$ti <- as.numeric(
+  as.Date(fluproxy$Week.ending, format = "%d/%m/%Y") -
+    as.Date(time0, format = "%d/%m/%Y")
+) - 1
+proxy <- data.frame(
+  ti = fluproxy$ti, proxy = (1 / r) * fluproxy$A.H1N1pdm.proxy
+)
 
 # create smoothed proxy for background risk
 s.proxy <- data.frame(
