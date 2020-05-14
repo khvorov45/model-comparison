@@ -36,6 +36,10 @@ hanam <- read_hanam_raw("hanam")
 hanam_extra <- hanam %>%
   mutate(
     status_bin = if_else(status == "Not infected", 0, 1),
+    status_bin_lbl = factor(
+      status_bin,
+      levels = c(0, 1), labels = c("Not infected", "Infected")
+    ),
     loghi = log(prehi),
     loghilb = if_else(prehi == 5L | is.na(prehi), -1e6, loghi),
     loghiub = if_else(prehi == 1280L | is.na(prehi), 1e6, loghi + log(2)),

@@ -25,9 +25,11 @@ rule all:
         expand("curve-cox/timeplot_{i}.pdf", i = range(0, 5)),
         expand("plausible/sclr/pl_{i}.png", i = range(1, 21)),
         "plausible/plausible-titres.pdf",
-        "data/hanam-hi-exp.csv",
-        "data/hanam-hi-gen.csv",
-        "data/hanam-hi-summ.csv",
+        "data-plot/hanam-hi-gen-scatter.pdf",
+        "data-plot/hanam-hi-scatter.pdf",
+        "data-plot/hanam-hi-summ-gen.pdf",
+        "data-plot/hanam-hi-summ-h3n2.pdf",
+        "data-plot/hanam-hi-summ.pdf",
         "data/sophia.csv",
         "data/kiddyvaxmain.csv",
         "data/kiddyvaxmain-summ.csv",
@@ -93,3 +95,20 @@ rule kiddyvax:
         "data/kiddyvaxmain-swab.csv"
     shell:
         "Rscript data/kiddyvaxmain.R"
+
+rule data_plot:
+    input:
+        ".deps-installed",
+        "data-plot/hanam-plot.R",
+        "data/read_data.R",
+        "data/hanam-hi-exp.csv",
+        "data/hanam-hi-gen.csv",
+        "data/hanam-hi-summ.csv"
+    output:
+        "data-plot/hanam-hi-gen-scatter.pdf",
+        "data-plot/hanam-hi-scatter.pdf",
+        "data-plot/hanam-hi-summ-gen.pdf",
+        "data-plot/hanam-hi-summ-h3n2.pdf",
+        "data-plot/hanam-hi-summ.pdf"
+    shell:
+        "Rscript data-plot/hanam-plot.R"

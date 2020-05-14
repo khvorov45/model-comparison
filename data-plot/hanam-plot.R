@@ -1,59 +1,14 @@
-# Relevant graphs of hanam data
-# Arseniy Khvorov
-# Created 2019-09-26
-# Last edit 2020-01-28
+# Relevant graphs of data
 
 library(tidyverse)
-library(ggdark) # devtools::install("khvorov45/ggdark")
 
 # Folders to be used later
-data_dir <- "data"
-graph_data_dir <- "data-plot"
+data_dir <- here::here("data")
+data_plot_dir <- here::here("data-plot")
 
 # Functions ===================================================================
 
-read_hanam <- function(nme) {
-  read_csv(
-    file.path(data_dir, paste0(nme, ".csv")),
-    col_types = cols(
-      hhold = col_character(),
-      ind = col_character(),
-      season = col_integer(),
-      virus = col_character(),
-      status = col_character(),
-      prehi = col_integer(),
-      status_bin = col_integer(),
-      loghi = col_double(),
-      loghilb = col_double(),
-      loghimid = col_double(),
-      population = col_factor(levels = c("General", "Exposed"))
-    )
-  )
-}
-
-read_hanam_summ <- function(nme) {
-  read_csv(
-    file.path(data_dir, paste0(nme, ".csv")),
-    col_types = cols(
-      population = col_factor(levels = c("General", "Exposed")),
-      virus = col_character(),
-      prehi = col_integer(),
-      loghimid = col_double(),
-      ntot = col_integer(),
-      inf_prop = col_double()
-    )
-  )
-}
-
-lbl_status_bin <- function(dat) {
-  dat %>%
-    mutate(
-      status_bin_lbl = factor(
-        status_bin,
-        levels = c(0, 1), labels = c("Not infected", "Infected")
-      )
-    )
-}
+source(file.path(data_dir, "read_data.R"))
 
 # Plots the antibody titre and infection status
 plot_counts <- function(dat, facet_type = "vir") {
@@ -79,7 +34,7 @@ plot_counts <- function(dat, facet_type = "vir") {
   )
   dat %>%
     ggplot(aes(log(prehi), inf_prop)) +
-    dark_theme_bw(verbose = FALSE) +
+    ggdark::dark_theme_bw(verbose = FALSE) +
     theme(
       strip.background = element_blank(),
       panel.spacing = unit(0, "null"),
@@ -111,7 +66,7 @@ plot_scatter <- function(dat, y_breaks = 5 * 2^(0:8), facet_type = "vir") {
   facet_type <- rlang::arg_match(facet_type, names(facets))
   dat %>%
     ggplot(aes(status_bin_lbl, prehi)) +
-    dark_theme_bw(verbose = FALSE) +
+    ggdark::dark_theme_bw(verbose = FALSE) +
     theme(
       strip.background = element_blank(),
       panel.grid.minor = element_blank(), panel.spacing = unit(0, "lines")
@@ -124,11 +79,10 @@ plot_scatter <- function(dat, y_breaks = 5 * 2^(0:8), facet_type = "vir") {
 }
 
 # Saves the plot with the name into the folder
-save_plot <- function(pl, dark, name, folder, height = 7.5) {
-  postfix <- if_else(dark, "dark", "light")
-  plname <- file.path(folder, paste0(name, "-", postfix, ".pdf"))
-  ggsave_dark(
-    plname, pl, dark,
+save_plot <- function(pl, name, height = 7.5) {
+  plname <- file.path(data_plot_dir, paste0(name, ".pdf"))
+  ggdark::ggsave_dark(
+    plname, pl,
     width = 15, height = height, units = "cm", device = "pdf"
   )
 }
@@ -140,24 +94,22 @@ save_plot_dl <- function(pl, name, folder, height = 7.5) {
 
 # Script ======================================================================
 
-han_dat <- map_dfr(c("hanam-hi-gen", "hanam-hi-exp"), read_hanam) %>%
-  filter(!is.na(status), !is.na(prehi), virus != "H1N1seas") %>%
-  lbl_status_bin()
+han_dat <- map_dfr(c("hanam-hi-gen", "hanam-hi-exp"), read_data) %>%
+  filter(!is.na(status), !is.na(prehi), virus != "H1N1seas")
 
-han_cnts <- read_hanam_summ("hanam-hi-summ") %>%
+han_cnts <- read_data("hanam-hi-summ") %>%
   filter(virus != "H1N1seas")
 
-pls_cnts <- plot_counts(han_cnts, "virpop")
-# save_plot_dl(pls_cnts, "hanam-hi-summ", graph_data_dir, 10)
+all_plots <- list(
+  "hanam-hi-summ" = plot_counts(han_cnts, "virpop"),
+  "hanam-hi-summ-h3n2" = plot_counts(filter(han_cnts, virus == "H3N2"), "pop"),
+  "hanam-hi-gen-scatter" = plot_scatter(
+    filter(han_dat, population == "General")
+  ),
+  "hanam-hi-scatter" = plot_scatter(han_dat, facet_type = "virpop"),
+  "hanam-hi-summ-gen" = plot_counts(
+    filter(han_cnts, population == "General"), "vir"
+  )
+)
 
-pls_cnts_h3n2 <- plot_counts(filter(han_cnts, virus == "H3N2"), "pop")
-# save_plot(pls_cnts_h3n2, FALSE, "hanam-hi-summ-h3n2", graph_data_dir, 7.5)
-
-pls_scat_gen <- plot_scatter(filter(han_dat, population == "General"))
-# save_plot(pls_scat_gen, TRUE, "hanam-hi-gen-scatter", graph_data_dir)
-
-pls_scat <- plot_scatter(han_dat, facet_type = "virpop")
-# save_plot_dl(pls_scat, "hanam-hi-scatter", graph_data_dir)
-
-pls_cnts_gen <- plot_counts(filter(han_cnts, population == "General"), "vir")
-# save_plot(pls_cnts_gen, TRUE, "hanam-hi-summ-gen", graph_data_dir)
+iwalk(all_plots, save_plot)
