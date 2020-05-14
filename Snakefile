@@ -62,6 +62,8 @@ rule plausible:
     shell:
         "Rscript plausible/plausible.R"
 
+# Raw data process ============================================================
+
 rule hanam:
     input:
         ".deps-installed",
@@ -95,6 +97,8 @@ rule kiddyvax:
         "data/kiddyvaxmain-swab.csv"
     shell:
         "Rscript data/kiddyvaxmain.R"
+
+# Data plot ===================================================================
 
 rule data_plot:
     input:
