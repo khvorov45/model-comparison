@@ -103,7 +103,7 @@ rule kiddyvax:
 rule data_plot:
     input:
         ".deps-installed",
-        "data-plot/hanam-plot.R",
+        "data-plot/data-plot.R",
         "data/read_data.R",
         "data/hanam-hi-exp.csv",
         "data/hanam-hi-gen.csv",
@@ -117,4 +117,4 @@ rule data_plot:
         "data-plot/kiddyvax-main-summ.pdf",
         "data-plot/kiddyvax-main-swab.pdf"
     shell:
-        "Rscript data-plot/hanam-plot.R"
+        "Rscript data-plot/data-plot.R"
