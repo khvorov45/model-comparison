@@ -1,35 +1,14 @@
-# Relevant graphs of hanam data
-# Arseniy Khvorov
-# Created 2020-02-03
-# Last edit 2020-02-03
+# Relevant tables of data
 
 library(tidyverse)
 
 # Folders to be used later
-data_dir <- "data"
-data_table_dir <- "data-table"
+data_dir <- here::here("data")
+data_table_dir <- here::here("data-table")
 
 # Functions ===================================================================
 
-read_hanam <- function(nme) {
-  read_csv(
-    file.path(data_dir, paste0(nme, ".csv")), 
-    col_types = cols(
-      hhold = col_character(),
-      ind = col_character(),
-      season = col_integer(),
-      virus = col_character(),
-      status = col_character(),
-      prehi = col_integer(),
-      status_bin = col_integer(),
-      loghi = col_double(),
-      loghilb = col_double(),
-      loghimid = col_double(),
-      population = col_factor(levels = c("General", "Exposed")),
-      age_years = col_double()
-    )
-  )
-}
+source(file.path(data_dir, "read_data.R"))
 
 save_table <- function(dat, name) {
   write_csv(dat, file.path(data_table_dir, paste0(name, ".csv")))
@@ -37,7 +16,7 @@ save_table <- function(dat, name) {
 
 # Script ======================================================================
 
-han_dat <- map_dfr(c("hanam-hi-gen", "hanam-hi-exp"), read_hanam) %>%
+han_dat <- map_dfr(c("hanam-hi-gen", "hanam-hi-exp"), read_data) %>%
   filter(!is.na(status), !is.na(prehi), virus != "H1N1seas")
 
 han_tbl1 <- han_dat %>%

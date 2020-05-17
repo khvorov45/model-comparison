@@ -118,3 +118,17 @@ rule data_plot:
         "data-plot/kiddyvax-main-swab.pdf"
     shell:
         "Rscript data-plot/data-plot.R"
+
+# Data table ==================================================================
+
+rule data_table:
+    input:
+        ".deps-installed",
+        "data-table/data-table.R",
+        "data/read_data.R",
+        "data/hanam-hi-exp.csv",
+        "data/hanam-hi-gen.csv"
+    output:
+        "data-table/hanam-hi-tbl1.csv"
+    shell:
+        "Rscript data-table/data-table.R"
