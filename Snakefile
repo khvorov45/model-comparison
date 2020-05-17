@@ -1,3 +1,5 @@
+# Subworkflows ================================================================
+
 subworkflow cox_tarprop:
     workdir:
         "cox-tarprop"
@@ -9,6 +11,8 @@ subworkflow sclr_lowbase:
 subworkflow logit_sim:
     workdir:
         "logit-sim"
+
+# Rule to generate everything =================================================
 
 rule all:
     input:
@@ -30,10 +34,13 @@ rule all:
         "data-plot/hanam-hi-summ-gen.pdf",
         "data-plot/hanam-hi-summ-h3n2.pdf",
         "data-plot/hanam-hi-summ.pdf",
+        "data-plot/kiddyvax-main-summ.pdf",
+        "data-plot/kiddyvax-main-swab.pdf",
+        "data-table/hanam-hi-tbl1.csv",
         "data/sophia.csv",
-        "data/kiddyvaxmain.csv",
-        "data/kiddyvaxmain-summ.csv",
-        "data/kiddyvaxmain-swab.csv"
+        "data/kiddyvaxmain.csv"
+
+# Dependencies ================================================================
 
 rule install_deps:
     input:
@@ -42,6 +49,8 @@ rule install_deps:
         ".deps-installed"
     shell:
         """Rscript -e 'renv::restore();file.create(".deps-installed")'"""
+
+# Misc plots ==================================================================
 
 rule curve_cox:
     input:
