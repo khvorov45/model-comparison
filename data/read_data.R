@@ -21,6 +21,27 @@ read_data <- function(name) {
       loghimid = col_double(),
       ntot = col_integer(),
       inf_prop = col_double()
+    ),
+    kiddyvaxmain = cols(
+      id = col_integer(),
+      virus = col_character(),
+      status = col_integer(),
+      hi = col_integer(),
+      virus_lbl = col_factor(c("B Vic", "B Yam", "A H1pdm", "A H1seas", "A H3"))
+    ),
+    swab = cols(
+      id = col_integer(),
+      swab_date = col_date("%Y-%m-%d"),
+      virus = col_character(),
+      swab_result = col_integer(),
+      start_date = col_date("%Y-%m-%d"),
+      end_date = col_date("%Y-%m-%d"),
+      virus_lbl = col_factor(c("B Vic", "B Yam", "A H1pdm", "A H1seas", "A H3"))
+    ),
+    kv_summ = cols(
+      hi = col_integer(),
+      ntot = col_integer(),
+      virus_lbl = col_factor(c("B Vic", "B Yam", "A H1pdm", "A H1seas", "A H3"))
     )
   )
   if (name == "hanam-hi-exp" | name == "hanam-hi-gen") {
@@ -32,6 +53,21 @@ read_data <- function(name) {
     read_csv(
       file.path("data", glue::glue("{name}.csv")),
       col_types = all_col_types[["hanam_summ"]]
+    )
+  } else if (name == "kiddyvaxmain") {
+    read_csv(
+      file.path("data", glue::glue("{name}.csv")),
+      col_types = all_col_types[["kiddyvaxmain"]]
+    )
+  } else if (name == "kiddyvaxmain-swab") {
+    read_csv(
+      file.path("data", glue::glue("{name}.csv")),
+      col_types = all_col_types[["swab"]]
+    )
+  } else if (name == "kiddyvaxmain-summ") {
+    read_csv(
+      file.path("data", glue::glue("{name}.csv")),
+      col_types = all_col_types[["kv_summ"]]
     )
   } else {
     read_csv(

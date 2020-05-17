@@ -173,6 +173,17 @@ add_loghis <- function(dat) {
     )
 }
 
+lbl_virus <- function(dat) {
+  dat %>%
+    mutate(
+      virus_lbl = factor(
+        virus,
+        levels = c("bvic", "byam", "h1pdm", "h1seas", "h3"),
+        labels = c("B Vic", "B Yam", "A H1pdm", "A H1seas", "A H3")
+      )
+    )
+}
+
 save_data <- function(dat, name) {
   write_csv(dat, file.path(data_dir, paste0(name, ".csv")))
 }
@@ -192,7 +203,7 @@ serology <- read_serology(
 
 startend_dates <- select(serology, id, start_date, end_date) %>% unique()
 
-swab_full <- left_join(swab, startend_dates, by = "id")
+swab_full <- left_join(swab, startend_dates, by = "id") %>% lbl_virus()
 save_data(swab_full, "kiddyvaxmain-swab")
 
 swab_summ <- summarise_swab(swab_full)
@@ -204,11 +215,12 @@ swabbed <- swab_full %>% pull(unique(id))
 all <- full_data %>% pull(unique(id))
 not_swabbed <- all[!all %in% swabbed]
 full_data <- full_data %>%
-  mutate(status = if_else(id %in% not_swabbed, 0L, status))
+  mutate(status = if_else(id %in% not_swabbed, 0L, status)) %>%
+  lbl_virus()
 save_data(full_data, "kiddyvaxmain")
 
 full_data_summ <- full_data %>%
-  group_by(virus, hi, loghimid) %>%
+  group_by(virus, virus_lbl, hi, loghimid) %>%
   filter(!is.na(status), !is.na(hi)) %>%
   summarise(ntot = n(), inf_prop = sum(status) / ntot) %>%
   ungroup()

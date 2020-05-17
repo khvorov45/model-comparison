@@ -113,6 +113,8 @@ rule data_plot:
         "data-plot/hanam-hi-scatter.pdf",
         "data-plot/hanam-hi-summ-gen.pdf",
         "data-plot/hanam-hi-summ-h3n2.pdf",
-        "data-plot/hanam-hi-summ.pdf"
+        "data-plot/hanam-hi-summ.pdf",
+        "data-plot/kiddyvax-main-summ.pdf",
+        "data-plot/kiddyvax-main-swab.pdf"
     shell:
         "Rscript data-plot/hanam-plot.R"

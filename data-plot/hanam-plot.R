@@ -30,7 +30,8 @@ plot_counts <- function(dat, facet_type = "vir") {
       coord_cartesian(xlim = c(log(5), log(1280))),
       scale_y_continuous(labels = scales::percent_format(1)),
       theme(panel.spacing.x = unit(1, "lines"))
-    )
+    ),
+    "none" = list()
   )
   dat %>%
     ggplot(aes(log(prehi), inf_prop)) +
@@ -78,6 +79,44 @@ plot_scatter <- function(dat, y_breaks = 5 * 2^(0:8), facet_type = "vir") {
     geom_point(alpha = 0.4, position = "jitter", shape = 16)
 }
 
+swab_plot <- function(swab) {
+  swab %>%
+    group_by(start_date, id) %>%
+    mutate(
+      id2 = group_indices(),
+      swab_result_lbl = factor(
+        swab_result,
+        levels = c(1, 0, NA),
+        labels = c("Positive", "Negative", "Missing"),
+        exclude = NULL
+      )
+    ) %>%
+    ungroup() %>%
+    ggplot(aes(start_date, id2)) +
+    ggdark::dark_theme_bw(verbose = FALSE) +
+    theme(
+      legend.position = "bottom",
+      axis.text.y = element_blank(),
+      axis.ticks.y = element_blank(),
+      axis.title.y = element_blank(),
+      panel.grid.minor.y = element_blank(),
+      panel.spacing = unit(0, "lines"),
+      strip.background = element_blank(),
+      axis.text.x = element_text(angle = 30, hjust = 1)
+    ) +
+    scale_color_discrete("Swab result") +
+    scale_x_date(expand = c(0.01, 0.01), minor_breaks = "month") +
+    scale_y_continuous(
+      expand = c(0.01, 0.01), breaks = seq_len(length(unique(swab$id)))
+    ) +
+    facet_wrap(~virus_lbl, nrow = 1) +
+    geom_segment(
+      aes(x = start_date, xend = end_date, y = id2, yend = id2),
+      lwd = 0.1, col = "gray50"
+    ) +
+    geom_point(aes(swab_date, id2, color = swab_result_lbl), shape = 17)
+}
+
 # Saves the plot with the name into the folder
 save_plot <- function(pl, name, height = 7.5) {
   plname <- file.path(data_plot_dir, paste0(name, ".pdf"))
@@ -87,18 +126,16 @@ save_plot <- function(pl, name, height = 7.5) {
   )
 }
 
-# Saves dark and light versions of the plot
-save_plot_dl <- function(pl, name, folder, height = 7.5) {
-  walk(c(TRUE, FALSE), ~ save_plot(pl, .x, name, folder, height))
-}
-
 # Script ======================================================================
 
 han_dat <- map_dfr(c("hanam-hi-gen", "hanam-hi-exp"), read_data) %>%
   filter(!is.na(status), !is.na(prehi), virus != "H1N1seas")
-
 han_cnts <- read_data("hanam-hi-summ") %>%
   filter(virus != "H1N1seas")
+
+kiddyvax <- read_data("kiddyvaxmain")
+kv_swab <- read_data("kiddyvaxmain-swab")
+kv_summ <- read_data("kiddyvaxmain-summ")
 
 all_plots <- list(
   "hanam-hi-summ" = plot_counts(han_cnts, "virpop"),
@@ -109,7 +146,12 @@ all_plots <- list(
   "hanam-hi-scatter" = plot_scatter(han_dat, facet_type = "virpop"),
   "hanam-hi-summ-gen" = plot_counts(
     filter(han_cnts, population == "General"), "vir"
-  )
+  ),
+  "kiddyvax-main-summ" = plot_counts(
+    filter(kv_summ, virus == "bvic") %>% mutate(prehi = hi),
+    "none"
+  ),
+  "kiddyvax-main-swab" = swab_plot(kv_swab)
 )
 
 iwalk(all_plots, save_plot)
