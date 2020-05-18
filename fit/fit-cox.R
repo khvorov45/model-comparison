@@ -4,7 +4,7 @@ library(tidyverse)
 library(survival)
 
 # Directories used
-fit_cox_dir <- here::here("fit-cox")
+fit_dir <- here::here("fit")
 data_dir <- here::here("data")
 
 # Functions ===================================================================
@@ -47,7 +47,7 @@ predict_cox_one <- function(fit, newdata) {
 }
 
 save_cox_pred <- function(pred, name) {
-  write_csv(pred, file.path(fit_cox_dir, glue::glue("{name}.csv")))
+  write_csv(pred, file.path(fit_dir, glue::glue("{name}.csv")))
 }
 
 # Script ======================================================================
