@@ -1,47 +1,15 @@
 # Fitting the cox model to the kiddyvax data
-# Arseniy Khvorov
-# Created 2020-02-17
-# Last edit 2020-02-21
 
 library(tidyverse)
 library(survival)
 
 # Directories used
-fit_cox_dir <- "fit-cox"
-data_dir <- "data"
+fit_cox_dir <- here::here("fit-cox")
+data_dir <- here::here("data")
 
 # Functions ===================================================================
 
-read_kiddyvax <- function(nme) {
-  read_csv(
-    file.path(data_dir, paste0(nme, ".csv")),
-    col_types = cols_only(
-      virus = col_character(),
-      status = col_integer(),
-      loghimid = col_double(),
-      infection_date = col_date(),
-      start_date = col_date(),
-      end_date = col_date()
-    )
-  )
-}
-
-read_sophia <- function(nme) {
-  read_csv(
-    file.path(data_dir, paste0(nme, ".csv")),
-    col_types = cols_only(
-      hhid = col_character(),
-      postvax = col_double(),
-      postvax_og = col_double(),
-      t = col_integer(),
-      start = col_integer(),
-      end = col_integer(),
-      event = col_integer(),
-      proxy = col_double(),
-      model = col_character()
-    )
-  )
-}
+source(file.path(data_dir, "read_data.R"))
 
 fit_cox_one <- function(dat, formula) {
   coxph(formula, dat, model = TRUE)
@@ -85,7 +53,7 @@ save_cox_pred <- function(pred, name) {
 # Script ======================================================================
 
 # Kiddyvax data
-kv <- read_kiddyvax("kiddyvaxmain") %>%
+kv <- read_data("kiddyvaxmain") %>%
   filter(virus %in% c("bvic", "h1pdm"))
 
 # Add follow-up
@@ -112,13 +80,13 @@ loghis_rel <- loghis - log(5)
 preds <- fits_cox %>%
   map_dfr(
     predict_cox_one,
-    tibble(loghi = loghis, loghimid = loghis_rel), 
+    tibble(loghi = loghis, loghimid = loghis_rel),
     .id = "virus"
   )
 save_cox_pred(preds, "kiddyvaxmain")
 
 # Sophia's data
-sophia <- read_sophia("sophia")
+sophia <- read_data("sophia")
 
 models <- list(
   sophia = formula(Surv(t, event == 1) ~ postvax + proxy),

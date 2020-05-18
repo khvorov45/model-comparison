@@ -42,6 +42,17 @@ read_data <- function(name) {
       hi = col_integer(),
       ntot = col_integer(),
       virus_lbl = col_factor(c("B Vic", "B Yam", "A H1pdm", "A H1seas", "A H3"))
+    ),
+    sophia = cols_only(
+      hhid = col_character(),
+      postvax = col_double(),
+      postvax_og = col_double(),
+      t = col_integer(),
+      start = col_integer(),
+      end = col_integer(),
+      event = col_integer(),
+      proxy = col_double(),
+      model = col_character()
     )
   )
   if (name == "hanam-hi-exp" | name == "hanam-hi-gen") {
@@ -68,6 +79,11 @@ read_data <- function(name) {
     read_csv(
       file.path("data", glue::glue("{name}.csv")),
       col_types = all_col_types[["kv_summ"]]
+    )
+  } else if (name == "sophia") {
+    read_csv(
+      file.path("data", glue::glue("{name}.csv")),
+      col_types = all_col_types[["sophia"]]
     )
   } else {
     read_csv(
