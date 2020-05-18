@@ -47,7 +47,7 @@ predict_cox_one <- function(fit, newdata) {
 }
 
 save_cox_pred <- function(pred, name) {
-  write_csv(pred, file.path(fit_dir, glue::glue("{name}.csv")))
+  write_csv(pred, file.path(fit_dir, glue::glue("{name}-preds-cox.csv")))
 }
 
 # Script ======================================================================

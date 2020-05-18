@@ -38,8 +38,8 @@ rule all:
         "data-plot/kiddyvax-main-summ.pdf",
         "data-plot/kiddyvax-main-swab.pdf",
         "data-table/hanam-hi-tbl1.csv",
-        "fit/sophia.csv",
-        "fit/kiddyvaxmain.csv"
+        "fit/sophia-preds-cox.csv",
+        "fit/kiddyvaxmain-preds-cox.csv"
 
 # Dependencies ================================================================
 
@@ -162,7 +162,7 @@ rule fit_cox:
         "data/kiddyvaxmain.csv",
         "data/sophia.csv"
     output:
-        "fit/kiddyvaxmain.csv",
-        "fit/sophia.csv"
+        "fit/kiddyvaxmain-preds-cox.csv",
+        "fit/sophia-preds-cox.csv"
     shell:
         "Rscript fit/fit-cox.R"
