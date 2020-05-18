@@ -29,6 +29,7 @@ rule all:
         expand("curve-cox/timeplot_{i}.pdf", i = range(0, 5)),
         expand("plausible/sclr/pl_{i}.png", i = range(1, 21)),
         "plausible/plausible-titres.pdf",
+        "fig-studies/fig-studies.pdf",
         "data-plot/hanam-hi-gen-scatter.pdf",
         "data-plot/hanam-hi-scatter.pdf",
         "data-plot/hanam-hi-summ-gen.pdf",
@@ -70,6 +71,15 @@ rule plausible:
         "plausible/plausible-titres.pdf"
     shell:
         "Rscript plausible/plausible.R"
+
+rule fig_studies:
+    input:
+        ".deps-installed",
+        "fig-studies/fig-studies.R"
+    output:
+        "fig-studies/fig-studies.pdf"
+    shell:
+        "Rscript fig-studies/fig-studies.R"
 
 # Raw data process ============================================================
 

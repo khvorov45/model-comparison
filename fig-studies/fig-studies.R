@@ -2,7 +2,7 @@
 # Sheena Sullivan
 
 # Directories used
-fig_studies_dir <- "fig-studies"
+fig_studies_dir <- here::here("fig-studies")
 
 # Script ======================================================================
 
@@ -14,29 +14,29 @@ plot(
   xlab = "Study timeline", ylab = ""
 )
 axis(
-  2, 
-  at = seq(0.5, 3.5, 1), 
-  labels = rep(c("Observational", "Challenge"), 2), 
-  las = 2, 
-  tick = F, 
+  2,
+  at = seq(0.5, 3.5, 1),
+  labels = rep(c("Observational", "Challenge"), 2),
+  las = 2,
+  tick = F,
   cex.axis = 0.8
 )
 mtext(
-  "Vaccinated \nsubjects", 
-  side = 2, 
-  cex = 1, 
-  lwd = 2, 
-  font = 2, 
-  line = 7, 
+  "Vaccinated \nsubjects",
+  side = 2,
+  cex = 1,
+  lwd = 2,
+  font = 2,
+  line = 7,
   at = c(3, -5)
 )
 mtext(
-  "Unvaccinated \nsubjects", 
-  side = 2, 
-  cex = 1, 
-  lwd = 2, 
-  font = 2, 
-  line = 7, 
+  "Unvaccinated \nsubjects",
+  side = 2,
+  cex = 1,
+  lwd = 2,
+  font = 2,
+  line = 7,
   at = c(1, -5)
 )
 legend(
