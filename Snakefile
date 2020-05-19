@@ -182,3 +182,17 @@ rule fit_lr:
         "fit/hanam-hi-preds-lr.csv"
     shell:
         "Rscript fit/fit-lr.R"
+
+rule fit_sclr:
+    input:
+        ".deps-installed",
+        "fit/fit-sclr.R",
+        "data/read_data.R",
+        "data/kiddyvaxmain.csv",
+        "data/hanam-hi-gen.csv",
+        "data/hanam-hi-exp.csv"
+    output:
+        "fit/kiddyvaxmain-preds-sclr.csv",
+        "fit/hanam-hi-preds-sclr.csv"
+    shell:
+        "Rscript fit/fit-sclr.R"

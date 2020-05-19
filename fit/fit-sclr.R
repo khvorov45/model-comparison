@@ -1,21 +1,17 @@
 # Fit the scaled logit model
-# Arseniy Khvorov
-# Created 2019-12-04
-# Last edit 2020-02-25
 
 library(tidyverse)
 library(sclr)
-library(ggdark) # devtools::install_github("khvorov45/ggdark")
 
 # Directories to be used later
-fit_sclr_dir <- "fit-sclr"
-data_dir <- "data"
+fit_dir <- here::here("fit")
+data_dir <- here::here("data")
 
 # Functions ===================================================================
 
 read_hanam <- function(nme) {
   read_csv(
-    file.path(data_dir, paste0(nme, ".csv")), 
+    file.path(data_dir, paste0(nme, ".csv")),
     col_types = cols_only(
       status_bin = col_integer(),
       loghimid = col_double(),
@@ -38,7 +34,7 @@ read_kiddyvax <- function(nme) {
 }
 
 predict_sclr_one <- function(fit_one, loghis) {
-  predict(fit_one, data.frame(loghimid = loghis)) %>% 
+  predict(fit_one, data.frame(loghimid = loghis)) %>%
     select(prot_point, prot_l, prot_u) %>%
     mutate(
       loghimid = loghis,
@@ -50,15 +46,16 @@ predict_sclr_one <- function(fit_one, loghis) {
 fit_sclr_one <- function(data, formula) {
   fit <- sclr(formula, data)
   attr(fit, "virus") <- unique(data$virus)
-  if ("population" %in% names(data)) 
+  if ("population" %in% names(data)) {
     attr(fit, "population") <- unique(data$population)
+  }
   fit
 }
 
 save_preds <- function(preds, nme) {
   write_csv(
     preds,
-    file.path(fit_sclr_dir, paste0(nme, ".csv"))
+    file.path(fit_dir, paste0(nme, "-preds-sclr.csv"))
   )
 }
 
@@ -85,8 +82,9 @@ fits_kv <- kv %>%
   map(fit_sclr_one, status ~ loghimid)
 
 # Predictions from regular fits
-preds_han <- fits_han %>% map_dfr(predict_sclr_one, loghis)
-save_preds(preds_han, "hanam-hi")
+all_preds <- map(
+  list("hanam-hi" = fits_han, "kiddyvaxmain" = fits_kv),
+  ~ map_dfr(.x, predict_sclr_one, loghis)
+)
 
-preds_kv <- fits_kv %>% map_dfr(predict_sclr_one, loghis)
-save_preds(preds_kv, "kiddyvaxmain")
+iwalk(all_preds, save_preds)
