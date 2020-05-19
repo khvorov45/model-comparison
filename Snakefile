@@ -41,7 +41,16 @@ rule all:
         "fit/sophia-preds-cox.csv",
         "fit/kiddyvaxmain-preds-cox.csv",
         "fit/hanam-hi-preds-lr.csv",
-        "fit/kiddyvaxmain-preds-lr.csv"
+        "fit/kiddyvaxmain-preds-lr.csv",
+        "fit/hanam-hi-preds-sclr.csv",
+        "fit/kiddyvaxmain-preds-sclr.csv",
+        "fit/out-sclr-bayesian/hanam-hi-exp-h1pdm.csv",
+        "fit/out-sclr-bayesian/hanam-hi-exp-h3.csv",
+        "fit/out-sclr-bayesian/hanam-hi-gen-h1pdm.csv",
+        "fit/out-sclr-bayesian/hanam-hi-gen-h3.csv",
+        "fit/out-sclr-bayesian/kiddyvaxmain-bvic.csv",
+        "fit/out-sclr-bayesian/kiddyvaxmain-h1pdm.csv"
+
 
 # Dependencies ================================================================
 
@@ -196,3 +205,21 @@ rule fit_sclr:
         "fit/hanam-hi-preds-sclr.csv"
     shell:
         "Rscript fit/fit-sclr.R"
+
+rule fit_sclr_bayesian:
+    input:
+        ".deps-installed",
+        "fit/fit-sclr-bayesian.R",
+        "data/read_data.R",
+        "data/kiddyvaxmain.csv",
+        "data/hanam-hi-gen.csv",
+        "data/hanam-hi-exp.csv"
+    output:
+        protected("fit/out-sclr-bayesian/hanam-hi-exp-h1pdm.csv"),
+        protected("fit/out-sclr-bayesian/hanam-hi-exp-h3.csv"),
+        protected("fit/out-sclr-bayesian/hanam-hi-gen-h1pdm.csv"),
+        protected("fit/out-sclr-bayesian/hanam-hi-gen-h3.csv"),
+        protected("fit/out-sclr-bayesian/kiddyvaxmain-bvic.csv"),
+        protected("fit/out-sclr-bayesian/kiddyvaxmain-h1pdm.csv")
+    shell:
+        "Rscript fit/fit-sclr-bayesian.R"
