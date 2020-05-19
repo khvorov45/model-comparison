@@ -9,29 +9,7 @@ data_dir <- here::here("data")
 
 # Functions ===================================================================
 
-read_hanam <- function(nme) {
-  read_csv(
-    file.path(data_dir, paste0(nme, ".csv")),
-    col_types = cols_only(
-      status_bin = col_integer(),
-      loghimid = col_double(),
-      virus = col_character(),
-      population = col_character()
-    )
-  ) %>%
-    rename(status = status_bin)
-}
-
-read_kiddyvax <- function(nme) {
-  read_csv(
-    file.path(data_dir, paste0(nme, ".csv")),
-    col_types = cols_only(
-      virus = col_character(),
-      status = col_integer(),
-      loghimid = col_double()
-    )
-  )
-}
+source(file.path(data_dir, "read_data.R"))
 
 predict_sclr_one <- function(fit_one, loghis) {
   predict(fit_one, data.frame(loghimid = loghis)) %>%
@@ -65,17 +43,17 @@ save_preds <- function(preds, nme) {
 loghis <- seq(0, 8.7, length.out = 101)
 
 # Hanam data
-han <- bind_rows(read_hanam("hanam-hi-exp"), read_hanam("hanam-hi-gen")) %>%
+han <- map_dfr(c("hanam-hi-exp", "hanam-hi-gen"), read_data) %>%
   filter(virus != "H1N1seas")
 
 # Kiddyvax data
-kv <- read_kiddyvax("kiddyvaxmain") %>%
+kv <- read_data("kiddyvaxmain") %>%
   filter(virus %in% c("bvic", "h1pdm"))
 
 # Regular fit
 fits_han <- han %>%
   group_split(virus, population) %>%
-  map(fit_sclr_one, status ~ loghimid)
+  map(fit_sclr_one, status_bin ~ loghimid)
 
 fits_kv <- kv %>%
   group_split(virus) %>%
