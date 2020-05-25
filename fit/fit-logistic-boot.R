@@ -1,7 +1,4 @@
 # Fit the logistic model to data
-# Arseniy Khvorov
-# Created 2020-01-16
-# Last edit 2020-01-24
 
 library(tidyverse)
 library(furrr)
@@ -11,34 +8,12 @@ library(broom)
 plan(multiprocess)
 
 # Directories to be used later
-fit_logistic_boot_dir <- "fit-logistic-boot"
-data_dir <- "data"
+fit_logistic_boot_dir <- here::here("fit", "out-logistic-boot")
+data_dir <- here::here("data")
 
 # Functions ===================================================================
 
-read_hanam <- function(nme) {
-  read_csv(
-    file.path(data_dir, paste0(nme, ".csv")), 
-    col_types = cols_only(
-      status_bin = col_integer(),
-      loghimid = col_double(),
-      virus = col_character(),
-      population = col_character()
-    )
-  ) %>%
-    rename(status = status_bin)
-}
-
-read_kiddyvax <- function(nme) {
-  read_csv(
-    file.path(data_dir, paste0(nme, ".csv")),
-    col_types = cols_only(
-      virus = col_character(),
-      status = col_integer(),
-      loghimid = col_double()
-    )
-  )
-}
+source(file.path(data_dir, "read_data.R"))
 
 boot_fit <- function(dat, formula, n_res = 1000) {
   resamples <- bootstraps(dat, times = n_res)
@@ -47,14 +22,19 @@ boot_fit <- function(dat, formula, n_res = 1000) {
     fit <- tryCatch(
       tidy(glm(formula, dat, family = binomial(link = "logit"))) %>%
         mutate(term = recode(term, "(Intercept)" = "b0", "loghimid" = "b1")),
-      error = function(e) return(NULL),
-      warning = function(w) return(NULL)
+      error = function(e) {
+        return(NULL)
+      },
+      warning = function(w) {
+        return(NULL)
+      }
     )
     if (!is.null(fit)) fit$ind <- ind
     fit
   }
   future_imap_dfr(
-    resamples$splits, fit_one, .options = future_options(packages = "broom")
+    resamples$splits, fit_one,
+    .options = future_options(packages = "broom")
   )
 }
 
@@ -68,17 +48,17 @@ save_lr_boot <- function(samples, name) {
 # Script ======================================================================
 
 # Hanam data
-han <- map_dfr(c("hanam-hi-exp", "hanam-hi-gen"), read_hanam) %>%
+han <- map_dfr(c("hanam-hi-exp", "hanam-hi-gen"), read_data) %>%
   filter(virus != "H1N1seas")
 
 # Kiddyvax data
-kv <- read_kiddyvax("kiddyvaxmain") %>%
+kv <- read_data("kiddyvaxmain") %>%
   filter(virus %in% c("bvic", "h1pdm"))
 
 # Fit hanam to viruses and populations separately
 fit_bootstraps_han <- han %>%
   group_by(virus, population) %>%
-  group_modify(~ boot_fit(.x, status ~ loghimid, 1e4))
+  group_modify(~ boot_fit(.x, status_bin ~ loghimid, 1e4))
 save_lr_boot(fit_bootstraps_han, "hanam-hi")
 
 # Fit kiddyvax to viruses separately

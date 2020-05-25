@@ -49,8 +49,9 @@ rule all:
         "fit/out-sclr-bayesian/hanam-hi-gen-h1pdm.csv",
         "fit/out-sclr-bayesian/hanam-hi-gen-h3.csv",
         "fit/out-sclr-bayesian/kiddyvaxmain-bvic.csv",
-        "fit/out-sclr-bayesian/kiddyvaxmain-h1pdm.csv"
-
+        "fit/out-sclr-bayesian/kiddyvaxmain-h1pdm.csv",
+        "fit/out-logistic-boot/hanam-hi.csv",
+        "fit/out-logistic-boot/kiddyvaxmain.csv"
 
 # Dependencies ================================================================
 
@@ -223,3 +224,17 @@ rule fit_sclr_bayesian:
         protected("fit/out-sclr-bayesian/kiddyvaxmain-h1pdm.csv")
     shell:
         "Rscript fit/fit-sclr-bayesian.R"
+
+rule fit_logistic_boot:
+    input:
+        ".deps-installed",
+        "fit/fit-logistic-boot.R",
+        "data/read_data.R",
+        "data/kiddyvaxmain.csv",
+        "data/hanam-hi-gen.csv",
+        "data/hanam-hi-exp.csv"
+    output:
+        protected("fit/out-logistic-boot/hanam-hi.csv"),
+        protected("fit/out-logistic-boot/kiddyvaxmain.csv")
+    shell:
+        "Rscript fit/fit-logistic-boot.R"
