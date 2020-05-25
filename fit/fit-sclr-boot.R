@@ -35,6 +35,7 @@ boot_fit <- function(dat, formula, n_res = 1000) {
 }
 
 save_lr_boot <- function(samples, name) {
+  if (!dir.exists(fit_sclr_boot_dir)) dir.create(fit_sclr_boot_dir)
   write_csv(
     samples,
     file.path(fit_sclr_boot_dir, paste0(name, ".csv"))
