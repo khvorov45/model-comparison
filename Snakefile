@@ -254,3 +254,20 @@ rule fit_sclr_boot:
         protected("fit/out-sclr-boot/kiddyvaxmain.csv")
     shell:
         "Rscript fit/fit-sclr-boot.R"
+
+# Data plots ==================================================================
+
+rule preds_plot:
+    input:
+        ".deps-installed",
+        "preds-plot/preds-plot.R",
+        "fit/kiddyvaxmain-preds-cox.csv",
+        "fit/sophia-preds-cox.csv"
+    output:
+        "preds-plot/kiddyvaxmain-cox-bvic.pdf",
+        "preds-plot/kiddyvaxmain-cox.pdf",
+        "preds-plot/sophia-cox-og.pdf",
+        "preds-plot/sophia-cox-fixci.pdf",
+        "preds-plot/sophia-cox-fixci-fixmod.pdf"
+    shell:
+        "Rscript preds-plot/preds-plot.R"

@@ -1,20 +1,16 @@
-# Plotting cox predictions
-# Arseniy Khvorov
-# Created 2020-02-17
-# Last edit 2020-02-17
+# Plotting protections curves
 
 library(tidyverse)
-library(ggdark) # devtools::install_github("khvorov45/ggdark")
 
 # Directories used
-fit_cox_dir <- "fit-cox"
-fit_cox_plot_dir <- "fit-cox-plot"
+fit_dir <- here::here("fit")
+preds_plot_dir <- here::here("preds-plot")
 
 # Functions ===================================================================
 
 read_pred <- function(name) {
   read_csv(
-    file.path(fit_cox_dir, glue::glue("{name}.csv")),
+    file.path(fit_dir, glue::glue("{name}.csv")),
     col_types = cols()
   )
 }
@@ -34,7 +30,7 @@ plot_pred <- function(dat, facet_by_virus = TRUE) {
   facets <- if (facet_by_virus) facet_wrap(~virus, nrow = 1) else NULL
   dat %>%
     ggplot(aes(loghi, prot)) +
-    dark_theme_bw(verbose = FALSE) +
+    ggdark::dark_theme_bw(verbose = FALSE) +
     theme(
       strip.background = element_blank(),
       panel.spacing = unit(0, "null"),
@@ -56,37 +52,34 @@ plot_pred <- function(dat, facet_by_virus = TRUE) {
     geom_line()
 }
 
-save_plot <- function(pl, name, width, height) {
-  ggsave_dark(
-    file.path(fit_cox_plot_dir, glue::glue("{name}.pdf")), pl,
+save_plot <- function(pl, name, width = 12, height = 7.5) {
+  ggdark::ggsave_dark(
+    file.path(preds_plot_dir, glue::glue("{name}.pdf")), pl,
     device = "pdf", width = width, height = height, units = "cm"
   )
 }
 
 # Script ======================================================================
 
-preds <- read_pred("kiddyvaxmain") %>% recode_viruses()
+kv_cox_preds <- read_pred("kiddyvaxmain-preds-cox") %>% recode_viruses()
+sophia_preds <- read_pred("sophia-preds-cox")
 
-preds_sophia <- read_pred("sophia")
-
-pl <- plot_pred(preds)
-# save_plot(pl, "kiddyvaxmain", 12, 7.5)
-
-pl_bvic <- plot_pred(filter(preds, virus == "B Vic"), facet_by_virus = FALSE)
-# save_plot(pl_bvic, "kiddyvaxmain-bvic", 7.5, 7.5)
-
-pl_soph_og <- plot_pred(
-  filter(preds_sophia, model == "sophia") %>%
-    mutate(prot_low = prot_low_wrong, prot_high = prot_high_wrong)
+all_plots <- list(
+  "kiddyvaxmain-cox" = plot_pred(kv_cox_preds),
+  "kiddyvaxmain-cox-bvic" = plot_pred(
+    filter(kv_cox_preds, virus == "B Vic"),
+    facet_by_virus = FALSE
+  ),
+  "sophia-cox-og" = plot_pred(
+    filter(sophia_preds, model == "sophia") %>%
+      mutate(prot_low = prot_low_wrong, prot_high = prot_high_wrong)
+  ),
+  "sophia-cox-fixci" = plot_pred(
+    filter(preds_sophia, model == "sophia")
+  ),
+  "sophia-cox-fixci-fixmod" = plot_pred(
+    filter(preds_sophia, model == "me")
+  )
 )
-# save_plot(pl_soph_og, "sophia-og", 12, 7.5)
 
-pl_soph_ci <- plot_pred(
-  filter(preds_sophia, model == "sophia")
-)
-# save_plot(pl_soph_ci, "sophia-ci", 12, 7.5)
-
-pl_soph_ci_mod <- plot_pred(
-  filter(preds_sophia, model == "me")
-)
-# save_plot(pl_soph_ci_mod, "sophia-ci-mod", 12, 7.5)
+iwalk(all_plots, save_plot)
