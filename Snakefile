@@ -38,8 +38,6 @@ rule all:
         "data-plot/kiddyvax-main-summ.pdf",
         "data-plot/kiddyvax-main-swab.pdf",
         "data-table/hanam-hi-tbl1.csv",
-        "fit/sophia-preds-cox.csv",
-        "fit/kiddyvaxmain-preds-cox.csv",
         "fit/hanam-hi-preds-lr.csv",
         "fit/kiddyvaxmain-preds-lr.csv",
         "fit/hanam-hi-preds-sclr.csv",
@@ -53,7 +51,12 @@ rule all:
         "fit/out-logistic-boot/hanam-hi.csv",
         "fit/out-logistic-boot/kiddyvaxmain.csv",
         "fit/out-sclr-boot/hanam-hi.csv",
-        "fit/out-sclr-boot/kiddyvaxmain.csv"
+        "fit/out-sclr-boot/kiddyvaxmain.csv",
+        "preds-plot/kiddyvaxmain-cox-bvic.pdf",
+        "preds-plot/kiddyvaxmain-cox.pdf",
+        "preds-plot/sophia-cox-og.pdf",
+        "preds-plot/sophia-cox-fixci.pdf",
+        "preds-plot/sophia-cox-fixci-fixmod.pdf"
 
 # Dependencies ================================================================
 
