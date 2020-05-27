@@ -48,10 +48,10 @@ rule all:
         "fit/out-sclr-bayesian/hanam-hi-gen-h3.csv",
         "fit/out-sclr-bayesian/kiddyvaxmain-bvic.csv",
         "fit/out-sclr-bayesian/kiddyvaxmain-h1pdm.csv",
-        "fit/out-logistic-boot/hanam-hi.csv",
-        "fit/out-logistic-boot/kiddyvaxmain.csv",
         "fit/out-sclr-boot/hanam-hi.csv",
         "fit/out-sclr-boot/kiddyvaxmain.csv",
+        "fit/hanam-hi-preds-lr-boot.csv",
+        "fit/kiddyvaxmain-preds-lr-boot.csv"
         "preds-plot/kiddyvaxmain-cox-bvic.pdf",
         "preds-plot/kiddyvaxmain-cox.pdf",
         "preds-plot/sophia-cox-og.pdf",
@@ -257,6 +257,18 @@ rule fit_sclr_boot:
         protected("fit/out-sclr-boot/kiddyvaxmain.csv")
     shell:
         "Rscript fit/fit-sclr-boot.R"
+
+rule lr_boot_summ:
+    input:
+        ".deps-installed",
+        "fit/fit-logistic-boot-summary.R",
+        "fit/out-logistic-boot/hanam-hi.csv",
+        "fit/out-logistic-boot/kiddyvaxmain.csv"
+    output:
+        "fit/hanam-hi-preds-lr-boot.csv",
+        "fit/kiddyvaxmain-preds-lr-boot.csv"
+    shell:
+        "Rscript fit/fit-logistic-boot-summary.R"
 
 # Data plots ==================================================================
 

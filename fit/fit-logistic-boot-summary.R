@@ -1,13 +1,10 @@
 # Summary of bootstraps of logistic fit
-# Arseniy Khvorov
-# Created 2020-02-03
-# Last edit 2020-02-03
 
 library(tidyverse)
 
 # Directories to be used later
-fit_logistic_boot_dir <- "fit-logistic-boot"
-fit_lr_bs_dir <- "fit-logistic-boot-summary"
+fit_dir <- here::here("fit")
+fit_lr_boot_out_dir <- file.path(fit_dir, "out-logistic-boot")
 
 # Functions ===================================================================
 
@@ -19,9 +16,11 @@ read_res <- function(path) {
     mutate(
       population = factor(
         population,
-        levels = c("General", "Exposed") 
+        levels = c("General", "Exposed")
       ),
-      filename = basename(path) 
+      filename = paste0(
+        str_replace(basename(path), ".csv", ""), "-preds-lr-boot"
+      )
     )
 }
 
@@ -43,7 +42,8 @@ calc_probs <- function(out) {
       prot_rel = 1 - inf / (1 - 1 / (1 + exp(b0 + b1 * log(5))))
     ) %>%
     pivot_longer(
-      c(prot, inf, prot_rel), names_to = "prob_type", values_to = "prob"
+      c(prot, inf, prot_rel),
+      names_to = "prob_type", values_to = "prob"
     )
 }
 
@@ -68,13 +68,13 @@ split_summ <- function(dat) {
 }
 
 save_summ <- function(dat, name) {
-  write_csv(dat, file.path(fit_lr_bs_dir, name))
+  write_csv(dat, file.path(fit_dir, paste0(name, ".csv")))
 }
 
 # Script ======================================================================
 
 # Bootstrap samples
-lr_boot <- read_res_all(fit_logistic_boot_dir)
+lr_boot <- read_res_all(fit_lr_boot_out_dir)
 
 # Log HI's for which to calculate infection/protection probabilities
 loghis <- seq(0, 8.7, length.out = 101)
