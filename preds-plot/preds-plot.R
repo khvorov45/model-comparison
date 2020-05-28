@@ -73,7 +73,9 @@ save_plot <- function(pl, name, width = 12, height = 7.5) {
 # Script ======================================================================
 
 kv_main_summ <- read_data("kiddyvaxmain-summ")
-han_hi_summ <- read_data("hanam-hi-summ") %>% filter(virus != "H1N1seas")
+han_hi_summ <- read_data("hanam-hi-summ") %>%
+  filter(virus != "H1N1seas") %>%
+  recode_viruses()
 
 kv_cox_preds <- read_pred("kiddyvaxmain-preds-cox")
 sophia_preds <- read_pred("sophia-preds-cox")
