@@ -66,13 +66,13 @@ kv_fup <- kv %>%
 
 # Fit the models
 fits_cox <- kv_fup %>%
-  group_split(virus) %>%
+  group_split(virus_lbl) %>%
   map(
     ~ fit_cox_one(
       .x, Surv(fup_days, event = status == 1, type = "right") ~ loghimid
     )
   )
-names(fits_cox) <- group_keys(kv_fup, virus)$virus
+names(fits_cox) <- group_keys(kv_fup, virus_lbl)$virus_lbl
 
 # Predict
 loghis <- seq(0, 8.7, length.out = 1001)
@@ -81,7 +81,7 @@ preds <- fits_cox %>%
   map_dfr(
     predict_cox_one,
     tibble(loghi = loghis, loghimid = loghis_rel),
-    .id = "virus"
+    .id = "virus_lbl"
   )
 save_cox_pred(preds, "kiddyvaxmain")
 
@@ -105,5 +105,6 @@ sophia_preds <- sophia_fits %>%
         fit, tibble(loghi = loghis, postvax = loghis_rel, proxy = 0)
       )
     }, .id = "model")
-  }, .id = "virus")
+  }, .id = "virus") %>%
+  mutate(virus_lbl = recode(virus, "A H1N1pdm09" = "A H1pdm"))
 save_cox_pred(sophia_preds, "sophia")

@@ -38,8 +38,6 @@ rule all:
         "data-plot/kiddyvax-main-summ.pdf",
         "data-plot/kiddyvax-main-swab.pdf",
         "data-table/hanam-hi-tbl1.csv",
-        "fit/hanam-hi-preds-lr.csv",
-        "fit/kiddyvaxmain-preds-lr.csv",
         "fit/hanam-hi-preds-sclr.csv",
         "fit/kiddyvaxmain-preds-sclr.csv",
         "fit/out-sclr-bayesian/hanam-hi-exp-h1pdm.csv",
@@ -56,7 +54,9 @@ rule all:
         "preds-plot/kiddyvaxmain-cox.pdf",
         "preds-plot/sophia-cox-og.pdf",
         "preds-plot/sophia-cox-fixci.pdf",
-        "preds-plot/sophia-cox-fixci-fixmod.pdf"
+        "preds-plot/sophia-cox-fixci-fixmod.pdf",
+        "preds-plot/hanam-hi-lr.pdf",
+        "preds-plot/kiddyvaxmain-lr.pdf"
 
 # Dependencies ================================================================
 
@@ -277,12 +277,16 @@ rule preds_plot:
         ".deps-installed",
         "preds-plot/preds-plot.R",
         "fit/kiddyvaxmain-preds-cox.csv",
-        "fit/sophia-preds-cox.csv"
+        "fit/sophia-preds-cox.csv",
+        "fit/kiddyvaxmain-preds-lr.csv",
+        "fit/hanam-hi-preds-lr.csv"
     output:
         "preds-plot/kiddyvaxmain-cox-bvic.pdf",
         "preds-plot/kiddyvaxmain-cox.pdf",
         "preds-plot/sophia-cox-og.pdf",
         "preds-plot/sophia-cox-fixci.pdf",
-        "preds-plot/sophia-cox-fixci-fixmod.pdf"
+        "preds-plot/sophia-cox-fixci-fixmod.pdf",
+        "preds-plot/hanam-hi-lr.pdf",
+        "preds-plot/kiddyvaxmain-lr.pdf"
     shell:
         "Rscript preds-plot/preds-plot.R"

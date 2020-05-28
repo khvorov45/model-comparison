@@ -20,7 +20,10 @@ predict_lr_one <- function(fit_one, loghis) {
       fit_high = invlogit(fit + qnorm(0.975) * se),
       fit_low = invlogit(fit - qnorm(0.975) * se),
       fit = invlogit(fit),
-      loghimid = loghis,
+      prot = 1 - fit,
+      prot_high = 1 - fit_low,
+      prot_low = 1 - fit_high,
+      loghi = loghis,
       population = attr(fit_one, "population"),
       virus = attr(fit_one, "virus")
     )
