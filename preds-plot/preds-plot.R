@@ -30,7 +30,7 @@ recode_viruses <- function(dat) {
 }
 
 plot_pred <- function(dat, facets = "vir",
-                      xmin = 5, xmax = 5120) {
+                      xmin = 5, xmax = 5120, ylab = "Relative protection") {
   xbreaks <- c(5 * 2^(0:10))
   facets <- rlang::arg_match(facets, c("vir", "virpop", "pop", "none"))
   if (facets == "virpop") {
@@ -55,7 +55,7 @@ plot_pred <- function(dat, facets = "vir",
     coord_cartesian(xlim = c(log(xmin), log(xmax)), ylim = c(0, 1)) +
     scale_x_continuous("HI titre", breaks = log(xbreaks), labels = xbreaks) +
     scale_y_continuous(
-      "Relative protection",
+      ylab,
       breaks = seq(0, 1, 0.1),
       labels = scales::percent_format(1)
     ) +
@@ -84,7 +84,7 @@ kvm_lr <- read_pred("kiddyvaxmain-preds-lr") %>% recode_viruses()
 
 all_plots <- list(
   "kiddyvaxmain-cox" = plot_pred(kv_cox_preds),
-  "kiddyvaxmain-lr" = plot_pred(kvm_lr),
+  "kiddyvaxmain-lr" = plot_pred(kvm_lr, ylab = "Protection"),
   "kiddyvaxmain-cox-bvic" = plot_pred(
     filter(kv_cox_preds, virus_lbl == "B Vic"),
     facets = "none",
@@ -99,7 +99,7 @@ all_plots <- list(
   "sophia-cox-fixci-fixmod" = plot_pred(
     filter(sophia_preds, model == "me")
   ),
-  "hanam-hi-lr" = plot_pred(han_hi_lr, "virpop")
+  "hanam-hi-lr" = plot_pred(han_hi_lr, "virpop", ylab = "Protection")
 )
 
 iwalk(all_plots, save_plot)
