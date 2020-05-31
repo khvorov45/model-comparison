@@ -5,11 +5,12 @@ library(tidyverse)
 # Directories to be used later
 fit_dir <- here::here("fit")
 fit_lr_boot_out_dir <- file.path(fit_dir, "out-logistic-boot")
+fit_sclr_boot_dir <- file.path(fit_dir, "out-sclr-boot")
 
 # Functions ===================================================================
 
 # Reads a set of results from path
-read_res <- function(path) {
+read_res <- function(path, model = "lr") {
   res <- read_csv(path, col_types = cols())
   if (!"population" %in% names(res)) res$population <- "General"
   res %>%
@@ -19,13 +20,14 @@ read_res <- function(path) {
         levels = c("General", "Exposed")
       ),
       filename = paste0(
-        str_replace(basename(path), ".csv", ""), "-preds-lr-boot"
+        str_replace(basename(path), ".csv", ""),
+        paste0("-preds-", model, "-boot")
       )
     )
 }
 
-read_res_all <- function(dirpath) {
-  map_dfr(tools::list_files_with_exts(dirpath, "csv"), read_res)
+read_res_all <- function(dirpath, model = "lr") {
+  map_dfr(tools::list_files_with_exts(dirpath, "csv"), read_res, model)
 }
 
 widen_bootstraps <- function(bootstr) {
@@ -43,6 +45,20 @@ calc_probs <- function(out) {
     ) %>%
     pivot_longer(
       c(prot, inf, prot_rel),
+      names_to = "prob_type", values_to = "prob"
+    )
+}
+
+calc_probs_sclr <- function(out) {
+  invlogit <- function(x) 1 - 1 / (1 + exp(x))
+  out %>%
+    mutate(
+      loghi = loghi,
+      prot = invlogit(beta_0 + beta_loghimid * loghi),
+      inf = invlogit(theta) * (1 - prot),
+    ) %>%
+    pivot_longer(
+      c(prot, inf),
       names_to = "prob_type", values_to = "prob"
     )
 }
@@ -67,6 +83,17 @@ split_summ <- function(dat) {
   dat
 }
 
+full_summ <- function(boot_data, prob_fun = calc_probs) {
+  boot_data %>%
+    group_by(virus, population, filename) %>%
+    group_modify(~ widen_bootstraps(.x)) %>%
+    slice(rep(1:n(), each = length(loghis))) %>%
+    mutate(loghi = rep_len(loghis, length.out = n())) %>%
+    group_modify(~ prob_fun(.x)) %>%
+    summ_probs() %>%
+    split_summ()
+}
+
 save_summ <- function(dat, name) {
   write_csv(dat, file.path(fit_dir, paste0(name, ".csv")))
 }
@@ -75,18 +102,14 @@ save_summ <- function(dat, name) {
 
 # Bootstrap samples
 lr_boot <- read_res_all(fit_lr_boot_out_dir)
+sclr_boot <- read_res_all(fit_sclr_boot_dir, "sclr")
 
 # Log HI's for which to calculate infection/protection probabilities
 loghis <- seq(0, 8.7, length.out = 101)
 
 # Calculate predicated probabilities
-preds <- lr_boot %>%
-  group_by(virus, population, filename) %>%
-  group_modify(~ widen_bootstraps(.x)) %>%
-  slice(rep(1:n(), each = length(loghis))) %>%
-  mutate(loghi = rep_len(loghis, length.out = n())) %>%
-  group_modify(~ calc_probs(.x)) %>%
-  summ_probs() %>%
-  split_summ()
+preds <- full_summ(lr_boot)
+preds_sclr <- full_summ(sclr_boot, calc_probs_sclr)
 
 iwalk(preds, save_summ)
+iwalk(preds_sclr, save_summ)

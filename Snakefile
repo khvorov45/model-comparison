@@ -258,15 +258,19 @@ rule fit_sclr_boot:
     shell:
         "Rscript fit/fit-sclr-boot.R"
 
-rule lr_boot_summ:
+rule logistic_boot_summ:
     input:
         ".deps-installed",
         "fit/fit-logistic-boot-summary.R",
         "fit/out-logistic-boot/hanam-hi.csv",
-        "fit/out-logistic-boot/kiddyvaxmain.csv"
+        "fit/out-logistic-boot/kiddyvaxmain.csv",
+        "fit/out-sclr-boot/hanam-hi.csv",
+        "fit/out-sclr-boot/kiddyvaxmain.csv"
     output:
         "fit/hanam-hi-preds-lr-boot.csv",
-        "fit/kiddyvaxmain-preds-lr-boot.csv"
+        "fit/kiddyvaxmain-preds-lr-boot.csv",
+        "fit/hanam-hi-preds-sclr-boot.csv",
+        "fit/kiddyvaxmain-preds-sclr-boot.csv"
     shell:
         "Rscript fit/fit-logistic-boot-summary.R"
 
