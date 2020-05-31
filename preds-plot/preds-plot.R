@@ -23,15 +23,36 @@ recode_viruses <- function(dat) {
     mutate(
       virus_lbl = factor(
         virus,
-        levels = c("H1N1pdm", "h1pdm", "H3N2", "bvic"),
-        labels = c("H1N1pdm", "H1N1pdm", "H3N2", "B Vic")
+        levels = c("H1N1pdm", "A H1pdm", "h1pdm", "H3N2", "bvic", "B Vic"),
+        labels = c("H1N1pdm", "H1N1pdm", "H1N1pdm", "H3N2", "B Vic", "B Vic")
       )
     )
 }
 
+common_plot_els <- function() {
+  xbreaks <- c(5 * 2^(0:10))
+  ybreaks <- seq(0, 1, 0.1)
+  list(
+    ggdark::dark_theme_bw(verbose = FALSE),
+    theme(
+      strip.background = element_blank(),
+      panel.spacing = unit(0, "null"),
+      axis.text.x = element_text(angle = 45, hjust = 1),
+      panel.grid.minor.y = element_blank()
+    ),
+    xlab("HI titre"),
+    scale_x_continuous(
+      breaks = log(xbreaks), labels = xbreaks,
+      minor_breaks = log((xbreaks + xbreaks * 2) / 2)
+    ),
+    scale_y_continuous(breaks = ybreaks, labels = scales::percent_format(1)),
+    geom_ribbon(alpha = 0.5),
+    geom_line()
+  )
+}
+
 plot_pred <- function(dat, facets = "vir",
                       xmin = 5, xmax = 5120, ylab = "Relative protection") {
-  xbreaks <- c(5 * 2^(0:10))
   facets <- rlang::arg_match(facets, c("vir", "virpop", "pop", "none"))
   if (facets == "virpop") {
     faceting <- facet_grid(population ~ virus_lbl)
@@ -43,24 +64,61 @@ plot_pred <- function(dat, facets = "vir",
     faceting <- NULL
   }
   dat %>%
-    ggplot(aes(loghi, prot)) +
-    ggdark::dark_theme_bw(verbose = FALSE) +
-    theme(
-      strip.background = element_blank(),
-      panel.spacing = unit(0, "null"),
-      axis.text.x = element_text(angle = 45, hjust = 1),
-      panel.grid.minor = element_blank()
-    ) +
+    ggplot(aes(loghi, prot, ymin = prot_low, ymax = prot_high)) +
+    common_plot_els() +
+    ylab(ylab) +
     faceting +
-    coord_cartesian(xlim = c(log(xmin), log(xmax)), ylim = c(0, 1)) +
-    scale_x_continuous("HI titre", breaks = log(xbreaks), labels = xbreaks) +
-    scale_y_continuous(
-      ylab,
-      breaks = seq(0, 1, 0.1),
-      labels = scales::percent_format(1)
+    coord_cartesian(xlim = c(log(xmin), log(xmax)), ylim = c(0, 1))
+}
+
+plot_pred_inf <- function(outsum, data, facets = "virpop",
+                          xmin = 5, xmax = 5120, ymin = 0, ymax = 0.5) {
+  facets <- rlang::arg_match(facets, c("vir", "virpop", "pop", "none"))
+  if (facets == "virpop") {
+    facets_spec <- list(
+      facetscales::facet_grid_sc(
+        population ~ virus_lbl,
+        scales = list(
+          y = list(
+            General = scale_y_continuous(
+              limits = c(0, 0.3), labels = scales::percent_format(1)
+            ),
+            Exposed = scale_y_continuous(
+              limits = c(0, 0.5), labels = scales::percent_format(1)
+            )
+          )
+        )
+      ),
+      coord_cartesian(xlim = c(log(xmin), log(xmax))),
+      theme(panel.spacing.y = unit(5, "points"))
+    )
+  } else if (facets == "vir") {
+    facets_spec <- list(
+      facet_wrap(~virus_lbl, nrow = 1),
+      coord_cartesian(xlim = c(log(xmin), log(xmax)), ylim = c(ymin, ymax))
+    )
+  } else if (facets == "pop") {
+    facets_spec <- list(
+      facet_wrap(~population, nrow = 1),
+      coord_cartesian(xlim = c(log(xmin), log(xmax)), ylim = c(ymin, ymax))
+    )
+  } else {
+    facets_spec <- list()
+  }
+  data <- filter(data, virus %in% unique(outsum$virus))
+  outsum %>%
+    ggplot(aes(loghi, fit, ymin = fit_low, ymax = fit_high)) +
+    ylab("Infection probability") +
+    common_plot_els() +
+    facets_spec +
+    geom_point(
+      data = data, mapping = aes(loghimid, inf_prop), inherit.aes = FALSE,
+      shape = 18
     ) +
-    geom_ribbon(aes(ymin = prot_low, ymax = prot_high), alpha = 0.5) +
-    geom_line()
+    ggrepel::geom_text_repel(
+      data = data, mapping = aes(loghimid, inf_prop, label = ntot),
+      inherit.aes = FALSE
+    )
 }
 
 save_plot <- function(pl, name, width = 12, height = 7.5) {
@@ -72,7 +130,7 @@ save_plot <- function(pl, name, width = 12, height = 7.5) {
 
 # Script ======================================================================
 
-kv_main_summ <- read_data("kiddyvaxmain-summ")
+kv_main_summ <- read_data("kiddyvaxmain-summ") %>% recode_viruses()
 han_hi_summ <- read_data("hanam-hi-summ") %>%
   filter(virus != "H1N1seas") %>%
   recode_viruses()
@@ -85,6 +143,14 @@ kvm_lr <- read_pred("kiddyvaxmain-preds-lr") %>% recode_viruses()
 all_plots <- list(
   "kiddyvaxmain-cox" = plot_pred(kv_cox_preds),
   "kiddyvaxmain-lr" = plot_pred(kvm_lr, ylab = "Protection"),
+  "kiddyvaxmain-lr-bvic" = plot_pred(
+    filter(kvm_lr, virus_lbl == "B Vic"), "none",
+    ylab = "Protection"
+  ),
+  "kiddyvaxmain-lr-inf" = plot_pred_inf(
+    kvm_lr, kv_main_summ, "vir",
+    ymax = 0.2
+  ),
   "kiddyvaxmain-cox-bvic" = plot_pred(
     filter(kv_cox_preds, virus_lbl == "B Vic"),
     facets = "none",
@@ -99,7 +165,12 @@ all_plots <- list(
   "sophia-cox-fixci-fixmod" = plot_pred(
     filter(sophia_preds, model == "me")
   ),
-  "hanam-hi-lr" = plot_pred(han_hi_lr, "virpop", ylab = "Protection")
+  "hanam-hi-lr" = plot_pred(han_hi_lr, "virpop", ylab = "Protection"),
+  "hanam-hi-lr-h3" = plot_pred(
+    filter(han_hi_lr, virus == "H3N2"), "pop",
+    ylab = "Protection"
+  ),
+  "hanam-hi-lr-inf" = plot_pred_inf(han_hi_lr, han_hi_summ)
 )
 
 iwalk(all_plots, save_plot)
