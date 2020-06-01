@@ -274,6 +274,23 @@ rule logistic_boot_summ:
     shell:
         "Rscript fit/fit-logistic-boot-summary.R"
 
+rule sclr_bayesian_summ:
+    input:
+        ".deps-installed",
+        "fit/fit-sclr-bayesian-summary.R",
+        "fit/out-sclr-bayesian/hanam-hi-exp-h1pdm.csv",
+        "fit/out-sclr-bayesian/hanam-hi-exp-h3.csv",
+        "fit/out-sclr-bayesian/hanam-hi-gen-h1pdm.csv",
+        "fit/out-sclr-bayesian/hanam-hi-gen-h3.csv",
+        "fit/out-sclr-bayesian/kiddyvaxmain-bvic.csv",
+        "fit/out-sclr-bayesian/kiddyvaxmain-h1pdm.csv"
+    output:
+        "fit/hanam-hi-preds-sclr-bayesian.csv",
+        "fit/kiddyvaxmain-preds-sclr-bayesian.csv",
+        "fit/hanam-hi-prothis-sclr-bayesian.csv"
+    shell:
+        "Rscript fit/fit-sclr-bayesian-summary.R"
+
 # Data plots ==================================================================
 
 rule preds_plot:
