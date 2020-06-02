@@ -138,11 +138,22 @@ han_hi_summ <- read_data("hanam-hi-summ") %>%
 kv_cox_preds <- read_pred("kiddyvaxmain-preds-cox")
 sophia_preds <- read_pred("sophia-preds-cox")
 han_hi_lr <- read_pred("hanam-hi-preds-lr") %>% recode_viruses()
+han_hi_sclr <- read_pred("hanam-hi-preds-sclr") %>%
+  recode_viruses() %>%
+  rename(
+    prot = prot_point, prot_low = prot_l, prot_high = prot_u, loghi = loghimid
+  )
 kvm_lr <- read_pred("kiddyvaxmain-preds-lr") %>% recode_viruses()
+kvm_sclr <- read_pred("kiddyvaxmain-preds-sclr") %>%
+  recode_viruses() %>%
+  rename(
+    prot = prot_point, prot_low = prot_l, prot_high = prot_u, loghi = loghimid
+  )
 
 all_plots <- list(
   "kiddyvaxmain-cox" = plot_pred(kv_cox_preds),
   "kiddyvaxmain-lr" = plot_pred(kvm_lr, ylab = "Protection"),
+  "kiddyvaxmain-sclr" = plot_pred(kvm_sclr, ylab = "Protection"),
   "kiddyvaxmain-lr-bvic" = plot_pred(
     filter(kvm_lr, virus_lbl == "B Vic"), "none",
     ylab = "Protection"
@@ -166,6 +177,7 @@ all_plots <- list(
     filter(sophia_preds, model == "me")
   ),
   "hanam-hi-lr" = plot_pred(han_hi_lr, "virpop", ylab = "Protection"),
+  "hanam-hi-sclr" = plot_pred(han_hi_sclr, "virpop", ylab = "Protection"),
   "hanam-hi-lr-h3" = plot_pred(
     filter(han_hi_lr, virus == "H3N2"), "pop",
     ylab = "Protection"

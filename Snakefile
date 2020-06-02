@@ -300,7 +300,9 @@ rule preds_plot:
         "fit/kiddyvaxmain-preds-cox.csv",
         "fit/sophia-preds-cox.csv",
         "fit/kiddyvaxmain-preds-lr.csv",
-        "fit/hanam-hi-preds-lr.csv"
+        "fit/hanam-hi-preds-lr.csv",
+        "fit/kiddyvaxmain-preds-sclr.csv",
+        "fit/hanam-hi-preds-sclr.csv"
     output:
         "preds-plot/kiddyvaxmain-cox-bvic.pdf",
         "preds-plot/kiddyvaxmain-cox.pdf",
@@ -308,10 +310,12 @@ rule preds_plot:
         "preds-plot/sophia-cox-fixci.pdf",
         "preds-plot/sophia-cox-fixci-fixmod.pdf",
         "preds-plot/hanam-hi-lr.pdf",
+        "preds-plot/hanam-hi-sclr.pdf",
         "preds-plot/hanam-hi-lr-h3.pdf",
         "preds-plot/hanam-hi-lr-inf.pdf",
         "preds-plot/kiddyvaxmain-lr.pdf",
         "preds-plot/kiddyvaxmain-lr-bvic.pdf",
+        "preds-plot/kiddyvaxmain-sclr.pdf",
         "preds-plot/kiddyvaxmain-lr-inf.pdf"
     shell:
         "Rscript preds-plot/preds-plot.R"
