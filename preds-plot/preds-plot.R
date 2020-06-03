@@ -143,16 +143,55 @@ han_hi_sclr <- read_pred("hanam-hi-preds-sclr") %>%
   rename(
     prot = prot_point, prot_low = prot_l, prot_high = prot_u, loghi = loghimid
   )
+han_hi_lr_boot <- read_pred("hanam-hi-preds-lr-boot") %>%
+  pivot_wider(
+    names_from = "prob_type",
+    values_from = c("prob_lb", "prob_med", "prob_ub")
+  ) %>%
+  rename(
+    fit_low = prob_lb_inf, fit = prob_med_inf, fit_high = prob_ub_inf,
+    prot_low = prob_lb_prot, prot = prob_med_prot, prot_high = prob_ub_prot
+  ) %>%
+  recode_viruses()
 kvm_lr <- read_pred("kiddyvaxmain-preds-lr") %>% recode_viruses()
 kvm_sclr <- read_pred("kiddyvaxmain-preds-sclr") %>%
   recode_viruses() %>%
   rename(
     prot = prot_point, prot_low = prot_l, prot_high = prot_u, loghi = loghimid
   )
-
+kvm_lr_boot <- read_pred("kiddyvaxmain-preds-lr-boot") %>%
+  pivot_wider(
+    names_from = "prob_type",
+    values_from = c("prob_lb", "prob_med", "prob_ub")
+  ) %>%
+  rename(
+    fit_low = prob_lb_inf, fit = prob_med_inf, fit_high = prob_ub_inf,
+    prot_low = prob_lb_prot, prot = prob_med_prot, prot_high = prob_ub_prot
+  ) %>%
+  recode_viruses()
 all_plots <- list(
   "kiddyvaxmain-cox" = plot_pred(kv_cox_preds),
   "kiddyvaxmain-lr" = plot_pred(kvm_lr, ylab = "Protection"),
+  "kiddyvaxmain-lr-boot" = plot_pred(kvm_lr_boot, ylab = "Protection"),
+  "kiddyvaxmain-lr-boot-inf" = plot_pred_inf(
+    kvm_lr_boot, kv_main_summ, "vir",
+    ymax = 0.2
+  ),
+  "kiddyvaxmain-lr-boot-rel" = plot_pred(
+    mutate(
+      kvm_lr_boot,
+      prot = prob_med_prot_rel, prot_low = prob_lb_prot_rel,
+      prot_high = prob_ub_prot_rel
+    )
+  ),
+  "kiddyvaxmain-lr-boot-rel" = plot_pred(
+    mutate(
+      filter(kvm_lr_boot, virus_lbl == "B Vic"),
+      prot = prob_med_prot_rel, prot_low = prob_lb_prot_rel,
+      prot_high = prob_ub_prot_rel
+    ),
+    "none"
+  ),
   "kiddyvaxmain-sclr" = plot_pred(kvm_sclr, ylab = "Protection"),
   "kiddyvaxmain-lr-bvic" = plot_pred(
     filter(kvm_lr, virus_lbl == "B Vic"), "none",
@@ -177,6 +216,24 @@ all_plots <- list(
     filter(sophia_preds, model == "me")
   ),
   "hanam-hi-lr" = plot_pred(han_hi_lr, "virpop", ylab = "Protection"),
+  "hanam-hi-lr-boot" = plot_pred(han_hi_lr_boot, "virpop", ylab = "Protection"),
+  "hanam-hi-lr-boot-inf" = plot_pred_inf(han_hi_lr_boot, han_hi_summ),
+  "hanam-hi-lr-boot-rel" = plot_pred(
+    mutate(
+      han_hi_lr_boot,
+      prot = prob_med_prot_rel, prot_low = prob_lb_prot_rel,
+      prot_high = prob_ub_prot_rel
+    ),
+    "virpop"
+  ),
+  "hanam-hi-lr-boot-rel-h3" = plot_pred(
+    mutate(
+      filter(han_hi_lr_boot, virus_lbl == "H3N2"),
+      prot = prob_med_prot_rel, prot_low = prob_lb_prot_rel,
+      prot_high = prob_ub_prot_rel
+    ),
+    "pop"
+  ),
   "hanam-hi-sclr" = plot_pred(han_hi_sclr, "virpop", ylab = "Protection"),
   "hanam-hi-lr-h3" = plot_pred(
     filter(han_hi_lr, virus == "H3N2"), "pop",
