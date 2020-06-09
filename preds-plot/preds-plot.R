@@ -23,8 +23,12 @@ recode_viruses <- function(dat) {
     mutate(
       virus_lbl = factor(
         virus,
-        levels = c("H1N1pdm", "A H1pdm", "h1pdm", "H3N2", "bvic", "B Vic"),
-        labels = c("H1N1pdm", "H1N1pdm", "H1N1pdm", "H3N2", "B Vic", "B Vic")
+        levels = c(
+          "H1N1pdm", "A H1pdm", "h1pdm", "H3N2", "h3", "bvic", "B Vic"
+        ),
+        labels = c(
+          "H1N1pdm", "H1N1pdm", "H1N1pdm", "H3N2", "H3N2", "B Vic", "B Vic"
+        )
       )
     )
 }
@@ -105,7 +109,7 @@ plot_pred_inf <- function(outsum, data, facets = "virpop",
   } else {
     facets_spec <- list()
   }
-  data <- filter(data, virus %in% unique(outsum$virus))
+  data <- filter(data, virus_lbl %in% unique(outsum$virus_lbl))
   outsum %>%
     ggplot(aes(loghi, fit, ymin = fit_low, ymax = fit_high)) +
     ylab("Infection probability") +
@@ -119,6 +123,25 @@ plot_pred_inf <- function(outsum, data, facets = "virpop",
       data = data, mapping = aes(loghimid, inf_prop, label = ntot),
       inherit.aes = FALSE
     )
+}
+
+widen_preds <- function(preds, ...) {
+  preds %>%
+    pivot_wider(
+      names_from = "prob_type",
+      values_from = c("prob_lb", "prob_med", "prob_ub", ...)
+    ) %>%
+    rename(
+      fit_low = prob_lb_inf, fit = prob_med_inf, fit_high = prob_ub_inf,
+      prot_low = prob_lb_prot, prot = prob_med_prot, prot_high = prob_ub_prot
+    ) %>%
+    recode_viruses()
+}
+
+add_priors <- function(plot) {
+  plot +
+    geom_line(aes(y = prob_lb_prior), lty = "3333", col = "gray50") +
+    geom_line(aes(y = prob_ub_prior), lty = "3333", col = "gray50")
 }
 
 save_plot <- function(pl, name, width = 12, height = 7.5) {
@@ -143,32 +166,28 @@ han_hi_sclr <- read_pred("hanam-hi-preds-sclr") %>%
   rename(
     prot = prot_point, prot_low = prot_l, prot_high = prot_u, loghi = loghimid
   )
-han_hi_lr_boot <- read_pred("hanam-hi-preds-lr-boot") %>%
-  pivot_wider(
-    names_from = "prob_type",
-    values_from = c("prob_lb", "prob_med", "prob_ub")
-  ) %>%
-  rename(
-    fit_low = prob_lb_inf, fit = prob_med_inf, fit_high = prob_ub_inf,
-    prot_low = prob_lb_prot, prot = prob_med_prot, prot_high = prob_ub_prot
-  ) %>%
-  recode_viruses()
+han_hi_lr_boot <- read_pred("hanam-hi-preds-lr-boot") %>% widen_preds()
+han_hi_sclr_bayes <- read_pred("hanam-hi-preds-sclr-bayesian") %>%
+  widen_preds("prob_lb_prior", "prob_ub_prior", "prob_med_prior") %>%
+  mutate(
+    prob_lb_prior = prob_lb_prior_prot, prob_ub_prior = prob_ub_prior_prot,
+    prob_med_prior = prob_med_prior_prot
+  )
+
 kvm_lr <- read_pred("kiddyvaxmain-preds-lr") %>% recode_viruses()
 kvm_sclr <- read_pred("kiddyvaxmain-preds-sclr") %>%
   recode_viruses() %>%
   rename(
     prot = prot_point, prot_low = prot_l, prot_high = prot_u, loghi = loghimid
   )
-kvm_lr_boot <- read_pred("kiddyvaxmain-preds-lr-boot") %>%
-  pivot_wider(
-    names_from = "prob_type",
-    values_from = c("prob_lb", "prob_med", "prob_ub")
-  ) %>%
-  rename(
-    fit_low = prob_lb_inf, fit = prob_med_inf, fit_high = prob_ub_inf,
-    prot_low = prob_lb_prot, prot = prob_med_prot, prot_high = prob_ub_prot
-  ) %>%
-  recode_viruses()
+kvm_lr_boot <- read_pred("kiddyvaxmain-preds-lr-boot") %>% widen_preds()
+kvm_sclr_bayes <- read_pred("kiddyvaxmain-preds-sclr-bayesian") %>%
+  widen_preds("prob_lb_prior", "prob_ub_prior", "prob_med_prior") %>%
+  mutate(
+    prob_lb_prior = prob_lb_prior_prot, prob_ub_prior = prob_ub_prior_prot,
+    prob_med_prior = prob_med_prior_prot
+  )
+
 all_plots <- list(
   "kiddyvaxmain-cox" = plot_pred(kv_cox_preds),
   "kiddyvaxmain-lr" = plot_pred(kvm_lr, ylab = "Protection"),
@@ -193,6 +212,18 @@ all_plots <- list(
     "none"
   ),
   "kiddyvaxmain-sclr" = plot_pred(kvm_sclr, ylab = "Protection"),
+  "kiddyvaxmain-sclr-bayesian" =
+    plot_pred(kvm_sclr_bayes, ylab = "Protection") %>%
+      add_priors(),
+  "kiddyvaxmain-sclr-bayesian-inf" = plot_pred_inf(
+    mutate(
+      kvm_sclr_bayes,
+      prob_lb_prior = prob_lb_prior_inf, prob_ub_prior = prob_ub_prior_inf,
+      prob_med_prior = prob_med_prior_inf
+    ),
+    kv_main_summ, "vir",
+    ymax = 0.2
+  ) %>% add_priors(),
   "kiddyvaxmain-lr-bvic" = plot_pred(
     filter(kvm_lr, virus_lbl == "B Vic"), "none",
     ylab = "Protection"
@@ -235,6 +266,17 @@ all_plots <- list(
     "pop"
   ),
   "hanam-hi-sclr" = plot_pred(han_hi_sclr, "virpop", ylab = "Protection"),
+  "hanam-hi-sclr-bayesian" =
+    plot_pred(han_hi_sclr_bayes, "virpop", ylab = "Protection") %>%
+      add_priors(),
+  "hanam-hi-sclr-bayesian-inf" = plot_pred_inf(
+    mutate(
+      han_hi_sclr_bayes,
+      prob_lb_prior = prob_lb_prior_inf, prob_ub_prior = prob_ub_prior_inf,
+      prob_med_prior = prob_med_prior_inf
+    ),
+    han_hi_summ
+  ) %>% add_priors(),
   "hanam-hi-lr-h3" = plot_pred(
     filter(han_hi_lr, virus == "H3N2"), "pop",
     ylab = "Protection"
