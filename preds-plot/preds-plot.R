@@ -167,6 +167,8 @@ han_hi_sclr <- read_pred("hanam-hi-preds-sclr") %>%
     prot = prot_point, prot_low = prot_l, prot_high = prot_u, loghi = loghimid
   )
 han_hi_lr_boot <- read_pred("hanam-hi-preds-lr-boot") %>% widen_preds()
+han_hi_sclr_boot <- read_pred("hanam-hi-preds-sclr-boot") %>%
+  widen_preds()
 han_hi_sclr_bayes <- read_pred("hanam-hi-preds-sclr-bayesian") %>%
   widen_preds("prob_lb_prior", "prob_ub_prior", "prob_med_prior") %>%
   mutate(
@@ -181,6 +183,8 @@ kvm_sclr <- read_pred("kiddyvaxmain-preds-sclr") %>%
     prot = prot_point, prot_low = prot_l, prot_high = prot_u, loghi = loghimid
   )
 kvm_lr_boot <- read_pred("kiddyvaxmain-preds-lr-boot") %>% widen_preds()
+kvm_sclr_boot <- read_pred("kiddyvaxmain-preds-sclr-boot") %>%
+  widen_preds()
 kvm_sclr_bayes <- read_pred("kiddyvaxmain-preds-sclr-bayesian") %>%
   widen_preds("prob_lb_prior", "prob_ub_prior", "prob_med_prior") %>%
   mutate(
@@ -212,6 +216,14 @@ all_plots <- list(
     "none"
   ),
   "kiddyvaxmain-sclr" = plot_pred(kvm_sclr, ylab = "Protection"),
+  "kiddyvaxmain-sclr-boot" = plot_pred(
+    kvm_sclr_boot,
+    ylab = "Protection"
+  ),
+  "kiddyvaxmain-sclr-boot-inf" = plot_pred_inf(
+    kvm_sclr_boot, kv_main_summ, "vir",
+    ymax = 0.15
+  ),
   "kiddyvaxmain-sclr-bayesian" =
     plot_pred(kvm_sclr_bayes, ylab = "Protection") %>%
       add_priors(),
@@ -266,6 +278,14 @@ all_plots <- list(
     "pop"
   ),
   "hanam-hi-sclr" = plot_pred(han_hi_sclr, "virpop", ylab = "Protection"),
+  "hanam-hi-sclr-boot" = plot_pred(
+    han_hi_sclr_boot, "virpop",
+    ylab = "Protection"
+  ),
+  "hanam-hi-sclr-boot-inf" = plot_pred_inf(
+    han_hi_sclr_boot, han_hi_summ, "virpop",
+    ymax = 0.3
+  ),
   "hanam-hi-sclr-bayesian" =
     plot_pred(han_hi_sclr_bayes, "virpop", ylab = "Protection") %>%
       add_priors(),
