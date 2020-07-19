@@ -207,7 +207,7 @@ all_plots <- list(
       prot_high = prob_ub_prot_rel
     )
   ),
-  "kiddyvaxmain-lr-boot-rel" = plot_pred(
+  "kiddyvaxmain-lr-boot-rel-bvic" = plot_pred(
     mutate(
       filter(kvm_lr_boot, virus_lbl == "B Vic"),
       prot = prob_med_prot_rel, prot_low = prob_lb_prot_rel,
@@ -216,6 +216,10 @@ all_plots <- list(
     "none"
   ),
   "kiddyvaxmain-sclr" = plot_pred(kvm_sclr, ylab = "Protection"),
+  "kiddyvaxmain-sclr-bvic" = plot_pred(
+    filter(kvm_sclr, virus == "bvic"), "none",
+    ylab = "Protection"
+  ),
   "kiddyvaxmain-sclr-boot" = plot_pred(
     kvm_sclr_boot,
     ylab = "Protection"
@@ -278,6 +282,10 @@ all_plots <- list(
     "pop"
   ),
   "hanam-hi-sclr" = plot_pred(han_hi_sclr, "virpop", ylab = "Protection"),
+  "hanam-hi-sclr-h3" = plot_pred(
+    filter(han_hi_sclr, virus == "H3N2"), "pop",
+    ylab = "Protection"
+  ),
   "hanam-hi-sclr-boot" = plot_pred(
     han_hi_sclr_boot, "virpop",
     ylab = "Protection"
